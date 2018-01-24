@@ -8,6 +8,9 @@ import {
 		ADD_AIRCREW_QUALS,
 		DEL_AIRCREW_QUALS,
 		SET_CURRENT_DAY,
+		ADD_DAY,
+		ADD_FLIGHT,
+		DEL_FLIGHT
 	   } from '../actions/index';
 
 const aircrewById = (state = {}, action) => {
@@ -95,8 +98,44 @@ const crewList = (state = {}, action) => {
 	};
 };
 
+const daysById = (state = {}, action) => {
+	switch (action.type) {
+		case ADD_DAY:
+			return {
+				...state,
+				[action.id]: {
+					id: action.id,
+					crewPucked: [],									// by aircrew.<id> as they are added to sorties, used by crewList filters
+					// flow: {
+					// 	numJets: [],
+					// 	method: [],
+					// },
+					// sun: {
+					// 	rise: 0710,
+					// 	set: 2031,
+					// },
+					flights: [],
+					notes: [],
+				}
+			};
+		default:
+			return state;
+	};
+};
+
+const allDays = (state = [], action) => {
+	switch (action.type) {
+		case ADD_DAY:
+			return state.concat(action.id);
+		default:
+			return state;
+	};
+};
+
 export const reducer = combineReducers ({
 	aircrewById,
 	allAircrew,
+	daysById,
+	allDays,
 	crewList,
 });

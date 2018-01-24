@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { reducer } from './reducers/index'
-import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay } from './actions/index'
+import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight } from './actions/index'
 import { INITIAL_STATE } from './reducers/initialstate'
 
 // it('renders without crashing', () => {
@@ -39,8 +39,25 @@ const nextState = {
 	},
 	allAircrew: [1],
 	crewList: {
-		currentDay: '20180109',
+		currentDay: '2018-01-09',
 	},
+	daysById: {
+		'2018-01-24': {
+			id: '2018-01-24',
+			crewPucked: [],									// by aircrew.<id> as they are added to sorties, used by crewList filters
+			// flow: {
+			// 	numJets: [],
+			// 	method: [],
+			// },
+			// sun: {
+			// 	rise: 0710,
+			// 	set: 2031,
+			// },
+			flights: [],
+			notes: [],
+		},
+	},
+	allDays: ['2018-01-24'],
 };
 
 let runningState = reducer(INITIAL_STATE,addAircrew({
@@ -101,7 +118,13 @@ runningState = reducer(runningState,delAircrewQuals(
 // ********************* test set current day
 
 runningState = reducer(runningState,setCurrentDay(
-	'20180109'
+	'2018-01-09'
+));
+
+// ****************** test add day
+
+runningState = reducer(runningState,addDay(
+	'2018-01-24'
 ));
 
 test('add crew reducer', () => {
