@@ -10,7 +10,11 @@ import {
 		SET_CURRENT_DAY,
 		ADD_DAY,
 		ADD_FLIGHT,
-		DEL_FLIGHT
+		DEL_FLIGHT,
+		UPDATE_FLIGHT_TIME,
+		TOGGLE_FLIGHT_TYPE,
+		ADD_UPDATE_NOTE,
+		DEL_NOTE
 	   } from '../actions/index';
 
 const aircrewById = (state = {}, action) => {
@@ -105,7 +109,7 @@ const daysById = (state = {}, action) => {
 				...state,
 				[action.id]: {
 					id: action.id,
-					crewPucked: [],									// by aircrew.<id> as they are added to sorties, used by crewList filters
+					crewPucked: [],
 					// flow: {
 					// 	numJets: [],
 					// 	method: [],
@@ -132,10 +136,106 @@ const allDays = (state = [], action) => {
 	};
 };
 
-export const reducer = combineReducers ({
+const flightsById = (state = {}, action) => {
+	switch (action.type) {
+		case ADD_FLIGHT:
+			return {
+				...state,
+				[action.id]: {
+					id: action.id,
+					sim: action.sim,
+					// flow: "pit",
+					times: {
+						brief: null,
+						takeoff: null,
+						land: null,
+					},
+					airspace: [],
+					sorties: [],
+					notes: [],
+				}
+			};
+		case DEL_FLIGHT:
+			let rest = Object.assign({},state);
+			delete rest[action.id];
+			return rest;
+		case UPDATE_FLIGHT_TIME:
+			return {
+				...state,
+				[action.id]: {
+					...state[action.id],
+					times: {
+						...state[action.id].times,
+						[action.timeType]: action.time,
+					},
+				},
+			};
+		case TOGGLE_FLIGHT_TYPE:
+			return {
+				...state,
+				[action.id]: {
+					...state[action.id],
+					sim: !state[action.id].sim,
+				}
+			};
+		default:
+			return state;
+	};
+};
+
+const allFlights = (state = [], action) => {
+	switch (action.type) {
+		case ADD_FLIGHT:
+			return state.concat(action.id);
+		case DEL_FLIGHT:
+			return state.filter(id => id != action.id)
+		default:
+			return state;
+	};
+};
+
+const notesById = (state = {}, action) => {
+	switch (action.type) {
+		case ADD_UPDATE_NOTE:
+			return {
+				...state,
+				[action.id]: {
+					id: action.id,
+					content: action.content,
+					// keep track of who added, edited, time added etc later
+				},
+			};
+		case DEL_NOTE:
+			let rest = Object.assign({},state);
+			delete rest[action.id];
+			return rest;
+		default:
+			return state;
+	}
+}
+
+const allNotes = (state = [], action) => {
+	switch (action.type) {
+		case ADD_UPDATE_NOTE:
+			if (state.includes(action.id)) {
+				return state;
+			}
+			return state.concat(action.id);
+		case DEL_NOTE:
+			return state.filter(id => id != action.id)
+		default:
+			return state;
+	};
+};
+
+export const whiteboardApp = combineReducers ({
 	aircrewById,
 	allAircrew,
 	daysById,
 	allDays,
+	flightsById,
+	allFlights,
+	notesById,
+	allNotes,
 	crewList,
 });

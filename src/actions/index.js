@@ -10,6 +10,10 @@ export const SET_CURRENT_DAY = "SET_CURRENT_DAY";
 export const ADD_DAY = "ADD_DAY";
 export const ADD_FLIGHT = "ADD_FLIGHT";
 export const DEL_FLIGHT = "DEL_FLIGHT";
+export const UPDATE_FLIGHT_TIME = "UPDATE_FLIGHT_TIME";
+export const TOGGLE_FLIGHT_TYPE = "TOGGLE_FLIGHT_TYPE";
+export const ADD_UPDATE_NOTE = "ADD_UPDATE_NOTE";
+export const DEL_NOTE = "DEL_NOTE";
 
 
 let inputID = 0;
@@ -78,15 +82,48 @@ export const addDay = (day) => {
 	};
 };
 
-export const addFlight = (id, dayId, sim) => {
+export const addFlight = (id, sim=false) => {
 	return {
 		type: ADD_FLIGHT,
 		id,
-		dayId,
 		sim,
 	};
 };
 
-export const delFlight = () => {
-	
+export const delFlight = (id) => {
+	return {
+		type: DEL_FLIGHT,
+		id,
+	};
+};
+
+export const updateFlightTime = (id, timeType, time) => {
+	return {
+		type: UPDATE_FLIGHT_TIME,
+		id,
+		timeType,
+		time,
+	};
+};
+
+export const toggleFlightType = (id) => {
+	return {
+		type: TOGGLE_FLIGHT_TYPE,
+		id,
+	};
+};
+
+export const addUpdateNote = (id, content='') => {
+	return {
+		type: ADD_UPDATE_NOTE,
+		id,
+		content,
+	};
+};
+
+export const delNote = (id) => {
+	return {
+		type: DEL_NOTE,
+		id,
+	};
 };
