@@ -176,7 +176,29 @@ const flightsById = (state = {}, action) => {
 				[action.id]: {
 					...state[action.id],
 					sim: !state[action.id].sim,
-				}
+				},
+			};
+		case ADD_UPDATE_NOTE:
+			if (action.entity != 'flight') {
+				return state;
+			}
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.concat(action.id),
+				},
+			};
+		case DEL_NOTE:
+			if (action.entity != 'flight') {
+				return state;
+			}
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.filter(noteId => noteId != action.id),
+				},
 			};
 		default:
 			return state;

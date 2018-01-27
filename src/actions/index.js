@@ -113,17 +113,24 @@ export const toggleFlightType = (id) => {
 	};
 };
 
-export const addUpdateNote = (id, content='') => {
+export const addUpdateNote = (args) => {
+	if (!args.content) {
+		args.content = '';
+	}
 	return {
 		type: ADD_UPDATE_NOTE,
-		id,
-		content,
+		id: args.id,
+		entity: args.entity,
+		entityId: args.entityId,
+		content: args.content,
 	};
 };
 
-export const delNote = (id) => {
+export const delNote = (args) => {
 	return {
 		type: DEL_NOTE,
-		id,
+		id: args.id,
+		entity: args.entity,
+		entityId: args.entityId,
 	};
 };
