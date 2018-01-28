@@ -14,6 +14,8 @@ export const UPDATE_FLIGHT_TIME = "UPDATE_FLIGHT_TIME";
 export const TOGGLE_FLIGHT_TYPE = "TOGGLE_FLIGHT_TYPE";
 export const ADD_UPDATE_NOTE = "ADD_UPDATE_NOTE";
 export const DEL_NOTE = "DEL_NOTE";
+export const ADD_SORTIE = "ADD_SORTIE";
+export const DEL_SORTIE = "DEL_SORTIE";
 
 
 let inputID = 0;
@@ -82,18 +84,20 @@ export const addDay = (day) => {
 	};
 };
 
-export const addFlight = (id, sim=false) => {
+export const addFlight = (id, dayId, sim=false) => {
 	return {
 		type: ADD_FLIGHT,
 		id,
+		dayId,
 		sim,
 	};
 };
 
-export const delFlight = (id) => {
+export const delFlight = (id, dayId) => {
 	return {
 		type: DEL_FLIGHT,
 		id,
+		dayId,
 	};
 };
 
@@ -134,3 +138,19 @@ export const delNote = (args) => {
 		entityId: args.entityId,
 	};
 };
+
+export const addSortie = (id,flightId) => {
+	return {
+		type: ADD_SORTIE,
+		id,
+		flightId,
+	};
+};
+
+export const delSortie = (id, flightId) => {
+	return {
+		type: DEL_SORTIE,
+		id,
+		flightId,
+	}
+}

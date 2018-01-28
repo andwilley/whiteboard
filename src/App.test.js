@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { whiteboardApp } from './reducers/index'
-import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote } from './actions/index'
+import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie } from './actions/index'
 // import { INITIAL_STATE } from './reducers/initialstate'
 
 // it('renders without crashing', () => {
@@ -25,6 +25,7 @@ const nextState1 = {
 			simPucks: [],
 			snivs: {},
 			odos: 0,
+			notes: [],
 		},
 	},
 	allAircrew: [1],
@@ -35,6 +36,8 @@ const nextState1 = {
 	notesById: {},
 	allNotes: [],
 	crewList: {},
+	sortiesById: {},
+	allSorties: [],
 };
 const nextState335 = {
 	daysById: {
@@ -132,6 +135,7 @@ let nextState2 = {
 			simPucks: [],
 			snivs: {},
 			odos: 0,
+			notes: [],
 		},
 	},
 	allAircrew: nextState1.allAircrew.concat(2),
@@ -277,14 +281,23 @@ test('add day', () => {
 
 let runningState8 = whiteboardApp(runningState7,addFlight(
 	1,
+	'2018-01-24'
 ));
 
 runningState8 = whiteboardApp(runningState8,addFlight(
 	2,
+	'2018-01-24'
 ));
 
 const nextState8 =  {
 	...nextState7,
+	daysById: {
+		...nextState7.daysById,
+		'2018-01-24': {
+			...nextState7.daysById['2018-01-24'],
+			flights: [1,2]
+		},
+	},
 	flightsById: {
 		1: {
 			id: 1,
@@ -325,10 +338,18 @@ test('add flights', () => {
 
 const runningState9 = whiteboardApp(runningState8,delFlight(
 	2,
+	'2018-01-24'
 ));
 
 const nextState9 = {
 	...nextState8,
+	daysById: {
+		...nextState8.daysById,
+		'2018-01-24': {
+			...nextState8.daysById['2018-01-24'],
+			flights: [1],
+		},
+	},
 	'flightsById': {
 		1: {
 			id: 1,
@@ -356,7 +377,7 @@ test('del flights', () => {
 
 const runningState10 = whiteboardApp(runningState9,updateFlightTime(
 	1,
-	'brief',
+	'takeoff',
 	'0900',
 ));
 
@@ -368,8 +389,8 @@ const nextState10 = {
 			sim: false,
 			// flow: "pit",
 			times: {
-				brief: '0900',
-				takeoff: null,
+				brief: null,
+				takeoff: '0900',
 				land: null,
 			},
 			airspace: [],
@@ -393,18 +414,10 @@ const runningState11 = whiteboardApp(runningState10,toggleFlightType(
 const nextState11 = {
 	...nextState10,
 	'flightsById': {
+		...nextState10.flightsById,
 		1: {
-			id: 1,
+			...nextState10.flightsById[1],
 			sim: true,
-			// flow: "pit",
-			times: {
-				brief: '0900',
-				takeoff: null,
-				land: null,
-			},
-			airspace: [],
-			sorties: [],
-			notes: [],
 		},
 	},
 }
@@ -414,7 +427,7 @@ test('toggle flight type', () => {
 	.toEqual(nextState11);
 });
 
-// ******************** test add / del note
+// ******************** test add note
 
 let runningState12 = whiteboardApp(runningState11,addUpdateNote({
 	id: 1,
@@ -460,6 +473,8 @@ test('add flight notes', () => {
 
 let runningState13 = whiteboardApp(runningState12,addUpdateNote({
 	id: 1,
+	entity: 'flight',
+	entityId: 1,
 	content: '0800: test',
 }));
 
@@ -490,4 +505,186 @@ const nextState13 = {
 test('update / del notes', () => {
 	expect(runningState13)
 	.toEqual(nextState13);
+});
+
+// ******************* test add day note
+
+const runningState14 = whiteboardApp(runningState13,addUpdateNote({
+	id: 3,
+	entity: 'day',
+	entityId: '2018-01-24',
+	content: '0900: test test',
+}));
+
+const nextState14 = {
+	...nextState13,
+	'daysById': {
+		...nextState13.daysById,
+		'2018-01-24': {
+			...nextState13.daysById['2018-01-24'],
+			notes: nextState13.daysById['2018-01-24'].notes.concat(3),
+		},
+	},
+	'allNotes': [1,3],
+	'notesById': {
+		...nextState13.notesById,
+		3: {
+			id: 3,
+			content: '0900: test test',
+		}
+	}
+}
+
+test('add day notes', () => {
+	expect(runningState14)
+	.toEqual(nextState14);
+});
+
+// ******************* test update day note
+
+const runningState15 = whiteboardApp(runningState14,addUpdateNote({
+	id: 3,
+	entity: 'day',
+	entityId: '2018-01-24',
+	content: '1000: testing',
+}));
+
+const nextState15 = {
+	...nextState14,
+	'notesById': {
+		...nextState14.notesById,
+		3: {
+			...nextState14.notesById[3],
+			content: '1000: testing',
+		}
+	}
+}
+
+test('update day notes', () => {
+	expect(runningState15)
+	.toEqual(nextState15);
+});
+
+
+// ******************* test del day note
+
+const runningState16 = whiteboardApp(runningState15,delNote({
+	id: 3,
+	entity: 'day',
+	entityId: '2018-01-24',
+}));
+
+// same as nextState13
+
+test('del day notes', () => {
+	expect(runningState16)
+	.toEqual(nextState13);
+});
+
+// ******************* test add sorties
+
+let runningState17 = whiteboardApp(runningState16,addSortie(
+	1,
+	1
+));
+
+runningState17 = whiteboardApp(runningState17,addSortie(
+	2,
+	1
+));
+
+const nextState17 = {
+	...nextState13,
+	'flightsById': {
+		...nextState13.flightsById,
+		1: {
+			...nextState13.flightsById[1],
+			sorties: [1,2],
+		}
+	},
+	'sortiesById': {
+		1: {
+			id: 1,
+			front: {
+				inputName: "",
+				crewId: null,
+				codes: [],
+				symbols: [],
+			},
+			back: {
+				inputName: "",
+				crewId: null,
+				codes: [],
+				symbols: [],
+			},
+			loadout: "",
+			notes: [],
+		},
+		2: {
+			id: 2,
+			front: {
+				inputName: "",
+				crewId: null,
+				codes: [],
+				symbols: [],
+			},
+			back: {
+				inputName: "",
+				crewId: null,
+				codes: [],
+				symbols: [],
+			},
+			loadout: "",
+			notes: [],
+		},
+	},
+	'allSorties': [1,2],
+};
+
+test('add sortie', () => {
+	expect(runningState17)
+	.toEqual(nextState17);
+});
+
+// ******************* test del sorties
+
+const runningState18 = whiteboardApp(runningState17,delSortie(
+	2,
+	1
+));
+
+const nextState18 = {
+	...nextState17,
+		'flightsById': {
+		...nextState17.flightsById,
+		1: {
+			...nextState13.flightsById[1],
+			sorties: [1],
+		}
+	},
+	'sortiesById': {
+		1: {
+			id: 1,
+			front: {
+				inputName: "",
+				crewId: null,
+				codes: [],
+				symbols: [],
+			},
+			back: {
+				inputName: "",
+				crewId: null,
+				codes: [],
+				symbols: [],
+			},
+			loadout: "",
+			notes: [],
+		},
+	},
+	'allSorties': [1],
+};
+
+test('del sortie', () => {
+	expect(runningState18)
+	.toEqual(nextState18);
 });

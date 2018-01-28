@@ -14,7 +14,9 @@ import {
 		UPDATE_FLIGHT_TIME,
 		TOGGLE_FLIGHT_TYPE,
 		ADD_UPDATE_NOTE,
-		DEL_NOTE
+		DEL_NOTE,
+		ADD_SORTIE,
+		DEL_SORTIE
 	   } from '../actions/index';
 
 const aircrewById = (state = {}, action) => {
@@ -33,6 +35,7 @@ const aircrewById = (state = {}, action) => {
 					simPucks: [],
 					odos: 0,
 					snivs: {},
+					notes: [],
 				},
 			};
 		case DEL_AIRCREW:
@@ -54,7 +57,6 @@ const aircrewById = (state = {}, action) => {
 				}
 			};
 		case ADD_AIRCREW_QUALS:
-			// may want to do this check in the action creator... might be impure to reference state here...
 			let quals = state[action.id].quals;
 			let freshQuals = action.quals.filter((qual) => !quals.includes(qual));
 			return {
@@ -73,6 +75,28 @@ const aircrewById = (state = {}, action) => {
 					...state[action.id],
 					quals: newQuals,
 				}
+			};
+		case ADD_UPDATE_NOTE:
+			if (action.entity != 'aircrew' || state[action.entityId].notes.includes(action.id)) {
+				return state;
+			}
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.concat(action.id),
+				},
+			};
+		case DEL_NOTE:
+			if (action.entity != 'aircrew') {
+				return state;
+			}
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.filter(noteId => noteId != action.id),
+				},
 			};
 		default:
 			return state;
@@ -122,6 +146,47 @@ const daysById = (state = {}, action) => {
 					notes: [],
 				}
 			};
+		case ADD_FLIGHT:
+			if (state[action.dayId].flights.includes(action.id)) {
+				return state;
+			}
+			return {
+				...state,
+				[action.dayId]: {
+					...state[action.dayId],
+					flights: state[action.dayId].flights.concat(action.id),
+				},
+			};
+		case DEL_FLIGHT:
+			return {
+				...state,
+				[action.dayId]: {
+					...state[action.dayId],
+					flights: state[action.dayId].flights.filter(flightId => flightId != action.id),
+				}
+			}
+		case ADD_UPDATE_NOTE:
+			if (action.entity != 'day' || state[action.entityId].notes.includes(action.id)) {
+				return state;
+			}
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.concat(action.id),
+				},
+			};
+		case DEL_NOTE:
+			if (action.entity != 'day') {
+				return state;
+			}
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.filter(noteId => noteId != action.id),
+				},
+			};
 		default:
 			return state;
 	};
@@ -160,6 +225,9 @@ const flightsById = (state = {}, action) => {
 			delete rest[action.id];
 			return rest;
 		case UPDATE_FLIGHT_TIME:
+			if (!['brief','takeoff','land'].includes(action.timeType)) {
+				return state;
+			}
 			return {
 				...state,
 				[action.id]: {
@@ -178,10 +246,29 @@ const flightsById = (state = {}, action) => {
 					sim: !state[action.id].sim,
 				},
 			};
-		case ADD_UPDATE_NOTE:
-			if (action.entity != 'flight') {
+		case ADD_SORTIE:
+			if (state[action.flightId].sorties.includes(action.id)) {
 				return state;
 			}
+			return {
+				...state,
+				[action.flightId]: {
+					...state[action.flightId],
+					sorties: state[action.flightId].sorties.concat(action.id),
+				},
+			};
+		case DEL_SORTIE:
+			return {
+				...state,
+				[action.flightId]: {
+					...state[action.flightId],
+					sorties: state[action.flightId].sorties.filter(sortieId => sortieId != action.id),
+				},
+			};
+		case ADD_UPDATE_NOTE:
+			if (action.entity != 'flight' || state[action.entityId].notes.includes(action.id)) {
+				return state;
+			};
 			return {
 				...state,
 				[action.entityId]: {
@@ -247,7 +334,54 @@ const allNotes = (state = [], action) => {
 			return state.filter(id => id != action.id)
 		default:
 			return state;
-	};
+	}
+};
+
+const sortiesById = (state = {}, action) => {
+	switch (action.type) {
+		case ADD_SORTIE:
+			return {
+				...state,
+				[action.id]: {
+					id: action.id,
+					front: {
+						inputName: "",
+						crewId: null,
+						codes: [],
+						symbols: [],
+					},
+					back: {
+						inputName: "",
+						crewId: null,
+						codes: [],
+						symbols: [],
+					},
+					loadout: "",
+					notes: [],
+				},
+			};
+		case DEL_SORTIE:
+			let rest = Object.assign({},state);
+			delete rest[action.id];
+			return rest;
+		case ADD_UPDATE_NOTE:
+		case DEL_NOTE:
+		default:
+			return state;
+	}
+};
+
+const allSorties = (state = [], action) => {
+	switch (action.type) {
+		case ADD_SORTIE:
+			return state.concat(action.id);
+		case DEL_SORTIE:
+			return state.filter(sortieId => sortieId != action.id);
+		case ADD_UPDATE_NOTE:
+		case DEL_NOTE:
+		default:
+			return state;
+	}
 };
 
 export const whiteboardApp = combineReducers ({
@@ -259,5 +393,7 @@ export const whiteboardApp = combineReducers ({
 	allFlights,
 	notesById,
 	allNotes,
+	sortiesById,
+	allSorties,
 	crewList,
 });
