@@ -196,7 +196,7 @@ test('update crew steam', () => {
 
 let runningState5 = whiteboardApp(runningState4,addAircrewQuals(
 	1,
-	["FAI","SL","DL"]
+	["FAI","SL","DL","MC","MC"]
 ));
 
 runningState5 = whiteboardApp(runningState5,delAircrewQuals(
@@ -206,7 +206,7 @@ runningState5 = whiteboardApp(runningState5,delAircrewQuals(
 
 runningState5 = whiteboardApp(runningState5,delAircrewQuals(
 	1,
-	["DL"]
+	["DL","MC"]
 ));
 
 let nextState5 = {
@@ -427,7 +427,7 @@ test('toggle flight type', () => {
 	.toEqual(nextState11);
 });
 
-// ******************** test add note
+// ******************** test add flight note
 
 let runningState12 = whiteboardApp(runningState11,addUpdateNote({
 	id: 1,

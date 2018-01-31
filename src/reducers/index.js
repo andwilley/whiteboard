@@ -58,7 +58,7 @@ const aircrewById = (state = {}, action) => {
 			};
 		case ADD_AIRCREW_QUALS:
 			let quals = state[action.id].quals;
-			let freshQuals = action.quals.filter((qual) => !quals.includes(qual));
+			let freshQuals = action.quals.filter((qual) => quals.indexOf(qual) == -1);
 			return {
 				...state,
 				[action.id]: {
@@ -68,7 +68,7 @@ const aircrewById = (state = {}, action) => {
 			};
 		case DEL_AIRCREW_QUALS:
 			let oldQuals = state[action.id].quals;
-			let newQuals = oldQuals.filter((qual) => !action.quals.includes(qual));
+			let newQuals = oldQuals.filter((qual) => action.quals.indexOf(qual) == -1);
 			return {
 				...state,
 				[action.id]: {
@@ -77,7 +77,7 @@ const aircrewById = (state = {}, action) => {
 				}
 			};
 		case ADD_UPDATE_NOTE:
-			if (action.entity != 'aircrew' || state[action.entityId].notes.includes(action.id)) {
+			if (action.entity != 'aircrew' || state[action.entityId].notes.indexOf(action.id) > -1) {
 				return state;
 			}
 			return {
@@ -147,7 +147,7 @@ const daysById = (state = {}, action) => {
 				}
 			};
 		case ADD_FLIGHT:
-			if (state[action.dayId].flights.includes(action.id)) {
+			if (state[action.dayId].flights.indexOf(action.id) > -1) {
 				return state;
 			}
 			return {
@@ -166,7 +166,7 @@ const daysById = (state = {}, action) => {
 				}
 			}
 		case ADD_UPDATE_NOTE:
-			if (action.entity != 'day' || state[action.entityId].notes.includes(action.id)) {
+			if (action.entity != 'day' || state[action.entityId].notes.indexOf(action.id) > -1) {
 				return state;
 			}
 			return {
@@ -225,7 +225,7 @@ const flightsById = (state = {}, action) => {
 			delete rest[action.id];
 			return rest;
 		case UPDATE_FLIGHT_TIME:
-			if (!['brief','takeoff','land'].includes(action.timeType)) {
+			if (['brief','takeoff','land'].indexOf(action.timeType) == -1) {
 				return state;
 			}
 			return {
@@ -247,7 +247,7 @@ const flightsById = (state = {}, action) => {
 				},
 			};
 		case ADD_SORTIE:
-			if (state[action.flightId].sorties.includes(action.id)) {
+			if (state[action.flightId].sorties.indexOf(action.id) > -1) {
 				return state;
 			}
 			return {
@@ -266,7 +266,7 @@ const flightsById = (state = {}, action) => {
 				},
 			};
 		case ADD_UPDATE_NOTE:
-			if (action.entity != 'flight' || state[action.entityId].notes.includes(action.id)) {
+			if (action.entity != 'flight' || state[action.entityId].notes.indexOf(action.id) > -1) {
 				return state;
 			};
 			return {
@@ -295,6 +295,9 @@ const flightsById = (state = {}, action) => {
 const allFlights = (state = [], action) => {
 	switch (action.type) {
 		case ADD_FLIGHT:
+			if (state.indexOf(action.id) > -1) {
+				return state;
+			}
 			return state.concat(action.id);
 		case DEL_FLIGHT:
 			return state.filter(id => id != action.id)
@@ -326,7 +329,7 @@ const notesById = (state = {}, action) => {
 const allNotes = (state = [], action) => {
 	switch (action.type) {
 		case ADD_UPDATE_NOTE:
-			if (state.includes(action.id)) {
+			if (state.indexOf(action.id) > -1) {
 				return state;
 			}
 			return state.concat(action.id);
