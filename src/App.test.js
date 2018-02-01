@@ -507,17 +507,45 @@ test('update / del notes', () => {
 	.toEqual(nextState13);
 });
 
-// ******************* test add day note
+// ******************* test add day, aircrew, flight note
 
-const runningState14 = whiteboardApp(runningState13,addUpdateNote({
+let runningState14 = whiteboardApp(runningState13,addUpdateNote({
 	id: 3,
 	entity: 'day',
 	entityId: '2018-01-24',
 	content: '0900: test test',
 }));
 
+runningState14 = whiteboardApp(runningState14,addUpdateNote({
+	id: 4,
+	entity: 'aircrew',
+	entityId: '1',
+	content: 'test aircrew note',
+}));
+
+runningState14 = whiteboardApp(runningState14,addUpdateNote({
+	id: 5,
+	entity: 'flight',
+	entityId: '1',
+	content: 'test flight note',
+}));
+
 const nextState14 = {
 	...nextState13,
+	'aircrewById': {
+		...nextState13.aircrewById,
+		[1]: {
+			...nextState13.aircrewById[1],
+			notes: [4],
+		},
+	},
+	'flightsById': {
+		...nextState13.flightsById,
+		[1]: {
+			...nextState13.flightsById[1],
+			notes: nextState13.flightsById[1].notes.concat([5]),
+		},
+	},
 	'daysById': {
 		...nextState13.daysById,
 		'2018-01-24': {
@@ -525,13 +553,21 @@ const nextState14 = {
 			notes: nextState13.daysById['2018-01-24'].notes.concat(3),
 		},
 	},
-	'allNotes': [1,3],
+	'allNotes': [1,3,4,5],
 	'notesById': {
 		...nextState13.notesById,
 		3: {
 			id: 3,
 			content: '0900: test test',
-		}
+		},
+		4: {
+			id: 4,
+			content: 'test aircrew note',
+		},
+		5: {
+			id: 5,
+			content: 'test flight note',
+		},
 	}
 }
 
@@ -574,11 +610,27 @@ const runningState16 = whiteboardApp(runningState15,delNote({
 	entityId: '2018-01-24',
 }));
 
-// same as nextState13
+
+const newNotes = Object.assign({}, nextState15.notesById);
+delete newNotes[3];
+const nextState16 = {
+	...nextState15,
+	'notesById': {
+		...newNotes
+	},
+	'allNotes': nextState15.allNotes.filter(noteId => noteId != 3),
+	'daysById': {
+		...nextState15.daysById,
+		'2018-01-24': {
+			...nextState15.daysById['2018-01-24'],
+			notes: nextState15.daysById['2018-01-24'].notes.filter(noteId => noteId != 3)
+		}
+	}
+}
 
 test('del day notes', () => {
 	expect(runningState16)
-	.toEqual(nextState13);
+	.toEqual(nextState16);
 });
 
 // ******************* test add sorties
@@ -594,11 +646,11 @@ runningState17 = whiteboardApp(runningState17,addSortie(
 ));
 
 const nextState17 = {
-	...nextState13,
+	...nextState16,
 	'flightsById': {
-		...nextState13.flightsById,
+		...nextState16.flightsById,
 		1: {
-			...nextState13.flightsById[1],
+			...nextState16.flightsById[1],
 			sorties: [1,2],
 		}
 	},
@@ -655,10 +707,10 @@ const runningState18 = whiteboardApp(runningState17,delSortie(
 
 const nextState18 = {
 	...nextState17,
-		'flightsById': {
+	'flightsById': {
 		...nextState17.flightsById,
 		1: {
-			...nextState13.flightsById[1],
+			...nextState17.flightsById[1],
 			sorties: [1],
 		}
 	},
