@@ -811,7 +811,7 @@ runningState20 = whiteboardApp(runningState20,updatePuckCode({
 runningState20 = whiteboardApp(runningState20,updatePuckSymbol({
 	sortieId: 1,
 	crewPosition: 'front',
-	symbols: '# $%, @',
+	symbols: '# $%, @,ten=my++*',
 }));
 
 const nextState20 = {
@@ -824,7 +824,7 @@ const nextState20 = {
 				inputName: 'steam',
 				crewId: null,
 				codes: ["2305","2402","6301"],
-				symbols: ['#','$','%','@'],
+				symbols: ['#','$','%','@','=','+','*'],
 			},
 		},
 	},

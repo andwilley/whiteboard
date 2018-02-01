@@ -171,7 +171,7 @@ export const updatePuckName = (args) => {
 // del?
 export const updatePuckCode = (args) => {
 	// parse codes input to create array of codes. delimiter is anything other than numbers.
-	const codes = args.codes.split(/[^0-9+]+/);
+	const codes = args.codes.split(/[^\d+]+/);
 	return {
 		type: UPDATE_PUCK_CODE,
 		sortieId: args.sortieId,
@@ -184,7 +184,7 @@ export const updatePuckCode = (args) => {
 // del?
 export const updatePuckSymbol = (args) => {
 	// parse symbols input to get array of symbols. strip all white space and go 1 char at a time into the array
-	let symbols = args.symbols.replace(/[^@#$%\*]/,"");
+	let symbols = args.symbols.replace(/[^@#\$%\*\+=+]+/g,"");
 	console.log(symbols);
 	symbols = symbols.split('');
 	return {
