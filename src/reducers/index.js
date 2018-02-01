@@ -16,7 +16,10 @@ import {
 		ADD_UPDATE_NOTE,
 		DEL_NOTE,
 		ADD_SORTIE,
-		DEL_SORTIE
+		DEL_SORTIE,
+		UPDATE_PUCK_NAME,
+		UPDATE_PUCK_CODE,
+		UPDATE_PUCK_SYMBOL
 	   } from '../actions/index';
 
 const aircrewById = (state = {}, action) => {
@@ -368,7 +371,67 @@ const sortiesById = (state = {}, action) => {
 			delete rest[action.id];
 			return rest;
 		case ADD_UPDATE_NOTE:
+			if (action.entity != 'sortie' || state[action.entityId].notes.indexOf(action.id) > -1) {
+				return state;
+			};
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.concat(action.id),
+				},
+			};
 		case DEL_NOTE:
+			if (action.entity != 'sortie') {
+				return state;
+			}
+			return {
+				...state,
+				[action.entityId]: {
+					...state[action.entityId],
+					notes: state[action.entityId].notes.filter(noteId => noteId != action.id),
+				},
+			};
+		case UPDATE_PUCK_NAME:
+			// match name to list of crew
+			// if its a match, set crewId to aircrew id
+			// if not:
+			const crewId = null;
+			return {
+				...state,
+				[action.sortieId]: {
+					...state[action.sortieId],
+					[action.crewPosition]: {
+						...state[action.sortieId][action.crewPosition],
+						inputName: action.name,
+						crewId, //						TODO ***
+					},
+				},
+			};
+		case UPDATE_PUCK_CODE:
+			// check if code already present
+			return {
+				...state,
+				[action.sortieId]: {
+					...state[action.sortieId],
+					[action.crewPosition]: {
+						...state[action.sortieId][action.crewPosition],
+						codes: action.codes,
+					},
+				},
+			};
+		case UPDATE_PUCK_SYMBOL:
+			// check if symbol aready present
+			return {
+				...state,
+				[action.sortieId]: {
+					...state[action.sortieId],
+					[action.crewPosition]: {
+						...state[action.sortieId][action.crewPosition],
+						symbols: action.symbols,
+					},
+				},
+			};
 		default:
 			return state;
 	}

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { whiteboardApp } from './reducers/index'
-import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie } from './actions/index'
+import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol } from './actions/index'
 // import { INITIAL_STATE } from './reducers/initialstate'
 
 // it('renders without crashing', () => {
@@ -739,4 +739,98 @@ const nextState18 = {
 test('del sortie', () => {
 	expect(runningState18)
 	.toEqual(nextState18);
+});
+
+// ************************ test add del sortie notes
+
+let runningState19 = whiteboardApp(runningState18,addUpdateNote({
+	id: 6,
+	entity: 'sortie',
+	entityId: '1',
+	content: 'test sortie note',
+}));
+
+runningState19 = whiteboardApp(runningState19,addUpdateNote({
+	id: 7,
+	entity: 'sortie',
+	entityId: '1',
+	content: 'another test sortie note',
+}));
+
+runningState19 = whiteboardApp(runningState19,addUpdateNote({
+	id: 6,
+	entity: 'sortie',
+	entityId: '1',
+	content: 'changed note text',
+}));
+
+runningState19 = whiteboardApp(runningState19,delNote({
+	id: 7,
+	entity: 'sortie',
+	entityId: '1',
+}));
+
+const nextState19 = {
+	...nextState18,
+	'sortiesById': {
+		...nextState18.sortiesById,
+		1: {
+			...nextState18.sortiesById[1],
+			notes: nextState18.sortiesById[1].notes.concat([6]),
+		},
+	},
+	'allNotes': nextState18.allNotes.concat([6]),
+	'notesById': {
+		...nextState18.notesById,
+		6: {
+			id: 6,
+			content: 'changed note text',
+		},
+	}
+}
+
+test('add del sortie note', () => {
+	expect(runningState19)
+	.toEqual(nextState19);
+});
+
+// *********************** test update puck name/code/symbol
+
+let runningState20 = whiteboardApp(runningState19,updatePuckName({
+	sortieId: 1,
+	crewPosition: 'front',
+	name: 'steam',
+}));
+
+runningState20 = whiteboardApp(runningState20,updatePuckCode({
+	sortieId: 1,
+	crewPosition: 'front',
+	codes: '2305,2402, hjk6301',
+}));
+
+runningState20 = whiteboardApp(runningState20,updatePuckSymbol({
+	sortieId: 1,
+	crewPosition: 'front',
+	symbols: '# $%, @',
+}));
+
+const nextState20 = {
+	...nextState19,
+	"sortiesById": {
+		...nextState19.sortiesById,
+		1: {
+			...nextState19.sortiesById[1],
+			front: {
+				inputName: 'steam',
+				crewId: null,
+				codes: ["2305","2402","6301"],
+				symbols: ['#','$','%','@'],
+			},
+		},
+	},
+};
+
+test('update puck info', () => {
+	expect(runningState20)
+	.toEqual(nextState20);
 });

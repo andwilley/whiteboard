@@ -16,6 +16,9 @@ export const ADD_UPDATE_NOTE = "ADD_UPDATE_NOTE";
 export const DEL_NOTE = "DEL_NOTE";
 export const ADD_SORTIE = "ADD_SORTIE";
 export const DEL_SORTIE = "DEL_SORTIE";
+export const UPDATE_PUCK_NAME = "UPDATE_PUCK_NAME";
+export const UPDATE_PUCK_CODE = "UPDATE_PUCK_CODE";
+export const UPDATE_PUCK_SYMBOL = "UPDATE_PUCK_SYMBOL";
 
 
 let inputID = 0;
@@ -130,7 +133,7 @@ export const addUpdateNote = (args) => {
 	};
 };
 
-export const delNote = (args) => {
+export const delNote = (args) => { // maybe the note could store the entity and entityId so we don't have to specify in the args
 	return {
 		type: DEL_NOTE,
 		id: args.id,
@@ -147,10 +150,47 @@ export const addSortie = (id,flightId) => {
 	};
 };
 
-export const delSortie = (id, flightId) => {
+export const delSortie = (id, flightId) => { // maybe the sortie could store the flight its associated with se we don't have to specify the flight
 	return {
 		type: DEL_SORTIE,
 		id,
 		flightId,
+	}
+}
+
+export const updatePuckName = (args) => {
+	return {
+		type: UPDATE_PUCK_NAME,
+		sortieId: args.sortieId,
+		crewPosition: args.crewPosition,
+		name: args.name,
+	}
+}
+
+
+// del?
+export const updatePuckCode = (args) => {
+	// parse codes input to create array of codes. delimiter is anything other than numbers.
+	const codes = args.codes.split(/[^0-9+]+/);
+	return {
+		type: UPDATE_PUCK_CODE,
+		sortieId: args.sortieId,
+		crewPosition: args.crewPosition,
+		codes,
+	}
+}
+
+
+// del?
+export const updatePuckSymbol = (args) => {
+	// parse symbols input to get array of symbols. strip all white space and go 1 char at a time into the array
+	let symbols = args.symbols.replace(/[^@#$%\*]/,"");
+	console.log(symbols);
+	symbols = symbols.split('');
+	return {
+		type: UPDATE_PUCK_SYMBOL,
+		sortieId: args.sortieId,
+		crewPosition: args.crewPosition,
+		symbols,
 	}
 }
