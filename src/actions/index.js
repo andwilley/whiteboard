@@ -185,7 +185,6 @@ export const updatePuckCode = (args) => {
 export const updatePuckSymbol = (args) => {
 	// parse symbols input to get array of symbols. strip all white space and go 1 char at a time into the array
 	let symbols = args.symbols.replace(/[^@#\$%\*\+=+]+/g,"");
-	console.log(symbols);
 	symbols = symbols.split('');
 	return {
 		type: UPDATE_PUCK_SYMBOL,
