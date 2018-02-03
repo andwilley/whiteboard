@@ -805,13 +805,13 @@ let runningState20 = whiteboardApp(runningState19,updatePuckName({
 runningState20 = whiteboardApp(runningState20,updatePuckCode({
 	sortieId: 1,
 	crewPosition: 'front',
-	codes: '2305,2402, hjk6301',
+	codes: 'r 2305,2402, hjk6301 6301,6301  rams',
 }));
 
 runningState20 = whiteboardApp(runningState20,updatePuckSymbol({
 	sortieId: 1,
 	crewPosition: 'front',
-	symbols: '# $%, @,ten=my++*',
+	symbols: 'r # $%, @,ten=my++*',
 }));
 
 const nextState20 = {

@@ -167,11 +167,38 @@ export const updatePuckName = (args) => {
 	}
 }
 
-
-// del?
 export const updatePuckCode = (args) => {
-	// parse codes input to create array of codes. delimiter is anything other than numbers.
-	const codes = args.codes.split(/[^\d+]+/);
+	// strip non-numeric chars from front and back of input
+	let newCodes = codes => {
+		let codesStartIndex, codesEndIndex;
+		const lenCodes = codes.length;
+		for (let i = 0; i < lenCodes; i++) {
+			if (codes[i].match(/\d/)) {
+				codesStartIndex = i;
+				break;
+			}
+		}
+		for (let lenCodes = codes.length, i = lenCodes - 1; i > 0; i--) {
+			if (codes[i].match(/\d/)) {
+				codesEndIndex = i+1;
+				break;
+			}
+		}
+		codes = codes.slice(codesStartIndex,codesEndIndex);
+		return codes;
+	};
+	let codes = newCodes(args.codes);
+	// make it an array
+	codes = codes.split(/[^\d]+/);
+	// get rid of duplicates or empty strings
+	let codeCount = {};
+	codes = codes.filter(code => {
+		if (codeCount[code] || code == "") {
+			return false;
+		}
+		codeCount[code] = code;
+		return true;
+	});
 	return {
 		type: UPDATE_PUCK_CODE,
 		sortieId: args.sortieId,
@@ -180,12 +207,21 @@ export const updatePuckCode = (args) => {
 	}
 }
 
-
-// del?
 export const updatePuckSymbol = (args) => {
-	// parse symbols input to get array of symbols. strip all white space and go 1 char at a time into the array
-	let symbols = args.symbols.replace(/[^@#\$%\*\+=+]+/g,"");
+	// strip all non-symbols
+	let symbols = args.symbols.replace(/[^@!\?~#\$%\*\+=+]+/g,"");
+	// make it an array
 	symbols = symbols.split('');
+	let symbolCount = {}
+	// get rid of duplicates and empty strings
+	// this is inefficient. can do it all in one step. this array will never be longer than 10 items, though.
+	symbols = symbols.filter(symbol => {
+		if (symbolCount[symbol] || symbol == "") {
+			return false;
+		}
+		symbolCount[symbol] = symbol;
+		return true;
+	});
 	return {
 		type: UPDATE_PUCK_SYMBOL,
 		sortieId: args.sortieId,
