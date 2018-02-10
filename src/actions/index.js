@@ -19,6 +19,9 @@ export const DEL_SORTIE = "DEL_SORTIE";
 export const UPDATE_PUCK_NAME = "UPDATE_PUCK_NAME";
 export const UPDATE_PUCK_CODE = "UPDATE_PUCK_CODE";
 export const UPDATE_PUCK_SYMBOL = "UPDATE_PUCK_SYMBOL";
+export const ADD_AIRSPACE = "ADD_AIRSPACE";
+export const DEL_AIRSPACE = "DEL_AIRSPACE";
+export const UPDATE_AIRSPACE = "UPDATE_AIRSPACE";
 
 
 let inputID = 0;
@@ -113,14 +116,14 @@ export const updateFlightTime = (id, timeType, time) => {
 	};
 };
 
-export const toggleFlightType = (id) => {
+export const toggleFlightType = id => {
 	return {
 		type: TOGGLE_FLIGHT_TYPE,
 		id,
 	};
 };
 
-export const addUpdateNote = (args) => {
+export const addUpdateNote = args => {
 	if (!args.content) {
 		args.content = '';
 	}
@@ -133,7 +136,7 @@ export const addUpdateNote = (args) => {
 	};
 };
 
-export const delNote = (args) => { // maybe the note could store the entity and entityId so we don't have to specify in the args
+export const delNote = args => { // maybe the note could store the entity and entityId so we don't have to specify in the args
 	return {
 		type: DEL_NOTE,
 		id: args.id,
@@ -158,7 +161,7 @@ export const delSortie = (id, flightId) => { // maybe the sortie could store the
 	}
 }
 
-export const updatePuckName = (args) => {
+export const updatePuckName = args => {
 	return {
 		type: UPDATE_PUCK_NAME,
 		sortieId: args.sortieId,
@@ -167,7 +170,7 @@ export const updatePuckName = (args) => {
 	}
 }
 
-export const updatePuckCode = (args) => {
+export const updatePuckCode = args => {
 	// strip non-numeric chars from front and back of input
 	let newCodes = codes => {
 		let codesStartIndex, codesEndIndex;
@@ -207,7 +210,7 @@ export const updatePuckCode = (args) => {
 	}
 }
 
-export const updatePuckSymbol = (args) => {
+export const updatePuckSymbol = args => {
 	// strip all non-symbols
 	let symbols = args.symbols.replace(/[^@!\?~#\$%\*\+=+]+/g,"");
 	// make it an array
@@ -227,5 +230,29 @@ export const updatePuckSymbol = (args) => {
 		sortieId: args.sortieId,
 		crewPosition: args.crewPosition,
 		symbols,
+	}
+}
+
+export const addAirspace = id => {
+	return {
+		type: ADD_AIRSPACE,
+		id,
+	}
+};
+
+export const delAirspace = id => {
+	return {
+		type: DEL_AIRSPACE,
+		id,
+	}
+};
+
+export const updateAirspace = args => {
+	return {
+		type: UPDATE_AIRSPACE,
+		id: args.id,
+		name: args.name,
+		start: args.start,
+		end: args.end,
 	}
 }

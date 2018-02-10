@@ -19,7 +19,10 @@ import {
 		DEL_SORTIE,
 		UPDATE_PUCK_NAME,
 		UPDATE_PUCK_CODE,
-		UPDATE_PUCK_SYMBOL
+		UPDATE_PUCK_SYMBOL,
+		ADD_AIRSPACE,
+		DEL_AIRSPACE,
+		UPDATE_AIRSPACE,
 	   } from '../actions/index';
 
 const aircrewById = (state = {}, action) => {
@@ -449,6 +452,45 @@ const allSorties = (state = [], action) => {
 			return state;
 	}
 };
+
+const airspaceById = (state = {}, action) => {
+	// add these cases to sortiesById as well
+	switch (action.type) {
+		case ADD_AIRSPACE:
+			return {
+				
+			};
+		case DEL_AIRSPACE:
+			return {
+				
+			};
+		case UPDATE_AIRSPACE:
+			return {
+				
+			};
+		default:
+			return state;
+	}
+}
+
+const allAirspace = (state= [], action) => {
+	switch (action.type) {
+		case ADD_AIRSPACE:
+			return {
+				
+			};
+		case DEL_AIRSPACE:
+			return {
+				
+			};
+		case UPDATE_AIRSPACE:
+			return {
+				
+			};
+		default:
+			return state;
+	}
+}
 
 export const whiteboardApp = combineReducers ({
 	aircrewById,

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { whiteboardApp } from './reducers/index'
-import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol } from './actions/index'
+import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol, addAirspace, delAirspace, updateAirspace } from './actions/index'
 // import { INITIAL_STATE } from './reducers/initialstate'
 
 // it('renders without crashing', () => {
