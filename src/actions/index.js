@@ -230,29 +230,29 @@ export const updatePuckSymbol = args => {
 		sortieId: args.sortieId,
 		crewPosition: args.crewPosition,
 		symbols,
-	}
-}
+	};
+};
 
 export const addAirspace = id => {
 	return {
 		type: ADD_AIRSPACE,
 		id,
-	}
+	};
 };
 
 export const delAirspace = id => {
 	return {
 		type: DEL_AIRSPACE,
 		id,
-	}
+	};
 };
 
 export const updateAirspace = args => {
 	return {
 		type: UPDATE_AIRSPACE,
 		id: args.id,
-		name: args.name,
-		start: args.start,
-		end: args.end,
-	}
-}
+		field: args.field,
+		input: args.input,
+		
+	};
+};

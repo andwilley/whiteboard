@@ -458,22 +458,35 @@ const airspaceById = (state = {}, action) => {
 	switch (action.type) {
 		case ADD_AIRSPACE:
 			return {
-				
+				...state,
+				[action.id]: {
+					id: action.id,
+					name: action.name,
+					start: action.start,
+					end: action.end,
+				},
 			};
 		case DEL_AIRSPACE:
 			return {
-				
+				let rest = Object.assign({},state);
+				delete rest[action.id];
+				return rest;
 			};
 		case UPDATE_AIRSPACE:
+			// handle this input better
 			return {
-				
+				...state,
+				[action.id]: {
+					...state[action.id],
+					[action.field]: action.input,
+				},
 			};
 		default:
 			return state;
 	}
 }
 
-const allAirspace = (state= [], action) => {
+const allAirspace = (state = [], action) => {
 	switch (action.type) {
 		case ADD_AIRSPACE:
 			return {
@@ -504,4 +517,6 @@ export const whiteboardApp = combineReducers ({
 	sortiesById,
 	allSorties,
 	crewList,
+	airspaceById,
+	allAirspace
 });
