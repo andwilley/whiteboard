@@ -38,6 +38,8 @@ const nextState1 = {
 	crewList: {},
 	sortiesById: {},
 	allSorties: [],
+	airspaceById: {},
+	allAirspace: [],
 };
 const nextState335 = {
 	daysById: {

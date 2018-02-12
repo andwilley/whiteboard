@@ -467,11 +467,9 @@ const airspaceById = (state = {}, action) => {
 				},
 			};
 		case DEL_AIRSPACE:
-			return {
-				let rest = Object.assign({},state);
-				delete rest[action.id];
-				return rest;
-			};
+			let rest = Object.assign({},state);
+			delete rest[action.id];
+			return rest;
 		case UPDATE_AIRSPACE:
 			// handle this input better
 			return {
