@@ -93,8 +93,8 @@ airspaceById: {
 	1: {
 		id: 1,
 		name: "W-137/8/9 A/B/C",
-		start: 0800,
-		end: 0930,
+		start: "0800",
+		end: "0930",
 	},
 	//2: {...}
 },
@@ -325,7 +325,7 @@ setCurrentDay // done
 		day: 20180109,
 	}
 
-addSniv
+addSniv // later
 	{
 		type: "ADD_SNIV",
 		day: 20190109,
@@ -335,7 +335,7 @@ addSniv
 		content: "dental",
 	}
 
-updateSniv
+updateSniv  // later
 	{
 		type: "UPDATE_SNIV",
 		day: 20190109,
@@ -345,7 +345,7 @@ updateSniv
 		content: "dental",
 	}
 	
-delSniv
+delSniv  // later
 	{
 		type: "DEL_SNIV",
 		id: 1,
@@ -418,9 +418,25 @@ updateFlightFlow // later
 		flow: "turn",
 	}
 
-addAirspace
-delAirspace
-updateAirspace
+addAirspace // done
+	{
+		type: "ADD_AIRSPACE",
+		id: 1,
+		flightId: 1,
+	}
+delAirspace // done
+	{
+		type: "DEL_AIRSPACE",
+		id: 1,
+		flightId: 1,
+	}
+updateAirspace // done
+	{
+		type: "UPDATE_AIRSPACE",
+		id: 1,
+		field: "name",
+		input: "W-137"
+	}
 
 addSortie // done
 	{
@@ -462,7 +478,7 @@ updatePuckSymbols // done
 
 updateLoadout
 	{
-		tyoe: "UPDATE_LOADOUT",
+		type: "UPDATE_LOADOUT",
 		sortieId: 1,
 		loadout: "H200L",
 	}

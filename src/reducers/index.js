@@ -106,7 +106,7 @@ const aircrewById = (state = {}, action) => {
 			};
 		default:
 			return state;
-	};
+	}
 };
 
 const allAircrew = (state = [], action) => {
@@ -117,7 +117,7 @@ const allAircrew = (state = [], action) => {
 			return state.filter(item => item != action.id);
 		default:
 			return state;
-	};
+	}
 };
 
 const crewList = (state = {}, action) => {
@@ -129,7 +129,7 @@ const crewList = (state = {}, action) => {
 			};
 		default:
 			return state;
-	};
+	}
 };
 
 const daysById = (state = {}, action) => {
@@ -195,7 +195,7 @@ const daysById = (state = {}, action) => {
 			};
 		default:
 			return state;
-	};
+	}
 };
 
 const allDays = (state = [], action) => {
@@ -204,7 +204,7 @@ const allDays = (state = [], action) => {
 			return state.concat(action.id);
 		default:
 			return state;
-	};
+	}
 };
 
 const flightsById = (state = {}, action) => {
@@ -293,9 +293,28 @@ const flightsById = (state = {}, action) => {
 					notes: state[action.entityId].notes.filter(noteId => noteId != action.id),
 				},
 			};
+		case ADD_AIRSPACE:
+			if (state[action.flightId].airspace.indexOf(action.id) > -1) {
+				return state;
+			};
+			return {
+				...state,
+				[action.flightId]: {
+					...state[action.flightId],
+					airspace: state[action.flightId].airspace.concat(action.id),
+				},
+			};
+		case DEL_AIRSPACE:
+			return {
+				...state,
+				[action.flightId]: {
+					...state[action.flightId],
+					airspace: state[action.flightId].airspace.filter(airspaceId => airspaceId != action.id),
+				},
+			};
 		default:
 			return state;
-	};
+	}
 };
 
 const allFlights = (state = [], action) => {
@@ -309,7 +328,7 @@ const allFlights = (state = [], action) => {
 			return state.filter(id => id != action.id)
 		default:
 			return state;
-	};
+	}
 };
 
 const notesById = (state = {}, action) => {
@@ -446,8 +465,6 @@ const allSorties = (state = [], action) => {
 			return state.concat(action.id);
 		case DEL_SORTIE:
 			return state.filter(sortieId => sortieId != action.id);
-		case ADD_UPDATE_NOTE:
-		case DEL_NOTE:
 		default:
 			return state;
 	}
@@ -461,9 +478,9 @@ const airspaceById = (state = {}, action) => {
 				...state,
 				[action.id]: {
 					id: action.id,
-					name: action.name,
-					start: action.start,
-					end: action.end,
+					name: "",
+					start: "",
+					end: "",
 				},
 			};
 		case DEL_AIRSPACE:
@@ -471,7 +488,7 @@ const airspaceById = (state = {}, action) => {
 			delete rest[action.id];
 			return rest;
 		case UPDATE_AIRSPACE:
-			// handle this input better
+			// handle this input better?
 			return {
 				...state,
 				[action.id]: {
@@ -482,26 +499,18 @@ const airspaceById = (state = {}, action) => {
 		default:
 			return state;
 	}
-}
+};
 
 const allAirspace = (state = [], action) => {
 	switch (action.type) {
 		case ADD_AIRSPACE:
-			return {
-				
-			};
+			return state.concat(action.id);
 		case DEL_AIRSPACE:
-			return {
-				
-			};
-		case UPDATE_AIRSPACE:
-			return {
-				
-			};
+			return state.filter(sortieId => sortieId != action.id);
 		default:
 			return state;
 	}
-}
+};
 
 export const whiteboardApp = combineReducers ({
 	aircrewById,

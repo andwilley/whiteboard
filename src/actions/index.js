@@ -233,17 +233,19 @@ export const updatePuckSymbol = args => {
 	};
 };
 
-export const addAirspace = id => {
+export const addAirspace = (id, flightId) => {
 	return {
 		type: ADD_AIRSPACE,
 		id,
+		flightId,
 	};
 };
 
-export const delAirspace = id => {
+export const delAirspace = (id, flightId) => {
 	return {
 		type: DEL_AIRSPACE,
 		id,
+		flightId,
 	};
 };
 
@@ -253,6 +255,5 @@ export const updateAirspace = args => {
 		id: args.id,
 		field: args.field,
 		input: args.input,
-		
 	};
 };

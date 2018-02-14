@@ -107,7 +107,7 @@ const runningState1 = whiteboardApp({},addAircrew({
 ));
 
 test('add crew steam', () => {
-	expect(runningState1)
+	expect(runningState1) /* global expect */
 	.toEqual(nextState1);
 });
 
@@ -835,4 +835,63 @@ const nextState20 = {
 test('update puck info', () => {
 	expect(runningState20)
 	.toEqual(nextState20);
+});
+
+
+// test add / del airspace
+
+let runningState21 = whiteboardApp(runningState20,addAirspace(1, 1));
+runningState21 = whiteboardApp(runningState21,addAirspace(2, 1));
+runningState21 = whiteboardApp(runningState21,delAirspace(2, 1));
+
+const nextState21 = {
+	...nextState20,
+	"airspaceById": {
+		...nextState20.airspaceById,
+		1: {
+			id: 1,
+			name: "",
+			start: "",
+			end: "",
+		},
+	},
+	"allAirspace": nextState20.allAirspace.concat(1),
+	"flightsById": {
+		...nextState20.flightsById,
+		1: {
+			...nextState20.flightsById[1],
+			"airspace": nextState20.flightsById[1].airspace.concat(1),
+		},
+	},
+};
+
+test('add del airspace', () => {
+	expect(runningState21)
+	.toEqual(nextState21);
+});
+
+// test update airspace
+
+let runningState22 = whiteboardApp(runningState21,updateAirspace({
+	id: 1,
+	field: "start",
+	input: "0800",
+}));
+
+const nextState22 = {
+	...nextState21,
+	"airspaceById": {
+		...nextState20.airspaceById,
+		1: {
+			id: 1,
+			name: "",
+			start: "0800",
+			end: "",
+		},
+	},
+};
+
+test('update airspace', () => {
+	expect(runningState22)
+	.toEqual(nextState22);
 });
