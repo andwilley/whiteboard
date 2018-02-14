@@ -22,6 +22,7 @@ export const UPDATE_PUCK_SYMBOL = "UPDATE_PUCK_SYMBOL";
 export const ADD_AIRSPACE = "ADD_AIRSPACE";
 export const DEL_AIRSPACE = "DEL_AIRSPACE";
 export const UPDATE_AIRSPACE = "UPDATE_AIRSPACE";
+export const UPDATE_LOADOUT = "UPDATE_LOADOUT";
 
 
 let inputID = 0;
@@ -257,3 +258,11 @@ export const updateAirspace = args => {
 		input: args.input,
 	};
 };
+
+export const updateLoadout = (sortieId, input) => {
+	return {
+		type: UPDATE_LOADOUT,
+		sortieId,
+		input,
+	}
+}

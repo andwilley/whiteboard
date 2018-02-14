@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { whiteboardApp } from './reducers/index'
-import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol, addAirspace, delAirspace, updateAirspace } from './actions/index'
+import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol, addAirspace, delAirspace, updateAirspace, updateLoadout } from './actions/index'
 // import { INITIAL_STATE } from './reducers/initialstate'
 
 // it('renders without crashing', () => {
@@ -881,7 +881,7 @@ let runningState22 = whiteboardApp(runningState21,updateAirspace({
 const nextState22 = {
 	...nextState21,
 	"airspaceById": {
-		...nextState20.airspaceById,
+		...nextState21.airspaceById,
 		1: {
 			id: 1,
 			name: "",
@@ -894,4 +894,24 @@ const nextState22 = {
 test('update airspace', () => {
 	expect(runningState22)
 	.toEqual(nextState22);
+});
+
+// test update loadout
+
+let runningState23 = whiteboardApp(runningState22,updateLoadout(1, "H200L"));
+
+const nextState23 = {
+	...nextState22,
+	"sortiesById": {
+		...nextState22.sortiesById,
+		1: {
+			...nextState22.sortiesById[1],
+			loadout: "H200L",
+		},
+	},
+};
+
+test('update loadout', () => {
+	expect(runningState23)
+	.toEqual(nextState23);
 });

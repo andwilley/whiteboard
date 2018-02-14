@@ -23,6 +23,7 @@ import {
 		ADD_AIRSPACE,
 		DEL_AIRSPACE,
 		UPDATE_AIRSPACE,
+		UPDATE_LOADOUT,
 	   } from '../actions/index';
 
 const aircrewById = (state = {}, action) => {
@@ -431,7 +432,6 @@ const sortiesById = (state = {}, action) => {
 				},
 			};
 		case UPDATE_PUCK_CODE:
-			// check if code already present
 			return {
 				...state,
 				[action.sortieId]: {
@@ -443,7 +443,6 @@ const sortiesById = (state = {}, action) => {
 				},
 			};
 		case UPDATE_PUCK_SYMBOL:
-			// check if symbol aready present
 			return {
 				...state,
 				[action.sortieId]: {
@@ -452,6 +451,14 @@ const sortiesById = (state = {}, action) => {
 						...state[action.sortieId][action.crewPosition],
 						symbols: action.symbols,
 					},
+				},
+			};
+		case UPDATE_LOADOUT:
+			return {
+				...state,
+				[action.sortieId]: {
+					...state[action.sortieId],
+					loadout: action.input,
 				},
 			};
 		default:
