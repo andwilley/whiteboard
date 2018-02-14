@@ -898,7 +898,7 @@ test('update airspace', () => {
 
 // test update loadout
 
-let runningState23 = whiteboardApp(runningState22,updateLoadout(1, "H200L"));
+const runningState23 = whiteboardApp(runningState22,updateLoadout(1, "H200L"));
 
 const nextState23 = {
 	...nextState22,
@@ -915,3 +915,4 @@ test('update loadout', () => {
 	expect(runningState23)
 	.toEqual(nextState23);
 });
+

@@ -1,3 +1,5 @@
+import { store } from "redux"
+
 // Action Types
 
 export const ADD_AIRCREW = "ADD_AIRCREW";
@@ -24,12 +26,22 @@ export const DEL_AIRSPACE = "DEL_AIRSPACE";
 export const UPDATE_AIRSPACE = "UPDATE_AIRSPACE";
 export const UPDATE_LOADOUT = "UPDATE_LOADOUT";
 
+const genUniqueId = entity => {
+	let result = '';
+	const idLength = 3;
+	const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+	for (var i = idLength; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    // if (store.getState()[entity].hasOwnProperty(result)) {
+    // 	return genUniqueId(entity);
+    // }
+    return result;
+};
 
-let inputID = 0;
 export const addAircrew = (args) => {
+	const id = genUniqueId("aircrewById");
 	return {
 		type: ADD_AIRCREW,
-		id: args.id,
+		id,
 		rank: args.rank,
 		first: args.first,
 		last: args.last,
@@ -38,7 +50,7 @@ export const addAircrew = (args) => {
 	};
 };
 
-export const delAircrew = (id) => {
+export const delAircrew = id => {
 	return {
 		type: DEL_AIRCREW,
 		id,
