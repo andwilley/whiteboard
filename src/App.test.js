@@ -41,61 +41,6 @@ const nextState1 = {
 	airspaceById: {},
 	allAirspace: [],
 };
-const nextState335 = {
-	daysById: {
-		'2018-01-24': {
-			id: '2018-01-24',
-			crewPucked: [],									// by aircrew.<id> as they are added to sorties, used by crewList filters
-			// flow: {
-			// 	numJets: [],
-			// 	method: [],
-			// },
-			// sun: {
-			// 	rise: 0710,
-			// 	set: 2031,
-			// },
-			flights: [],
-			notes: [],
-		},
-	},
-	allDays: ['2018-01-24'],
-	flightsById: {
-		1: {
-			id: 1,
-			sim: true,
-			// flow: "pit",
-			times: {
-				brief: '0900',
-				takeoff: null,
-				land: null,
-			},
-			airspace: [],
-			sorties: [],
-			notes: [1],
-		},
-		// 2: {
-		// 	id: 2,
-		// 	sim: false,
-		// 	// flow: "pit",
-		// 	times: {
-		// 		brief: null,
-		// 		takeoff: null,
-		// 		land: null,
-		// 	},
-		// 	airspace: [],
-		// 	sorties: [],
-		// 	notes: [],
-		// },
-	},
-	allFlights: [1],
-	notesById: {
-		1: {
-			id: 1,
-			content: '0800: test',
-		},
-	},
-	allNotes: [1],
-};
 
 const runningState1 = whiteboardApp({},addAircrew({
 		callsign: 'Steamboat',
