@@ -1,0 +1,468 @@
+//*****************************************************************************
+//
+//				Better (Flat) State
+//
+//*****************************************************************************
+{
+aircrewById: {
+	1: {
+		id: 1,
+		rank: 3,
+		first: "Drew",
+		last: "Willey",
+		callsign: "Steamboat",
+		quals: ["SL","DL","FAI"],
+		flightPucks: [20190101, 20180102, 20180109],	// sorted array of dates. to get total, use the length of this array.
+		simPucks: [20190101, 20180102, 20180109],		// these can technically be calculated from the state... but this is easier.
+		odos: 10,
+		snivs: [1,2,3],
+		notes: [],
+	},
+	//2: {...},
+},
+allAircrew: [1,2],
+snivsById: {
+	1: {
+		id: 1,
+		day: 1,
+		crew: 1,
+		start: 1200,
+		end: 1400,
+		content: "dental",
+	},
+	//2: {...},
+},
+allSnivs: [1,2],
+daysById: {
+	20180109: {
+		id: 20180809,
+		crewPucked: [1,2],									// by aircrew.<id> as they are added to sorties, used by crewList filters
+		flow: {
+			numJets: [2,2,2],
+			method: ["pit","pit","turn"],
+		},
+		sun: {
+			rise: 0710,
+			set: 2031,
+		},
+		flights: [2,3,4],
+		notes: [3,2,6],
+	},
+	//20180110: {...},
+}
+allDays: [1,2],
+flightsById: {
+	1: {
+		id: 1,
+		sim: false,									// for now this just changes the color of the lines
+		flow: "pit",
+		times: {
+			brief: 0600,
+			takeoff: 0800,
+			land: 0930,
+		},
+		airspace: [5,6,7],							// array of airspace indexes, put the index in the component so it can call it if it has to update
+		sorties: [2,3],
+		notes: [1,2,3],
+	},
+	//2: {...},
+}
+allFlights: [1,2],
+sortiesById: {
+	1: {
+		id: 1,
+		front: {
+			inputName: "in the list",
+			crewID: 1,					// app found state.sortiesById.id.front.inputName in the crewList state.
+			codes: [3702,3703,6103],
+			symbols: ["#","@"],
+		},
+		back: {
+			inputName: "not in the list",
+			crewID: null,				// app has not found ..back.inputName in the state, it just lives as a string in ..back.inputName
+			codes: [3702,3703],
+			symbols: ["+"],
+		},
+		loadout: "H200L",
+		notes: [8,9],
+	},
+	//2: {...},
+}
+allSorties: [1,2],
+airspaceById: {
+	1: {
+		id: 1,
+		name: "W-137/8/9 A/B/C",
+		start: 0800,
+		end: 0930,
+	},
+	//2: {...}
+},
+allAirspace: [2,5,8],
+notesById: {
+	1: {
+		id: 1,
+		content: "provided by MACS 2",
+	},
+	//2: {...},
+},
+allNotes: [1,2,3,],
+crewList: {
+	currentDay: 20180109,									// days.<id> of day with focus (used to update puck colors)
+	crewSearchInput: "",
+	qualfilter: [],
+	rankfilter: [],
+	usedPucks: [1,3,2],										// list of aircrew on the board for that day. can be calculated from state...
+},
+settings {
+	display: {
+		panes: 1,											// default should be 2 as soon as I can figure it out
+		baseDay: 20180109,									// determines which day is furthest left in the view, distict from currentDay for the crewList
+		hideNames: false,									// true will hide the left side pucks column
+		crewCountDate: null,								// setting a date resets the count (pucks and ODOs etc) to start from that day
+	},
+},
+}
+
+//*****************************************************************************
+//
+//				State
+//
+//*****************************************************************************
+
+{
+crewList: {
+	-currentDay: 20180109,									// days.<id> of day with focus (used to update puck colors)
+	-crewSearchInput: "",
+	-qualfilter: [],
+	-rankfilter: [],
+	-usedPucks: [1,3,2],										// list of aircrew on the board for that day. can be calculated from state...
+	aircrew: {
+		1: {
+			id: 1,
+			rank: 3,
+			first: "Drew",
+			last: "Willey",
+			callsign: "Steamboat",
+			quals: ["SL","DL","FAI"],
+			flightPucks: [20190101, 20180102, 20180109],	// sorted array of dates. to get total, use the length of this array.
+			simPucks: [20190101, 20180102, 20180109],		// these can technically be calculated from the state... but this is easier.
+			odos: 10,
+			snivs: {
+				20180109: {
+					id: 20180109,
+					data: {
+						1: {
+							id: 1,
+							start: 1200,
+							end: 1400,
+							content: "dental",
+						},
+						//2: {...},
+					},
+				},
+				//20180110: {...}
+			},
+		},
+		//2: {...},
+	},
+},
+days: {
+	20180109: {
+		id: 20180809,
+		crewPucked: [1,2],									// by crewList.aircrew.<id> as they are added to sorties, used by crewSearch
+		flow: {
+			numJets: [2,2,2],
+			method: ["pit","pit","turn"]
+		}
+		sun: {
+			rise: 0710,
+			set: 2031,
+		},
+		flights: {
+			1: {
+				id: 1,
+				sim: false,									// for now this just changes the color of the lines
+				flow: "pit",
+				times: {
+					brief: 0600,
+					takeoff: 0800,
+					land: 0930,
+				},
+				airspace: [									// array of airspace objects, put the index in the component so it can call it if it has to update
+					{
+						name: "W-137/8/9 A/B/C",
+						start: 0800,
+						end: 0930,
+					},
+					//{...}
+				],
+				sorties: {
+					1: {
+						id: 1,
+						front: {
+							name: "in the list",
+							crewID: 1,					// app found state.days.id.flights.id.sorties.id.front.name in the crewList state.
+							codes: [3702,3703,6103],
+							symbols: ["#","@"],
+						},
+						back: {
+							name: "not in the list",
+							crewID: null,				// app has not found ..back.name in the state, it just lives as a string in ..back.name
+							codes: [3702,3703],
+							symbols: ["+"],
+						},
+						loadout: "H200L",
+						notes: {
+							1: {
+								id: 1,
+								content: "this is a note",
+							},
+							//2: {...},
+						},
+					},
+					//2: {...},
+				},
+				notes: {
+					1: {
+						id: 1,
+						prefix: "AIC",
+						content: "provided by MACS 2",
+					},
+					//2: {...},
+				},
+			},
+			//2: {...},
+		},
+		notes: {
+			1: {
+				id: 1,
+				content: "0800: all hands AOM",
+			},
+			//2: {...},
+		},
+	},
+	//20180110: {...},
+},
+settings: {
+	display: {
+		panes: 1,											// default should be 2 as soon as I can figure it out
+		baseDay: 20180109,									// determines which day is furthest left in the view, distict from currentDay for the crewList
+		hideNames: false,									// true will hide the left side pucks column
+		crewCountDate: null,								// setting a date resets the count (pucks and ODOs etc) to start from that day
+	}
+},
+}
+
+// ****************************************************************************
+//
+//				Actions
+//
+//*****************************************************************************
+
+// crew list section specific
+
+addAirrew // done
+	{
+		type: "ADDCHANGECREW",
+		id: 1,
+		rank: 3,
+		first: "Drew",
+		last: "Willey",
+		callsign: "Steamboat",
+		quals: ["SL","DL","FAI"],
+	}
+	
+updateAircrew // done
+	{
+		type: "UPDATE_AIRCREW",
+		id: 1,
+		rank: 3,
+		first: "Drew",
+		last: "Willey",
+		callsign: "Steamboat",
+	}
+	
+delAirew // done
+	{
+		type: "DEL_AIRCREW",
+		id: 2,
+	}
+
+crewSearch
+	{
+		// later
+	}
+
+addAircrewQuals // done
+	{
+		type: "ADD_AIRCREW_QUALS",
+		id: 1,
+		quals: ["DL", "SL"],
+	}
+
+delAircrewQuals // done
+	{
+		type: "DEL_AIRCREW_QUALS",
+		id: 1,
+		quals: ["DL", "SL"],
+	}
+
+setQualFilter
+	{
+		type: "setQualFilter",
+		filter: ["WTI","DL"],
+	}
+
+setRankFilter
+	{
+		// later
+	}
+
+setCurrentDay // done
+	{
+		type: "setCurrentDay",
+		day: 20180109,
+	}
+
+addSniv
+	{
+		type: "ADD_SNIV",
+		day: 20190109,
+		dataID: 1,
+		start: 1200,
+		end: 1400,
+		content: "dental",
+	}
+
+updateSniv
+	{
+		type: "UPDATE_SNIV",
+		day: 20190109,
+		dataID: 1,
+		start: 1200,
+		end: 1400,
+		content: "dental",
+	}
+	
+delSniv
+	{
+		type: "DEL_SNIV",
+		id: 1,
+	}
+
+// flights section specific
+
+addDay // done (except for sunrise/set)
+	{
+		type: "ADD_DAY",
+		id: '20180111',
+	}
+	
+updateFlow // later
+	{
+		type: "UPDATE_DAY",
+		id: '2018-01-24',
+		flow: '2p2p2',
+	}
+
+addUpdateNote // done
+	{
+		type: "ADD_NOTE",
+		id: 1,
+		entity: 'flight',
+		entityId: 2,
+		content: "0800: example note.",
+	}
+
+delNote // done
+	{
+		type: "DEL_NOTE",
+		id: 1,
+		entity: 'flight',
+		entityId: 2,
+	}
+
+addFlight // done
+	{
+		type: "ADD_FLIGHT",
+		id: 2,
+		dayId: '2018-01-24',
+		sim: false,
+	}
+
+delFlight // done
+	{
+		type: "DEL_FLIGHT",
+		id: 2,
+	}
+
+toggleFlightType // done
+	{
+		type: "TOGGLE_FLIGHT_TYPE",
+		id: 2,
+	}
+
+updateFlightTime // done
+	{
+		type: "UPDATE_FLIGHT_TIME",
+		timeType: "brief",
+		time: 0900,
+		flight: 1,
+		day: 20180109,
+	}
+
+updateFlightFlow // later
+	{
+		type: "UPDATE_FLIGHT_FLOW",
+		flow: "turn",
+	}
+
+addAirspace
+delAirspace
+updateAirspace
+
+addSortie // done
+	{
+		type: "ADD_SORTIE",
+		id: 1,
+		flightId: 2,
+	}
+	
+delSortie // done
+	{
+		type: "DEL_SORTIE",
+		id: 1,
+		flightId: 2,
+	}
+	
+updatePuckName // done
+	{
+		type: "UPDATE_PUCK_NAME",
+		sortieId: 1,
+		crewPosition: "front",
+		name: "steam",
+	}
+	
+updatePuckCode // done
+	{
+		type: "UPDATE_PUCK_CODE",
+		sortieId: 1,
+		crewPosition: "front",
+		code: "2403",
+	}
+	
+updatePuckSymbols // done
+	{
+		type: "UPDATE_PUCK_SYMBOL",
+		sortieId: 1,
+		crewPosition: "front",
+		symbols: "@#",
+	}
+
+updateLoadout
+	{
+		tyoe: "UPDATE_LOADOUT",
+		sortieId: 1,
+		loadout: "H200L",
+	}
