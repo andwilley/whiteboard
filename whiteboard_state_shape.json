@@ -504,7 +504,7 @@ App
 				Qual
 		CrewList
 			Aircrew
-			AddButton
+			AddButton(aircrew)
 		FilterBox
 			Filter
 	Day

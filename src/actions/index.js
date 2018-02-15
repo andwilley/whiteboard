@@ -36,18 +36,18 @@ export const UPDATE_LOADOUT = "UPDATE_LOADOUT";
 //     }
 //     return result;
 // };
-let aircrewId = 0;			// for testing
+// let aircrewId = 0;			// for testing
 export const addAircrew = (args) => {
-	// const aircrewId = cuid(); uncomment after testing
-	aircrewId++;			// for testing
+	const aircrewId = cuid(); // uncomment after testing
+	// aircrewId++;			// for testing
 	return {
 		type: ADD_AIRCREW,
 		id: aircrewId,
-		rank: args.rank,
-		first: args.first,
-		last: args.last,
+		rank: args.rank ? args.rank : "",
+		first: args.first ? args.first : "",
+		last: args.last ? args.last: "",
 		callsign: args.callsign,
-		quals: args.quals,
+		quals: args.quals ? args.quals : [],
 	};
 };
 
@@ -301,5 +301,5 @@ export const updateLoadout = (sortieId, input) => {
 		type: UPDATE_LOADOUT,
 		sortieId,
 		input,
-	}
-}
+	};
+};
