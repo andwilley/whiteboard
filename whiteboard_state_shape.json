@@ -482,3 +482,59 @@ updateLoadout  // done
 		sortieId: 1,
 		loadout: "H200L",
 	}
+	
+// ****************************************************************************
+//
+//				Component Heirarchy
+//
+//*****************************************************************************
+
+App
+	Header
+		Logo
+		UtilBox
+			Search
+			ProfileButton
+			HelpButton
+			SettingsButton
+	CrewlistBox
+		SearchBox
+			Search
+			QualBox
+				Qual
+		CrewList
+			Aircrew
+			AddButton
+		FilterBox
+			Filter
+	Day
+		FlightBox
+			Flight
+				TimesBox
+					FlightTimesBox
+						Brief
+						Takeoff
+						Land
+					AirspaceBox
+						AirspaceName
+						Start
+						End
+					AddButton(airspace)
+				SortieBox
+					Sortie
+						CodeBox
+							Codes
+							Loadout
+						CrewBox
+							Crew
+							Crew
+						Symbol
+					AddButton(sortie)
+				FlightNoteBox
+					Note
+					AddButton(flightNote)
+			AddButton(flight)
+		DayNoteBox
+			NoteList
+				Note
+				AddButton(dayNote)

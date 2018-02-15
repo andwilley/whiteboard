@@ -1,21 +1,11 @@
 import React, { Component } from 'react';
+import CrewListBox from './CrewListBox';
 import '../style/App.css';
 
-class App extends Component {
-	constructor(props) {
-		super(props);
-	}
-	
-	sum(x,y) {
-		return x+y;
-	}
-	
-	render() {
-		return (
-			<div className="myApp">
-			</div>
-		);
-	}
-}
+const App = () => (
+	<div>
+		<CrewListBox />
+	</div>
+);
 
 export default App;
