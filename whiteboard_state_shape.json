@@ -476,7 +476,7 @@ updatePuckSymbols // done
 		symbols: "@#",
 	}
 
-updateLoadout
+updateLoadout  // done
 	{
 		type: "UPDATE_LOADOUT",
 		sortieId: 1,

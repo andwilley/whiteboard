@@ -44,7 +44,6 @@ const nextState1 = {
 
 const runningState1 = whiteboardApp({},addAircrew({
 		callsign: 'Steamboat',
-		id: 1,
 		rank: 3,
 		first: "Drew",
 		last: "Willey",
@@ -60,7 +59,6 @@ test('add crew steam', () => {
 		
 let runningState2 = whiteboardApp(runningState1,addAircrew({
 	callsign: 'Jambo',
-	id: 2,
 	rank: 3,
 	first: "Alex",
 	last: "Blank",
@@ -97,7 +95,6 @@ test('add crew jambo', () => {
 
 let runningState3 = whiteboardApp(runningState2,addAircrew({
 		callsign: 'Dump',
-		id: 3,
 		rank: 3,
 		first: "Mark",
 		last: "Infante",
@@ -227,12 +224,10 @@ test('add day', () => {
 // *********************** test add flight
 
 let runningState8 = whiteboardApp(runningState7,addFlight(
-	1,
 	'2018-01-24'
 ));
 
 runningState8 = whiteboardApp(runningState8,addFlight(
-	2,
 	'2018-01-24'
 ));
 
@@ -242,7 +237,7 @@ const nextState8 =  {
 		...nextState7.daysById,
 		'2018-01-24': {
 			...nextState7.daysById['2018-01-24'],
-			flights: [1,2]
+			flights: [1,2],
 		},
 	},
 	flightsById: {
@@ -251,9 +246,9 @@ const nextState8 =  {
 			sim: false,
 			// flow: "pit",
 			times: {
-				brief: null,
-				takeoff: null,
-				land: null,
+				brief: "",
+				takeoff: "",
+				land: "",
 			},
 			airspace: [],
 			sorties: [],
@@ -264,9 +259,9 @@ const nextState8 =  {
 			sim: false,
 			// flow: "pit",
 			times: {
-				brief: null,
-				takeoff: null,
-				land: null,
+				brief: "",
+				takeoff: "",
+				land: "",
 			},
 			airspace: [],
 			sorties: [],
@@ -303,9 +298,9 @@ const nextState9 = {
 			sim: false,
 			// flow: "pit",
 			times: {
-				brief: null,
-				takeoff: null,
-				land: null,
+				brief: "",
+				takeoff: "",
+				land: "",
 			},
 			airspace: [],
 			sorties: [],
@@ -336,9 +331,9 @@ const nextState10 = {
 			sim: false,
 			// flow: "pit",
 			times: {
-				brief: null,
+				brief: "",
 				takeoff: '0900',
-				land: null,
+				land: "",
 			},
 			airspace: [],
 			sorties: [],
@@ -377,13 +372,11 @@ test('toggle flight type', () => {
 // ******************** test add flight note
 
 let runningState12 = whiteboardApp(runningState11,addUpdateNote({
-	id: 1,
 	entity: 'flight',
 	entityId: '1',
 }));
 
 runningState12 = whiteboardApp(runningState12,addUpdateNote({
-	id: 2,
 	entity: 'flight',
 	entityId: '1',
 	content: 'nothing',
@@ -457,21 +450,18 @@ test('update / del notes', () => {
 // ******************* test add day, aircrew, flight note
 
 let runningState14 = whiteboardApp(runningState13,addUpdateNote({
-	id: 3,
 	entity: 'day',
 	entityId: '2018-01-24',
 	content: '0900: test test',
 }));
 
 runningState14 = whiteboardApp(runningState14,addUpdateNote({
-	id: 4,
 	entity: 'aircrew',
 	entityId: '1',
 	content: 'test aircrew note',
 }));
 
 runningState14 = whiteboardApp(runningState14,addUpdateNote({
-	id: 5,
 	entity: 'flight',
 	entityId: '1',
 	content: 'test flight note',
@@ -518,7 +508,7 @@ const nextState14 = {
 	}
 }
 
-test('add day notes', () => {
+test('add day aircrew and flight notes', () => {
 	expect(runningState14)
 	.toEqual(nextState14);
 });
@@ -583,12 +573,10 @@ test('del day notes', () => {
 // ******************* test add sorties
 
 let runningState17 = whiteboardApp(runningState16,addSortie(
-	1,
 	1
 ));
 
 runningState17 = whiteboardApp(runningState17,addSortie(
-	2,
 	1
 ));
 
@@ -785,8 +773,8 @@ test('update puck info', () => {
 
 // test add / del airspace
 
-let runningState21 = whiteboardApp(runningState20,addAirspace(1, 1));
-runningState21 = whiteboardApp(runningState21,addAirspace(2, 1));
+let runningState21 = whiteboardApp(runningState20,addAirspace(1));
+runningState21 = whiteboardApp(runningState21,addAirspace(1));
 runningState21 = whiteboardApp(runningState21,delAirspace(2, 1));
 
 const nextState21 = {
@@ -860,4 +848,3 @@ test('update loadout', () => {
 	expect(runningState23)
 	.toEqual(nextState23);
 });
-

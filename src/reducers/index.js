@@ -52,7 +52,7 @@ const aircrewById = (state = {}, action) => {
 			//let { [action.id]: delcrew, ...rest } = state;
 			return rest;
 		case UPDATE_AIRCREW:
-			const { rank, first, last, callsign } = state[action.id]
+			const { rank, first, last, callsign } = state[action.id];
 			return {
 				...state,
 				[action.id]: {
@@ -218,9 +218,9 @@ const flightsById = (state = {}, action) => {
 					sim: action.sim,
 					// flow: "pit",
 					times: {
-						brief: null,
-						takeoff: null,
-						land: null,
+						brief: "",
+						takeoff: "",
+						land: "",
 					},
 					airspace: [],
 					sorties: [],

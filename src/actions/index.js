@@ -1,4 +1,4 @@
-import { store } from "redux"
+import cuid from "cuid";
 
 // Action Types
 
@@ -26,22 +26,23 @@ export const DEL_AIRSPACE = "DEL_AIRSPACE";
 export const UPDATE_AIRSPACE = "UPDATE_AIRSPACE";
 export const UPDATE_LOADOUT = "UPDATE_LOADOUT";
 
-const genUniqueId = entity => {
-	let result = '';
-	const idLength = 3;
-	const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-	for (var i = idLength; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
-    // if (store.getState()[entity].hasOwnProperty(result)) {
-    // 	return genUniqueId(entity);
-    // }
-    return result;
-};
-
+// const genUniqueId = entity => {
+// 	let result = '';
+// 	const idLength = 4;
+// 	const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+// 	for (var i = idLength; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+//     if (store.getState()[entity].hasOwnProperty(result)) {
+//     	return genUniqueId(entity);
+//     }
+//     return result;
+// };
+let aircrewId = 0;			// for testing
 export const addAircrew = (args) => {
-	const id = genUniqueId("aircrewById");
+	// const aircrewId = cuid(); uncomment after testing
+	aircrewId++;			// for testing
 	return {
 		type: ADD_AIRCREW,
-		id,
+		id: aircrewId,
 		rank: args.rank,
 		first: args.first,
 		last: args.last,
@@ -91,7 +92,7 @@ export const setCurrentDay = (day) => {
 	};
 };
 
-export const addDay = (day) => {
+export const addDay = day => {
 	day = new Date(day);
 	return {
 		type: ADD_DAY,
@@ -103,10 +104,13 @@ export const addDay = (day) => {
 	};
 };
 
-export const addFlight = (id, dayId, sim=false) => {
+let flightId = 0;		// for testing
+export const addFlight = (dayId, sim=false) => {
+	// flightId = cuid();
+	flightId++;			// for testing
 	return {
 		type: ADD_FLIGHT,
-		id,
+		id: flightId,
 		dayId,
 		sim,
 	};
@@ -136,13 +140,24 @@ export const toggleFlightType = id => {
 	};
 };
 
+let cnoteId = 0;			// for testing
 export const addUpdateNote = args => {
 	if (!args.content) {
 		args.content = '';
 	}
+	// let noteId = args.id ? args.id : cuid();
+	// below for testing
+	let noteId;
+	if (args.id) {
+		noteId = args.id;
+	} else {
+		cnoteId++;
+		noteId = cnoteId;
+	}
+	// end testing code
 	return {
 		type: ADD_UPDATE_NOTE,
-		id: args.id,
+		id: noteId,
 		entity: args.entity,
 		entityId: args.entityId,
 		content: args.content,
@@ -158,15 +173,18 @@ export const delNote = args => { // maybe the note could store the entity and en
 	};
 };
 
-export const addSortie = (id,flightId) => {
+let sortieId = 0;			// for testing
+export const addSortie = flightId => {
+	// sortieId = cuid();
+	sortieId++;				// for testing
 	return {
 		type: ADD_SORTIE,
-		id,
+		id: sortieId,
 		flightId,
 	};
 };
 
-export const delSortie = (id, flightId) => { // maybe the sortie could store the flight its associated with se we don't have to specify the flight
+export const delSortie = (id, flightId) => {
 	return {
 		type: DEL_SORTIE,
 		id,
@@ -204,8 +222,10 @@ export const updatePuckCode = args => {
 		return codes;
 	};
 	let codes = newCodes(args.codes);
+	
 	// make it an array
 	codes = codes.split(/[^\d]+/);
+	
 	// get rid of duplicates or empty strings
 	let codeCount = {};
 	codes = codes.filter(code => {
@@ -226,9 +246,11 @@ export const updatePuckCode = args => {
 export const updatePuckSymbol = args => {
 	// strip all non-symbols
 	let symbols = args.symbols.replace(/[^@!\?~#\$%\*\+=+]+/g,"");
+	
 	// make it an array
 	symbols = symbols.split('');
 	let symbolCount = {}
+	
 	// get rid of duplicates and empty strings
 	// this is inefficient. can do it all in one step. this array will never be longer than 10 items, though.
 	symbols = symbols.filter(symbol => {
@@ -246,10 +268,13 @@ export const updatePuckSymbol = args => {
 	};
 };
 
-export const addAirspace = (id, flightId) => {
+let airspaceId = 0;			// for testing
+export const addAirspace = flightId => {
+	// airspaceId = cuid();
+	airspaceId++;			// for testing
 	return {
 		type: ADD_AIRSPACE,
-		id,
+		id: airspaceId,
 		flightId,
 	};
 };
