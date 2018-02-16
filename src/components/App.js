@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import CrewListBox from './CrewListBox';
 import '../style/App.css';
 

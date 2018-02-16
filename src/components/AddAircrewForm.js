@@ -21,8 +21,8 @@ const AddAircrewForm = ({ onSubmit }) => {
         rank.value = callsign.value = first.value = last.value = '';
         quals = quals.map(qual => qual.checked = false);
     }}>
-        <input type="text" placeholder={"Rank"} ref={node => { rank = node }} />
         <input type="text" placeholder={"Callsign"} ref={node => { callsign = node }} required />
+        <input type="text" placeholder={"Rank"} ref={node => { rank = node }} />
         <input type="text" placeholder={"First"} ref={node => { first = node }} />
         <input type="text" placeholder={"Last"} ref={node => { last = node }} />
         { qualsList.map( qual => {

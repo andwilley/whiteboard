@@ -229,7 +229,7 @@ export const updatePuckCode = args => {
 	// get rid of duplicates or empty strings
 	let codeCount = {};
 	codes = codes.filter(code => {
-		if (codeCount[code] || code == "") {
+		if (codeCount[code] || code === "") {
 			return false;
 		}
 		codeCount[code] = code;
@@ -245,16 +245,16 @@ export const updatePuckCode = args => {
 
 export const updatePuckSymbol = args => {
 	// strip all non-symbols
-	let symbols = args.symbols.replace(/[^@!\?~#\$%\*\+=+]+/g,"");
+	let symbols = args.symbols.replace(/[^@!?~#$%*+=]+/g,""); // [^@!\?~#\$%\*\+=+]
 	
 	// make it an array
 	symbols = symbols.split('');
-	let symbolCount = {}
 	
 	// get rid of duplicates and empty strings
 	// this is inefficient. can do it all in one step. this array will never be longer than 10 items, though.
+	let symbolCount = {};
 	symbols = symbols.filter(symbol => {
-		if (symbolCount[symbol] || symbol == "") {
+		if (symbolCount[symbol] || symbol === "") {
 			return false;
 		}
 		symbolCount[symbol] = symbol;
