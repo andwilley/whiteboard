@@ -43,7 +43,7 @@ export const addAircrew = (args) => {
 	return {
 		type: ADD_AIRCREW,
 		id: aircrewId,
-		rank: args.rank ? args.rank : "",
+		rank: args.rank ? args.rank : 0,
 		first: args.first ? args.first : "",
 		last: args.last ? args.last: "",
 		callsign: args.callsign,
