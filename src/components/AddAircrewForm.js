@@ -40,7 +40,7 @@ const parseRank = rank => {
     return 0;
 };
 
-const AddAircrewForm = ({ onSubmit }) => {
+const AddAircrewForm = ({ onSubmit, aircrewToUpd={quals: []} }) => {
     let rank, callsign, first, last;
     let seat = [];
     let quals = [];
@@ -61,17 +61,26 @@ const AddAircrewForm = ({ onSubmit }) => {
         });
         rank.value = callsign.value = first.value = last.value = '';
         quals = quals.map(qual => qual.checked = false);
+        seat = seat.map(seat => {
+            if (seat.value === "pilot") {
+                seat.checked = true;
+                return seat;
+            } else {
+                seat.checked = false;
+                return seat;
+            }
+        });
     }}><br />
         Add New Aircrew:<br />
-        <input type="text" placeholder={"Callsign*"} name="callsign" ref={node => { callsign = node }} required /><br />
-        <input type="text" placeholder={"Rank"} name="rank" ref={node => { rank = node }} /><br />
-        <input type="text" placeholder={"First"} name="first" ref={node => { first = node }} /><br />
-        <input type="text" placeholder={"Last"} name="last" ref={node => { last = node }} /><br />
-        <input type="radio" name="seat" ref={node => { seat.push(node) }} value="pilot" defaultChecked />Pilot
-        <input type="radio" name="seat" ref={node => { seat.push(node) }} value="wso" />WSO<br />
+        <input type="text" placeholder={"Callsign*"} name="callsign" ref={node => { callsign = node }} value={aircrewToUpd.callsign} required /><br />
+        <input type="text" placeholder={"First"} name="first" ref={node => { first = node }} value={aircrewToUpd.first} /><br />
+        <input type="text" placeholder={"Last"} name="last" ref={node => { last = node }} value={aircrewToUpd.last} /><br />
+        <input type="text" placeholder={"Rank"} name="rank" ref={node => { rank = node }} value={aircrewToUpd.rank} /><br />
+        <input type="radio" name="seat" ref={node => { seat.push(node) }} value="pilot" defaultChecked={aircrewToUpd.seat === "wso" ? "" : "defaultChecked"} />Pilot
+        <input type="radio" name="seat" ref={node => { seat.push(node) }} value="wso" defaultChecked={aircrewToUpd.seat === "wso" ? "defaultChecked" : ""} />WSO<br />
         Quals:<br />
         { qualsList.map( qual => {
-             return (<label key={qual}><input type="checkbox" name="quals" ref={(node) => {quals.push(node)}} value={qual} />{qual}</label>);
+             return (<label key={qual}><input type="checkbox" name="quals" ref={(node) => {quals.push(node)}} value={qual} defaultChecked={aircrewToUpd.quals.indexOf(qual) > -1 ? "defaultChecked" : ""} />{qual}</label>);
         })}
         <br />
         <button type="Submit">

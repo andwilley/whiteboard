@@ -21,7 +21,10 @@ const mapDispatchToProps = dispatch => {
     onXClick: id => {
     	dispatch(delAircrew(id));
     },
-    onAddButtonSubmit: input => {
+    onEditClick: id => {
+    	// somehow add the Update Aircrew Form under the name...
+    },
+    onAddAircrewSubmit: input => {
     	dispatch(addAircrew(input));
     },
   };
