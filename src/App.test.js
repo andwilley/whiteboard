@@ -20,10 +20,11 @@ const nextState1 = {
 			first: "Drew",
 			last: "Willey",
 			callsign: "Steamboat",
+			seat: "wso",
 			quals: ['FAI'],
 			flightPucks: [],
 			simPucks: [],
-			snivs: {},
+			snivs: [],
 			odos: 0,
 			notes: [],
 		},
@@ -47,6 +48,7 @@ const runningState1 = whiteboardApp({},addAircrew({
 		rank: 3,
 		first: "Drew",
 		last: "Willey",
+		seat: "wso",
 		quals: ['FAI']}
 ));
 
@@ -62,6 +64,7 @@ let runningState2 = whiteboardApp(runningState1,addAircrew({
 	rank: 3,
 	first: "Alex",
 	last: "Blank",
+	seat: "pilot",
 	quals: ['FAI']}
 ));
 
@@ -75,10 +78,11 @@ let nextState2 = {
 			first: "Alex",
 			last: "Blank",
 			callsign: "Jambo",
+			seat: "pilot",
 			quals: ['FAI'],
 			flightPucks: [],
 			simPucks: [],
-			snivs: {},
+			snivs: [],
 			odos: 0,
 			notes: [],
 		},
@@ -98,6 +102,7 @@ let runningState3 = whiteboardApp(runningState2,addAircrew({
 		rank: 3,
 		first: "Mark",
 		last: "Infante",
+		seat: "pilot",
 		quals: ['FAI']}
 ));
 

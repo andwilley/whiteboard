@@ -35,13 +35,14 @@ const parseRank = rank => {
     const rankPattern = /[Oo]?-?([1-9])/;
     const rankMatch = rank.match(rankPattern);
     if (rankMatch !== null) {
-        return parseInt(rankMatch[1]);
+        return parseInt(rankMatch[1],10);
     }
     return 0;
 };
 
 const AddAircrewForm = ({ onSubmit }) => {
     let rank, callsign, first, last;
+    let seat = [];
     let quals = [];
     const qualsList = ["SL","DL","MC","NSI","FAI","MDTI","WTI","ACM","ODO","LAT","PMCF"];
     return (
@@ -55,15 +56,19 @@ const AddAircrewForm = ({ onSubmit }) => {
             callsign: callsign.value.trim(),
             first: first.value.trim(),
             last: last.value.trim(),
+            seat: seat.filter(seat => seat.checked)[0].value,
             quals: quals.filter(qual => qual.checked).map(qual => qual.value),
         });
         rank.value = callsign.value = first.value = last.value = '';
         quals = quals.map(qual => qual.checked = false);
-    }}>
+    }}><br />
+        Add New Aircrew:<br />
         <input type="text" placeholder={"Callsign*"} name="callsign" ref={node => { callsign = node }} required /><br />
-        <input type="text" placeholder={"Rank"}  name="rank" ref={node => { rank = node }} /><br />
-        <input type="text" placeholder={"First"}  name="first" ref={node => { first = node }} /><br />
-        <input type="text" placeholder={"Last"}  name="last" ref={node => { last = node }} /><br />
+        <input type="text" placeholder={"Rank"} name="rank" ref={node => { rank = node }} /><br />
+        <input type="text" placeholder={"First"} name="first" ref={node => { first = node }} /><br />
+        <input type="text" placeholder={"Last"} name="last" ref={node => { last = node }} /><br />
+        <input type="radio" name="seat" ref={node => { seat.push(node) }} value="pilot" defaultChecked />Pilot
+        <input type="radio" name="seat" ref={node => { seat.push(node) }} value="wso" />WSO<br />
         Quals:<br />
         { qualsList.map( qual => {
              return (<label key={qual}><input type="checkbox" name="quals" ref={(node) => {quals.push(node)}} value={qual} />{qual}</label>);

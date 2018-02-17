@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { addAircrew } from '../actions/index'
+import { addAircrew, delAircrew } from '../actions/index'
 import CrewList from '../components/CrewList'
 
 const getAircrewList = (aircrewById, allAircrew) => {
@@ -14,9 +14,12 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onAircrewClick: id => {
+    onAircrewClick: aircrew => {
       // dispatch(something(id));
-      alert(id);
+      alert(Object.keys(aircrew).map(key => key + ": " + aircrew[key]).join("\r"));
+    },
+    onXClick: id => {
+    	dispatch(delAircrew(id));
     },
     onAddButtonSubmit: input => {
     	dispatch(addAircrew(input));

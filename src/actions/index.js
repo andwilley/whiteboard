@@ -45,8 +45,9 @@ export const addAircrew = (args) => {
 		id: aircrewId,
 		rank: args.rank ? args.rank : 0,
 		first: args.first ? args.first : "",
-		last: args.last ? args.last: "",
+		last: args.last ? args.last : "",
 		callsign: args.callsign,
+		seat: args.seat ? args.seat : "",
 		quals: args.quals ? args.quals : [],
 	};
 };

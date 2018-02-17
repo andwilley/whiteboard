@@ -37,11 +37,12 @@ const aircrewById = (state = {}, action) => {
 					first: action.first,
 					last: action.last,
 					callsign: action.callsign,
+					seat: action.seat,
 					quals: action.quals,
 					flightPucks: [],
 					simPucks: [],
 					odos: 0,
-					snivs: {},
+					snivs: [],
 					notes: [],
 				},
 			};
