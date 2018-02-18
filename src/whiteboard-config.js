@@ -1,1 +1,1 @@
-export const qualsList = ["SL","DL","MC","NSI","FAI","MDTI","WTI","ACM","ODO","LAT","PMCF"];
+export const qualsList = ["SL","DL","MC","NSI","FAI","MDTI","WTI","FAC(A)","FAC(A)I","NS","ACM","LAT","PMCF","ODO"];

@@ -31,7 +31,7 @@ import {
 		UPDATE_LOADOUT,
 	   } from '../actions/index';
 
-const aircrewFormValues = (state = {
+const addUpdateAircrewFormValues = (state = {
 		id: "",
 		callsign: "",
 		first: "",
@@ -39,7 +39,9 @@ const aircrewFormValues = (state = {
 		rank: 0,
 		seat: "pilot",
 		quals: [],
+		existingAircrewUnchanged: false,
 		qualsList,
+		display: false,
 	}, action) => {
 	switch (action.type) {
 		case ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE:
@@ -60,13 +62,7 @@ const aircrewFormValues = (state = {
 		case SET_AIRCREW_FORM:
 			return {
 				...state,
-				id: action.id,
-				callsign: action.callsign,
-				first: action.first,
-				last: action.last,
-				rank: action.rank,
-				seat: action.seat,
-				quals: action.quals,
+				...action.payload,
 			};
 		default:
 			return state;
@@ -571,7 +567,7 @@ const allAirspace = (state = [], action) => {
 };
 
 export const whiteboardApp = combineReducers ({
-	aircrewFormValues,
+	addUpdateAircrewFormValues,
 	aircrewById,
 	allAircrew,
 	daysById,

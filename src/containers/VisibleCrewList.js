@@ -7,18 +7,30 @@ import { addUpdateAircrew,
 				 setAircrewForm} from '../actions/index'
 import CrewList from '../components/CrewList'
 
+const blankForm = {
+	id: "",
+	callsign: "",
+	first: "",
+	last: "",
+	rank: 0,
+	seat: "pilot",
+	quals: [],
+	existingAircrewUnchanged: false,
+	display: false,
+};
+
 const getAircrewList = (state) => {
   return state.allAircrew.map( aircrew => state.aircrewById[aircrew]);
 };
 
-const getAircrewFormValues = (state) => {
-	return state.aircrewFormValues;
+const getAddUpdateAircrewFormValues = (state) => {
+	return state.addUpdateAircrewFormValues;
 };
 
 const mapStateToProps = state => {
   return {
     aircrewList: getAircrewList(state),
-    aircrewFormValues: getAircrewFormValues(state),
+    addUpdateAircrewFormValues: getAddUpdateAircrewFormValues(state),
   };
 };
 
@@ -32,19 +44,18 @@ const mapDispatchToProps = dispatch => {
     	dispatch(delAircrew(id));
     },
     onEditClick: aircrew => {
+    	aircrew["existingAircrewUnchanged"] = true;
+    	aircrew["display"] = true;
     	dispatch(setAircrewForm(aircrew));
     },
     onAddUpdateAircrewSubmit: aircrew => {
-    	dispatch(addUpdateAircrew(aircrew));
-    	dispatch(setAircrewForm({
-    		id: "",
-				callsign: "",
-				first: "",
-				last: "",
-				rank: 0,
-				seat: "pilot",
-				quals: [],
-    	}))
+      if (aircrew.callsign === "") {
+          return;
+      }
+    	if (!aircrew.existingAircrewUnchanged) {
+    		dispatch(addUpdateAircrew(aircrew));
+    	}
+    	dispatch(setAircrewForm(blankForm));
     },
     onInputChange: event => {
     	const target = event.target;
@@ -60,6 +71,13 @@ const mapDispatchToProps = dispatch => {
     			dispatch(addUpdateAircrewFormInputChange(name, value));
     			break;
     	}
+    	dispatch(addUpdateAircrewFormInputChange("existingAircrewUnchanged",false));
+    },
+    onAddAircrewFormButtonClick: () => {
+    	dispatch(addUpdateAircrewFormInputChange("display", true));
+    },
+    onDelAircrewFormButtonClick: () => {
+    	dispatch(setAircrewForm(blankForm));
     },
   };
 };

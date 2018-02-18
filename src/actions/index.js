@@ -66,14 +66,18 @@ export const addUpdateAircrewFormDelQual = qual => {
 export const setAircrewForm = args => {
 	return {
 		type: SET_AIRCREW_FORM,
-		id: args.id,
-		callsign: args.callsign,
-		first: args.first,
-		last: args.last,
-		rank: args.rank,
-		seat: args.seat,
-		quals: args.quals,
-	};
+		payload: {
+			id: args.id,
+			callsign: args.callsign,
+			first: args.first,
+			last: args.last,
+			rank: args.rank,
+			seat: args.seat,
+			quals: args.quals,
+			existingAircrewUnchanged: args.existingAircrewUnchanged,
+			display: args.display,
+		},
+		};
 };
 
 // let aircrewId = 0;			// for testing

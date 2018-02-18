@@ -57,7 +57,7 @@ export const INITIAL_STATE = {
 	allSorties: [],
 	airspaceById: {},
 	allAirspace: [],
-	aircrewFormValues: {
+	addUpdateAircrewFormValues: {
 		id: "",
 		callsign: "",
 		first: "",
@@ -65,6 +65,8 @@ export const INITIAL_STATE = {
 		rank: 0,
 		seat: "pilot",
 		quals: [],
+		existingAircrewUnchanged: false,
     	qualsList,
+    	display: false,
 	},
 };
