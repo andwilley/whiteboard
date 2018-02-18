@@ -1,14 +1,14 @@
 import React from 'react';
 import Aircrew from './Aircrew';
-import AddAircrewForm from './AddAircrewForm';
+import AddUpdateAircrewForm from './AddUpdateAircrewForm';
 import PropTypes from 'prop-types';
 
-const CrewList = ({ aircrewList, onAircrewClick, onXClick, onEditClick, onAddAircrewSubmit }) => (
+const CrewList = ({ aircrewList, aircrewFormValues, onAircrewClick, onXClick, onEditClick, onInputChange, onAddUpdateAircrewSubmit }) => (
     <ul>
         { aircrewList.map(aircrew => (
-            <Aircrew key={aircrew.id} aircrew={aircrew} onAircrewClick={() => onAircrewClick(aircrew)} onXClick={() => onXClick(aircrew.id)} onEditClick={() => onEditClick(aircrew.id)} />
+            <Aircrew key={aircrew.id} aircrew={aircrew} onAircrewClick={() => onAircrewClick(aircrew)} onXClick={() => onXClick(aircrew.id)} onEditClick={() => onEditClick(aircrew)} />
         ))}
-        <AddAircrewForm entity={"Aircrew"} onSubmit={input => onAddAircrewSubmit(input)} />
+        <AddUpdateAircrewForm aircrewFormValues={aircrewFormValues} onInputChange={event => onInputChange(event)} onSubmit={input => onAddUpdateAircrewSubmit(input)} />
     </ul>
 );
 

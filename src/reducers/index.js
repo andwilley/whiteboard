@@ -1,12 +1,17 @@
 // reducers
 
 import { combineReducers } from 'redux';
+import { qualsList } from '../whiteboard-config';
 import {
-		ADD_AIRCREW,
+		ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE,
+		ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
+		ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
+		SET_AIRCREW_FORM,
+		ADD_UPDATE_AIRCREW,
 		DEL_AIRCREW,
-		UPDATE_AIRCREW,
-		ADD_AIRCREW_QUALS,
-		DEL_AIRCREW_QUALS,
+		// UPDATE_AIRCREW,
+		// ADD_AIRCREW_QUALS,
+		// DEL_AIRCREW_QUALS,
 		SET_CURRENT_DAY,
 		ADD_DAY,
 		ADD_FLIGHT,
@@ -26,9 +31,51 @@ import {
 		UPDATE_LOADOUT,
 	   } from '../actions/index';
 
+const aircrewFormValues = (state = {
+		id: "",
+		callsign: "",
+		first: "",
+		last: "",
+		rank: 0,
+		seat: "pilot",
+		quals: [],
+		qualsList,
+	}, action) => {
+	switch (action.type) {
+		case ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE:
+			return {
+				...state,
+				[action.field]: action.value,
+			};
+		case ADD_UPDATE_AIRCREW_FORM_ADD_QUAL:
+			return {
+				...state,
+				quals: state.quals.concat(action.qual),
+			};
+		case ADD_UPDATE_AIRCREW_FORM_DEL_QUAL:
+			return {
+				...state,
+				quals: state.quals.filter(qual => qual !== action.qual),
+			};
+		case SET_AIRCREW_FORM:
+			return {
+				...state,
+				id: action.id,
+				callsign: action.callsign,
+				first: action.first,
+				last: action.last,
+				rank: action.rank,
+				seat: action.seat,
+				quals: action.quals,
+			};
+		default:
+			return state;
+	}
+};
+
 const aircrewById = (state = {}, action) => {
 	switch (action.type) {
-		case ADD_AIRCREW:
+		case ADD_UPDATE_AIRCREW:
 			return {
 				...state,
 				[action.id]: {
@@ -52,38 +99,38 @@ const aircrewById = (state = {}, action) => {
 			// why doesn't this work??? rest is returning the entire state...????
 			//let { [action.id]: delcrew, ...rest } = state;
 			return rest;
-		case UPDATE_AIRCREW:
-			const { rank, first, last, callsign } = state[action.id];
-			return {
-				...state,
-				[action.id]: {
-					...state[action.id],
-					rank: action.rank ? action.rank : rank,
-					first: action.first ? action.first : first,
-					last: action.last ? action.last : last,
-					callsign: action.callsign ? action.callsign : callsign,
-				}
-			};
-		case ADD_AIRCREW_QUALS:
-			let quals = state[action.id].quals;
-			let freshQuals = action.quals.filter((qual) => quals.indexOf(qual) === -1);
-			return {
-				...state,
-				[action.id]: {
-					...state[action.id],
-					quals: quals.concat(freshQuals),
-				}
-			};
-		case DEL_AIRCREW_QUALS:
-			let oldQuals = state[action.id].quals;
-			let newQuals = oldQuals.filter((qual) => action.quals.indexOf(qual) === -1);
-			return {
-				...state,
-				[action.id]: {
-					...state[action.id],
-					quals: newQuals,
-				}
-			};
+		// case UPDATE_AIRCREW:
+		// 	const { rank, first, last, callsign } = state[action.id];
+		// 	return {
+		// 		...state,
+		// 		[action.id]: {
+		// 			...state[action.id],
+		// 			rank: action.rank ? action.rank : rank,
+		// 			first: action.first ? action.first : first,
+		// 			last: action.last ? action.last : last,
+		// 			callsign: action.callsign ? action.callsign : callsign,
+		// 		}
+		// 	};
+		// case ADD_AIRCREW_QUALS:
+		// 	let quals = state[action.id].quals;
+		// 	let freshQuals = action.quals.filter((qual) => quals.indexOf(qual) === -1);
+		// 	return {
+		// 		...state,
+		// 		[action.id]: {
+		// 			...state[action.id],
+		// 			quals: quals.concat(freshQuals),
+		// 		}
+		// 	};
+		// case DEL_AIRCREW_QUALS:
+		// 	let oldQuals = state[action.id].quals;
+		// 	let newQuals = oldQuals.filter((qual) => action.quals.indexOf(qual) === -1);
+		// 	return {
+		// 		...state,
+		// 		[action.id]: {
+		// 			...state[action.id],
+		// 			quals: newQuals,
+		// 		}
+		// 	};
 		case ADD_UPDATE_NOTE:
 			if (action.entity !== 'aircrew' || state[action.entityId].notes.indexOf(action.id) > -1) {
 				return state;
@@ -113,7 +160,10 @@ const aircrewById = (state = {}, action) => {
 
 const allAircrew = (state = [], action) => {
 	switch (action.type) {
-		case ADD_AIRCREW:
+		case ADD_UPDATE_AIRCREW:
+			if (state.indexOf(action.id) > -1) {
+				return state;
+			}
 			return state.concat(action.id);
 		case DEL_AIRCREW:
 			return state.filter(item => item !== action.id);
@@ -521,6 +571,7 @@ const allAirspace = (state = [], action) => {
 };
 
 export const whiteboardApp = combineReducers ({
+	aircrewFormValues,
 	aircrewById,
 	allAircrew,
 	daysById,

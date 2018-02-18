@@ -2,11 +2,15 @@ import cuid from "cuid";
 
 // Action Types
 
-export const ADD_AIRCREW = "ADD_AIRCREW";
-export const UPDATE_AIRCREW = "UPDATE_AIRCREW";
+export const ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE = "ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE";
+export const ADD_UPDATE_AIRCREW_FORM_ADD_QUAL = "ADD_UPDATE_AIRCREW_FORM_ADD_QUAL";
+export const ADD_UPDATE_AIRCREW_FORM_DEL_QUAL = "ADD_UPDATE_AIRCREW_FORM_DEL_QUAL";
+export const SET_AIRCREW_FORM = "SET_AIRCREW_FORM";
+export const ADD_UPDATE_AIRCREW = "ADD_AIRCREW";
+// export const UPDATE_AIRCREW = "UPDATE_AIRCREW";
 export const DEL_AIRCREW = "DEL_AIRCREW";
-export const ADD_AIRCREW_QUALS = "ADD_AIRCREW_QUALS";
-export const DEL_AIRCREW_QUALS = "DEL_AIRCREW_QUALS";
+// export const ADD_AIRCREW_QUALS = "ADD_AIRCREW_QUALS";
+// export const DEL_AIRCREW_QUALS = "DEL_AIRCREW_QUALS";
 export const SET_QUAL_FILTER = "SET_QUAL_FILTER";
 export const SET_CURRENT_DAY = "SET_CURRENT_DAY";
 export const ADD_DAY = "ADD_DAY";
@@ -36,12 +40,48 @@ export const UPDATE_LOADOUT = "UPDATE_LOADOUT";
 //     }
 //     return result;
 // };
+
+export const addUpdateAircrewFormInputChange = (field, value) => {
+	return {
+		type: ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE,
+		field,
+		value,
+	};
+};
+
+export const addUpdateAircrewFormAddQual = qual => {
+	return {
+		type: ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
+		qual,
+	};
+};
+
+export const addUpdateAircrewFormDelQual = qual => {
+	return {
+		type: ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
+		qual,
+	};
+};
+
+export const setAircrewForm = args => {
+	return {
+		type: SET_AIRCREW_FORM,
+		id: args.id,
+		callsign: args.callsign,
+		first: args.first,
+		last: args.last,
+		rank: args.rank,
+		seat: args.seat,
+		quals: args.quals,
+	};
+};
+
 // let aircrewId = 0;			// for testing
-export const addAircrew = (args) => {
-	const aircrewId = cuid(); // uncomment after testing
+export const addUpdateAircrew = args => {
+	const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
 	// aircrewId++;			// for testing
 	return {
-		type: ADD_AIRCREW,
+		type: ADD_UPDATE_AIRCREW,
 		id: aircrewId,
 		rank: args.rank ? args.rank : 0,
 		first: args.first ? args.first : "",
@@ -59,32 +99,32 @@ export const delAircrew = id => {
 	};
 };
 
-export const updateAircrew = (args) => {
-	return {
-		type: UPDATE_AIRCREW,
-		id: args.id,
-		rank: args.rank,
-		first: args.first,
-		last: args.last,
-		callsign: args.callsign,
-	};
-};
+// export const updateAircrew = (args) => {
+// 	return {
+// 		type: UPDATE_AIRCREW,
+// 		id: args.id,
+// 		rank: args.rank,
+// 		first: args.first,
+// 		last: args.last,
+// 		callsign: args.callsign,
+// 	};
+// };
 
-export const addAircrewQuals = (id, quals) => {
-	return {
-		type: ADD_AIRCREW_QUALS,
-		id,
-		quals,
-	};
-};
+// export const addAircrewQuals = (id, quals) => {
+// 	return {
+// 		type: ADD_AIRCREW_QUALS,
+// 		id,
+// 		quals,
+// 	};
+// };
 
-export const delAircrewQuals = (id, quals) => {
-	return {
-		type: DEL_AIRCREW_QUALS,
-		id,
-		quals,
-	};
-};
+// export const delAircrewQuals = (id, quals) => {
+// 	return {
+// 		type: DEL_AIRCREW_QUALS,
+// 		id,
+// 		quals,
+// 	};
+// };
 
 export const setCurrentDay = (day) => {
 	return {

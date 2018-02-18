@@ -1,3 +1,5 @@
+import { qualsList } from "../whiteboard-config";
+
 export const INITIAL_STATE = {
 	aircrewById: {
 		1: {
@@ -55,4 +57,14 @@ export const INITIAL_STATE = {
 	allSorties: [],
 	airspaceById: {},
 	allAirspace: [],
+	aircrewFormValues: {
+		id: "",
+		callsign: "",
+		first: "",
+		last: "",
+		rank: 0,
+		seat: "pilot",
+		quals: [],
+    	qualsList,
+	},
 };

@@ -1,14 +1,24 @@
 import { connect } from 'react-redux'
-import { addAircrew, delAircrew } from '../actions/index'
+import { addUpdateAircrew,
+				 delAircrew,
+				 addUpdateAircrewFormInputChange,
+				 addUpdateAircrewFormAddQual,
+				 addUpdateAircrewFormDelQual,
+				 setAircrewForm} from '../actions/index'
 import CrewList from '../components/CrewList'
 
-const getAircrewList = (aircrewById, allAircrew) => {
-  return allAircrew.map( aircrew => aircrewById[aircrew]);
+const getAircrewList = (state) => {
+  return state.allAircrew.map( aircrew => state.aircrewById[aircrew]);
+};
+
+const getAircrewFormValues = (state) => {
+	return state.aircrewFormValues;
 };
 
 const mapStateToProps = state => {
   return {
-    aircrewList: getAircrewList(state.aircrewById, state.allAircrew),
+    aircrewList: getAircrewList(state),
+    aircrewFormValues: getAircrewFormValues(state),
   };
 };
 
@@ -21,11 +31,35 @@ const mapDispatchToProps = dispatch => {
     onXClick: id => {
     	dispatch(delAircrew(id));
     },
-    onEditClick: id => {
-    	// somehow add the Update Aircrew Form under the name...
+    onEditClick: aircrew => {
+    	dispatch(setAircrewForm(aircrew));
     },
-    onAddAircrewSubmit: input => {
-    	dispatch(addAircrew(input));
+    onAddUpdateAircrewSubmit: aircrew => {
+    	dispatch(addUpdateAircrew(aircrew));
+    	dispatch(setAircrewForm({
+    		id: "",
+				callsign: "",
+				first: "",
+				last: "",
+				rank: 0,
+				seat: "pilot",
+				quals: [],
+    	}))
+    },
+    onInputChange: event => {
+    	const target = event.target;
+    	const name = target.name;
+    	let value;
+    	switch (name) {
+    		case "quals":
+    			value = target.value;
+    			dispatch(target.checked ? addUpdateAircrewFormAddQual(value) : addUpdateAircrewFormDelQual(value));
+    			break;
+    		default:
+    			value = target.value;
+    			dispatch(addUpdateAircrewFormInputChange(name, value));
+    			break;
+    	}
     },
   };
 };
@@ -33,6 +67,6 @@ const mapDispatchToProps = dispatch => {
 const VisibleCrewList = connect(
   mapStateToProps,
   mapDispatchToProps
-)(CrewList)
+)(CrewList);
 
-export default VisibleCrewList
+export default VisibleCrewList;
