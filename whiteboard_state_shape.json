@@ -34,8 +34,8 @@ snivsById: {
 },
 allSnivs: [1,2],
 daysById: {
-	20180109: {
-		id: 20180809,
+	"2018-01-09": {
+		id: "2018-01-09",
 		crewPucked: [1,2],									// by aircrew.<id> as they are added to sorties, used by crewList filters
 		flow: {
 			numJets: [2,2,2],
@@ -73,13 +73,13 @@ sortiesById: {
 		id: 1,
 		front: {
 			inputName: "in the list",
-			crewID: 1,					// app found state.sortiesById.id.front.inputName in the crewList state.
+			crewId: 1,					// app found state.sortiesById.id.front.inputName in the crewList state.
 			codes: [3702,3703,6103],
 			symbols: ["#","@"],
 		},
 		back: {
 			inputName: "not in the list",
-			crewID: null,				// app has not found ..back.inputName in the state, it just lives as a string in ..back.inputName
+			crewId: null,				// app has not found ..back.inputName in the state, it just lives as a string in ..back.inputName
 			codes: [3702,3703],
 			symbols: ["+"],
 		},

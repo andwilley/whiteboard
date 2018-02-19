@@ -19,11 +19,50 @@ const blankForm = {
 	display: false,
 };
 
-const getAircrewList = (state) => {
-  return state.allAircrew.map( aircrew => state.aircrewById[aircrew]);
+const getDayPucks = (state) => {
+	let crewId;
+	let pucks = {};
+	const aircrewPucks = state.daysById[state.crewList.currentDay].flights
+		.reduce((flightPucks,flightId) => {
+			pucks = state.flightsById[flightId].sorties
+				.reduce((sortiePucks, sortieId) => {
+					crewId = state.sortiesById[sortieId].front.crewId;
+					sortiePucks[crewId] = sortiePucks[crewId] ? sortiePucks[crewId] + 1 : 1;
+					crewId = state.sortiesById[sortieId].back.crewId;
+					sortiePucks[crewId] = sortiePucks[crewId] ? sortiePucks[crewId] + 1 : 1;
+					return sortiePucks;
+				},{});
+			Object.keys(pucks).map(key => {
+				flightPucks[key] = flightPucks[key] ? flightPucks[key] + pucks[key] : pucks[key];
+			});
+			return flightPucks;
+		},{});
+	return aircrewPucks;
 };
 
-const getAddUpdateAircrewFormValues = (state) => {
+const getAircrewList = state => {
+  return state.allAircrew.map( aircrewId => {
+  	// this is not efficient. calc this outside of the aircrew loop. its going through each sortie as many times as there are aircrew.
+  	// const aircrewPucks = state.daysById[state.crewList.currentDay].flights
+  	// 	.reduce((flightPucks,flightId) => {
+  	// 		flightPucks += state.flightsById[flightId].sorties
+  	// 			.reduce((sortiePucks, sortieId) => {
+  	// 				if (state.sortiesById[sortieId].front.crewId === aircrewId ||
+  	// 					state.sortiesById[sortieId].back.crewId === aircrewId) {
+  	// 					sortiePucks++;
+  	// 				}
+  	// 				return sortiePucks;
+  	// 			},0);
+  	// 		return flightPucks;
+  	// 	},0);
+  	const aircrewPucks = getDayPucks(state);
+  	const aircrewWithPucks = state.aircrewById[aircrewId];
+  	aircrewWithPucks["pucks"] = aircrewPucks[aircrewId] ? aircrewPucks[aircrewId] : 0;
+  	return aircrewWithPucks;
+  });
+};
+
+const getAddUpdateAircrewFormValues = state => {
 	return state.addUpdateAircrewFormValues;
 };
 

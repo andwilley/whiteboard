@@ -5,11 +5,15 @@ const parseRank = rank => {
     const validRanks = {
         "second lieutenant": 1,
         "2nd lieutenant": 1,
+        "2nd lt": 1,
         "2ndlt": 1,
+        "2 lt": 1,
         "2lt": 1,
         "first lieutenant": 2,
         "1st lieutenant": 2,
+        "1s tlt": 2,
         "1stlt": 2,
+        "1 lt": 2,
         "1lt": 2,
         "captain": 3,
         "capt": 3,
@@ -17,6 +21,7 @@ const parseRank = rank => {
         "major": 4,
         "maj": 4,
         "lieutenant colonel": 5,
+        "lt col": 5,
         "ltcol": 5,
         "lcol": 5,
         "colonel": 6,
@@ -26,6 +31,8 @@ const parseRank = rank => {
         "major general": 8,
         "mgen": 8,
         "lieutenant general": 9,
+        "lt gen": 9,
+        "ltgen": 9,
         "lgen": 9,
         "general": 10,
         "gen": 10,
@@ -46,7 +53,7 @@ const parseRank = rank => {
 };
 
 const intToRank = rank => {
-    if (rank !== parseInt(rank)) {
+    if (rank !== parseInt(rank,10)) {
         return rank;
     }
     switch (rank) {
