@@ -218,7 +218,6 @@ const nextState7 = {
 	daysById: {
 		'2018-01-24': {
 			id: '2018-01-24',
-			crewPucked: [],
 			// flow: {
 			// 	numJets: [],
 			// 	method: [],

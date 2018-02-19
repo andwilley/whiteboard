@@ -147,7 +147,6 @@ const daysById = (state = {}, action) => {
 				...state,
 				[action.id]: {
 					id: action.id,
-					crewPucked: [],
 					// flow: {
 					// 	numJets: [],
 					// 	method: [],
@@ -400,6 +399,17 @@ const sortiesById = (state = {}, action) => {
 			let rest = Object.assign({},state);
 			delete rest[action.id];
 			return rest;
+		case DEL_AIRCREW:
+			let newSortiesById = Object.assign({},state);
+			Object.keys(state).forEach(sortieId => {
+				if (sortieId === state[sortieId].front.crewId) {
+					// clear front object
+				}
+				if (sortieId === state[sortieId].back.crewId) {
+					// clear back object
+				}
+			});
+			return newSortiesById;
 		case ADD_UPDATE_NOTE:
 			if (action.entity !== 'sortie' || state[action.entityId].notes.indexOf(action.id) > -1) {
 				return state;
@@ -477,6 +487,7 @@ const allSorties = (state = [], action) => {
 	switch (action.type) {
 		case ADD_SORTIE:
 			return state.concat(action.id);
+		case DEL_AIRCREW:
 		case DEL_SORTIE:
 			return state.filter(sortieId => sortieId !== action.id);
 		default:

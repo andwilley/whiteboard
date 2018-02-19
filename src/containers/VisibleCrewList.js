@@ -41,19 +41,6 @@ const getDayPucks = (state) => {
 
 const getAircrewList = state => {
   return state.allAircrew.map( aircrewId => {
-  	// this is not efficient. calc this outside of the aircrew loop. its going through each sortie as many times as there are aircrew.
-  	// const aircrewPucks = state.daysById[state.crewList.currentDay].flights
-  	// 	.reduce((flightPucks,flightId) => {
-  	// 		flightPucks += state.flightsById[flightId].sorties
-  	// 			.reduce((sortiePucks, sortieId) => {
-  	// 				if (state.sortiesById[sortieId].front.crewId === aircrewId ||
-  	// 					state.sortiesById[sortieId].back.crewId === aircrewId) {
-  	// 					sortiePucks++;
-  	// 				}
-  	// 				return sortiePucks;
-  	// 			},0);
-  	// 		return flightPucks;
-  	// 	},0);
   	const aircrewPucks = getDayPucks(state);
   	const aircrewWithPucks = state.aircrewById[aircrewId];
   	aircrewWithPucks["pucks"] = aircrewPucks[aircrewId] ? aircrewPucks[aircrewId] : 0;
@@ -68,6 +55,7 @@ const getAddUpdateAircrewFormValues = state => {
 const mapStateToProps = state => {
   return {
     aircrewList: getAircrewList(state),
+    // need something to validate unique callsigns from server.
     addUpdateAircrewFormValues: getAddUpdateAircrewFormValues(state),
   };
 };
@@ -75,7 +63,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     onAircrewClick: aircrew => {
-      // dispatch(something(id));
+      // dispatch(something(id)); not sure I'm going to need this. below is for test.
       alert(Object.keys(aircrew).map(key => key + ": " + aircrew[key]).join("\r"));
     },
     onXClick: id => {
@@ -95,6 +83,7 @@ const mapDispatchToProps = dispatch => {
     	}
     	dispatch(setAircrewForm(blankForm));
     },
+    // need async action to validate unique callsign on server.
     onInputChange: event => {
     	const target = event.target;
     	const name = target.name;
