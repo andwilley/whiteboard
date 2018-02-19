@@ -10,7 +10,9 @@ import { createStore } from 'redux';
 import registerServiceWorker from './registerServiceWorker';
 import { INITIAL_STATE } from './reducers/initialstate'
 
-let store = createStore(whiteboardApp, INITIAL_STATE);
+const store = createStore(whiteboardApp, INITIAL_STATE,
+window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
 
 ReactDOM.render(
     <Provider store={store}>

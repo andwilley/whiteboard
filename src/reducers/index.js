@@ -9,9 +9,6 @@ import {
 		SET_AIRCREW_FORM,
 		ADD_UPDATE_AIRCREW,
 		DEL_AIRCREW,
-		// UPDATE_AIRCREW,
-		// ADD_AIRCREW_QUALS,
-		// DEL_AIRCREW_QUALS,
 		SET_CURRENT_DAY,
 		ADD_DAY,
 		ADD_FLIGHT,
@@ -44,11 +41,6 @@ const addUpdateAircrewFormValues = (state = {
 		display: false,
 	}, action) => {
 	switch (action.type) {
-		case ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE:
-			return {
-				...state,
-				[action.field]: action.value,
-			};
 		case ADD_UPDATE_AIRCREW_FORM_ADD_QUAL:
 			return {
 				...state,
@@ -92,41 +84,9 @@ const aircrewById = (state = {}, action) => {
 		case DEL_AIRCREW:
 			let rest = Object.assign({},state);
 			delete rest[action.id];
-			// why doesn't this work??? rest is returning the entire state...????
-			//let { [action.id]: delcrew, ...rest } = state;
+			// why doesn't this work??? rest is returning the entire state...???
+			// let { [action.id]: delcrew, ...rest } = state;
 			return rest;
-		// case UPDATE_AIRCREW:
-		// 	const { rank, first, last, callsign } = state[action.id];
-		// 	return {
-		// 		...state,
-		// 		[action.id]: {
-		// 			...state[action.id],
-		// 			rank: action.rank ? action.rank : rank,
-		// 			first: action.first ? action.first : first,
-		// 			last: action.last ? action.last : last,
-		// 			callsign: action.callsign ? action.callsign : callsign,
-		// 		}
-		// 	};
-		// case ADD_AIRCREW_QUALS:
-		// 	let quals = state[action.id].quals;
-		// 	let freshQuals = action.quals.filter((qual) => quals.indexOf(qual) === -1);
-		// 	return {
-		// 		...state,
-		// 		[action.id]: {
-		// 			...state[action.id],
-		// 			quals: quals.concat(freshQuals),
-		// 		}
-		// 	};
-		// case DEL_AIRCREW_QUALS:
-		// 	let oldQuals = state[action.id].quals;
-		// 	let newQuals = oldQuals.filter((qual) => action.quals.indexOf(qual) === -1);
-		// 	return {
-		// 		...state,
-		// 		[action.id]: {
-		// 			...state[action.id],
-		// 			quals: newQuals,
-		// 		}
-		// 	};
 		case ADD_UPDATE_NOTE:
 			if (action.entity !== 'aircrew' || state[action.entityId].notes.indexOf(action.id) > -1) {
 				return state;

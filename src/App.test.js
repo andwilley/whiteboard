@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { whiteboardApp } from './reducers/index'
-import { addAircrew, delAircrew, updateAircrew, addAircrewQuals, delAircrewQuals, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol, addAirspace, delAirspace, updateAirspace, updateLoadout } from './actions/index'
+import { addUpdateAircrewFormValues, addUpdateAircrew, delAircrew, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol, addAirspace, delAirspace, updateAirspace, updateLoadout, addUpdateAircrewFormInputChange, addUpdateAircrewFormAddQual, addUpdateAircrewFormDelQual, setAircrewForm } from './actions/index'
 // import { INITIAL_STATE } from './reducers/initialstate'
 
 // it('renders without crashing', () => {
@@ -41,9 +41,21 @@ const nextState1 = {
 	allSorties: [],
 	airspaceById: {},
 	allAirspace: [],
+	addUpdateAircrewFormValues: {
+		id: "",
+		callsign: "",
+		first: "",
+		last: "",
+		rank: 0,
+		seat: "pilot",
+		quals: [],
+		existingAircrewUnchanged: false,
+    	qualsList: ["SL","DL","MC","NSI","FAI","MDTI","WTI","FAC(A)","FAC(A)I","NS","ACM","LAT","PMCF","ODO"],
+    	display: false,
+	},
 };
 
-const runningState1 = whiteboardApp({},addAircrew({
+const runningState1 = whiteboardApp({},addUpdateAircrew({
 		callsign: 'Steamboat',
 		rank: 3,
 		first: "Drew",
@@ -59,7 +71,7 @@ test('add crew steam', () => {
 
 // ************ test add crew
 		
-let runningState2 = whiteboardApp(runningState1,addAircrew({
+let runningState2 = whiteboardApp(runningState1,addUpdateAircrew({
 	callsign: 'Jambo',
 	rank: 3,
 	first: "Alex",
@@ -97,7 +109,7 @@ test('add crew jambo', () => {
 
 // ****************** test del crew
 
-let runningState3 = whiteboardApp(runningState2,addAircrew({
+let runningState3 = whiteboardApp(runningState2,addUpdateAircrew({
 		callsign: 'Dump',
 		rank: 3,
 		first: "Mark",
@@ -116,10 +128,13 @@ test('del crew dump and jambo', () => {
 
 // ****************** test update crew
 
-let runningState4 = whiteboardApp(runningState3,updateAircrew({
+let runningState4 = whiteboardApp(runningState3,addUpdateAircrew({
 	id: 1,
 	rank: 4,
 	first: "Andrew",
+	last: "Willey",
+	seat: "wso",
+	quals: ["FAI"],
 	callsign: 'no one',
 }));
 
@@ -143,45 +158,45 @@ test('update crew steam', () => {
 
 // ****************** test add / del quals
 
-let runningState5 = whiteboardApp(runningState4,addAircrewQuals(
-	1,
-	["FAI","SL","DL","MC","MC"]
-));
+// let runningState5 = whiteboardApp(runningState4,addAircrewQuals(
+// 	1,
+// 	["FAI","SL","DL","MC","MC"]
+// ));
 
-runningState5 = whiteboardApp(runningState5,delAircrewQuals(
-	1,
-	["ML"]
-));
+// runningState5 = whiteboardApp(runningState5,delAircrewQuals(
+// 	1,
+// 	["ML"]
+// ));
 
-runningState5 = whiteboardApp(runningState5,delAircrewQuals(
-	1,
-	["DL","MC"]
-));
+// runningState5 = whiteboardApp(runningState5,delAircrewQuals(
+// 	1,
+// 	["DL","MC"]
+// ));
 
-let nextState5 = {
-	...nextState4,
-	aircrewById: {
-		...nextState4.aircrewById,
-		[1]: {
-			...nextState4.aircrewById[1],
-			quals: nextState4.aircrewById[1].quals.concat(["SL"]),
-		}
-	}
-}
+// let nextState5 = {
+// 	...nextState4,
+// 	aircrewById: {
+// 		...nextState4.aircrewById,
+// 		[1]: {
+// 			...nextState4.aircrewById[1],
+// 			quals: nextState4.aircrewById[1].quals.concat(["SL"]),
+// 		}
+// 	}
+// }
 
-test('add del quals steam', () => {
-	expect(runningState5)
-	.toEqual(nextState5);
-});
+// test('add del quals steam', () => {
+// 	expect(runningState5)
+// 	.toEqual(nextState5);
+// });
 
 // ********************* test set current day
 
-const runningState6 = whiteboardApp(runningState5,setCurrentDay(
+const runningState6 = whiteboardApp(runningState4,setCurrentDay(
 	'2018-01-09'
 ));
 
 const nextState6 = {
-	...nextState5,
+	...nextState4,
 	crewList: {
 		currentDay: '2018-01-09',
 	}
@@ -193,8 +208,6 @@ test('set current day', () => {
 });
 
 // ****************** test add day
-
-let runningState144 = {};																			// get rid of this
 
 const runningState7 = whiteboardApp(runningState6,addDay(
 	'2018-01-24'
@@ -852,4 +865,44 @@ const nextState23 = {
 test('update loadout', () => {
 	expect(runningState23)
 	.toEqual(nextState23);
+});
+
+// test change aircrew form values
+
+const runningState24 = whiteboardApp(runningState23,setAircrewForm({
+	callsign: "stea",
+}));
+
+const nextState24 = {
+	...nextState23,
+	"addUpdateAircrewFormValues": {
+		...nextState23.addUpdateAircrewFormValues,
+		callsign: "stea",
+	},
+};
+
+test('test set aircrew form values', () => {
+	expect(runningState24)
+	.toEqual(nextState24);
+});
+
+// test add / del quals in aircrew form
+
+let runningState25 = whiteboardApp(runningState24,addUpdateAircrewFormAddQual("SL"));
+
+runningState25 = whiteboardApp(runningState25,addUpdateAircrewFormAddQual("DL"));
+
+runningState25 = whiteboardApp(runningState25,addUpdateAircrewFormDelQual("SL"));
+
+const nextState25 = {
+	...nextState24,
+	"addUpdateAircrewFormValues": {
+		...nextState24.addUpdateAircrewFormValues,
+		quals: nextState24.addUpdateAircrewFormValues.quals.concat("DL"),
+	},
+};
+
+test('test add / del aircrew form quals', () => {
+	expect(runningState25)
+	.toEqual(nextState25);
 });

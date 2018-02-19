@@ -1,7 +1,6 @@
 import { connect } from 'react-redux'
 import { addUpdateAircrew,
 				 delAircrew,
-				 addUpdateAircrewFormInputChange,
 				 addUpdateAircrewFormAddQual,
 				 addUpdateAircrewFormDelQual,
 				 setAircrewForm} from '../actions/index'
@@ -107,13 +106,13 @@ const mapDispatchToProps = dispatch => {
     			break;
     		default:
     			value = target.value;
-    			dispatch(addUpdateAircrewFormInputChange(name, value));
+    			dispatch(setAircrewForm({[name]: value}));
     			break;
     	}
-    	dispatch(addUpdateAircrewFormInputChange("existingAircrewUnchanged",false));
+    	dispatch(setAircrewForm({"existingAircrewUnchanged":false}));
     },
     onAddAircrewFormButtonClick: () => {
-    	dispatch(addUpdateAircrewFormInputChange("display", true));
+    	dispatch(setAircrewForm({"display": true}));
     },
     onDelAircrewFormButtonClick: () => {
     	dispatch(setAircrewForm(blankForm));

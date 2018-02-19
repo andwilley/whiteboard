@@ -41,14 +41,6 @@ export const UPDATE_LOADOUT = "UPDATE_LOADOUT";
 //     return result;
 // };
 
-export const addUpdateAircrewFormInputChange = (field, value) => {
-	return {
-		type: ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE,
-		field,
-		value,
-	};
-};
-
 export const addUpdateAircrewFormAddQual = qual => {
 	return {
 		type: ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
@@ -67,23 +59,21 @@ export const setAircrewForm = args => {
 	return {
 		type: SET_AIRCREW_FORM,
 		payload: {
-			id: args.id,
-			callsign: args.callsign,
-			first: args.first,
-			last: args.last,
-			rank: args.rank,
-			seat: args.seat,
-			quals: args.quals,
-			existingAircrewUnchanged: args.existingAircrewUnchanged,
-			display: args.display,
+			...args,
 		},
-		};
+	};
 };
 
-// let aircrewId = 0;			// for testing
+let crewId = 0;			// for testing
 export const addUpdateAircrew = args => {
-	const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
-	// aircrewId++;			// for testing
+	// const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
+	let aircrewId; // for testing
+	if (args.id) {
+		aircrewId = args.id;
+	} else {
+		crewId++; 
+		aircrewId = crewId;
+	}// for testing
 	return {
 		type: ADD_UPDATE_AIRCREW,
 		id: aircrewId,
@@ -102,33 +92,6 @@ export const delAircrew = id => {
 		id,
 	};
 };
-
-// export const updateAircrew = (args) => {
-// 	return {
-// 		type: UPDATE_AIRCREW,
-// 		id: args.id,
-// 		rank: args.rank,
-// 		first: args.first,
-// 		last: args.last,
-// 		callsign: args.callsign,
-// 	};
-// };
-
-// export const addAircrewQuals = (id, quals) => {
-// 	return {
-// 		type: ADD_AIRCREW_QUALS,
-// 		id,
-// 		quals,
-// 	};
-// };
-
-// export const delAircrewQuals = (id, quals) => {
-// 	return {
-// 		type: DEL_AIRCREW_QUALS,
-// 		id,
-// 		quals,
-// 	};
-// };
 
 export const setCurrentDay = (day) => {
 	return {
