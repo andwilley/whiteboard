@@ -40,10 +40,10 @@ const getDayPucks = (state) => {
 };
 
 const getAircrewList = state => {
+  const aircrewDayPucks = getDayPucks(state);
   return state.allAircrew.map( aircrewId => {
-  	const aircrewPucks = getDayPucks(state);
-  	const aircrewWithPucks = state.aircrewById[aircrewId];
-  	aircrewWithPucks["pucks"] = aircrewPucks[aircrewId] ? aircrewPucks[aircrewId] : 0;
+  	const aircrewWithPucks = Object.assign({},state.aircrewById[aircrewId]);
+  	aircrewWithPucks["pucks"] = aircrewDayPucks[aircrewId] ? aircrewDayPucks[aircrewId] : 0;
   	return aircrewWithPucks;
   });
 };

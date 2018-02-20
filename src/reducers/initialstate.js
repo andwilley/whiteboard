@@ -86,7 +86,7 @@ export const INITIAL_STATE = {
 				land: "",
 			},
 			airspace: [],
-			sorties: [3],
+			sorties: [3,4],
 			notes: [],
 		},
 	},
