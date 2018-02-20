@@ -3,7 +3,6 @@
 import { combineReducers } from 'redux';
 import { qualsList } from '../whiteboard-config';
 import {
-		ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE,
 		ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
 		ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
 		SET_AIRCREW_FORM,
@@ -17,6 +16,8 @@ import {
 		TOGGLE_FLIGHT_TYPE,
 		ADD_UPDATE_NOTE,
 		DEL_NOTE,
+		ADD_CREW_REF_TO_NOTE,
+		DEL_CREW_REF_FROM_NOTE,
 		ADD_SORTIE,
 		DEL_SORTIE,
 		UPDATE_PUCK_NAME,
@@ -346,6 +347,7 @@ const notesById = (state = {}, action) => {
 				[action.id]: {
 					id: action.id,
 					content: action.content,
+					aircrewRefIds: [],
 					// keep track of who added, edited, time added etc later
 				},
 			};
@@ -353,6 +355,31 @@ const notesById = (state = {}, action) => {
 			let rest = Object.assign({},state);
 			delete rest[action.id];
 			return rest;
+		case ADD_CREW_REF_TO_NOTE:
+			if (state[action.noteId].aircrewRefIds.indexOf(action.id) > -1) {
+				return state;
+			}
+			return {
+				...state,
+				[action.noteId]: {
+					...state[action.noteId],
+					aircrewRefIds: state[action.noteId].aircrewRefIds.concat(action.aircrewId),
+				},
+			};
+		case DEL_CREW_REF_FROM_NOTE:
+			return {
+				...state,
+				[action.noteId]: {
+					...state[action.noteId],
+					aircrewRefIds: state[action.noteId].aircrewRefIds.filter(id => id !== action.aircrewId),
+				},
+			};
+		case DEL_AIRCREW:
+			let newNotesById = Object.assign({},state);
+			Object.keys(newNotesById).forEach(noteId => {
+				newNotesById[noteId].aircrewRefIds = newNotesById[noteId].aircrewRefIds.filter(id => id !== action.id);
+			});
+			return newNotesById;
 		default:
 			return state;
 	}
@@ -401,12 +428,20 @@ const sortiesById = (state = {}, action) => {
 			return rest;
 		case DEL_AIRCREW:
 			let newSortiesById = Object.assign({},state);
-			Object.keys(state).forEach(sortieId => {
-				if (sortieId === state[sortieId].front.crewId) {
-					// clear front object
+			Object.keys(newSortiesById).forEach(sortieId => {
+				if (action.id === newSortiesById[sortieId].front.crewId) {
+					newSortiesById[sortieId].front = {
+						...newSortiesById[sortieId].front,
+						inputName: "",
+						crewId: null,
+					};
 				}
-				if (sortieId === state[sortieId].back.crewId) {
-					// clear back object
+				if (action.id === newSortiesById[sortieId].back.crewId) {
+					newSortiesById[sortieId].back = {
+						...newSortiesById[sortieId].back,
+						inputName: "",
+						crewId: null,
+					};
 				}
 			});
 			return newSortiesById;
@@ -487,7 +522,6 @@ const allSorties = (state = [], action) => {
 	switch (action.type) {
 		case ADD_SORTIE:
 			return state.concat(action.id);
-		case DEL_AIRCREW:
 		case DEL_SORTIE:
 			return state.filter(sortieId => sortieId !== action.id);
 		default:

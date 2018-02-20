@@ -31,7 +31,7 @@ const getDayPucks = (state) => {
 					sortiePucks[crewId] = sortiePucks[crewId] ? sortiePucks[crewId] + 1 : 1;
 					return sortiePucks;
 				},{});
-			Object.keys(pucks).map(key => {
+			Object.keys(pucks).forEach(key => {
 				flightPucks[key] = flightPucks[key] ? flightPucks[key] + pucks[key] : pucks[key];
 			});
 			return flightPucks;

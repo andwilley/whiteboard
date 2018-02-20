@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { whiteboardApp } from './reducers/index'
-import { addUpdateAircrewFormValues, addUpdateAircrew, delAircrew, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol, addAirspace, delAirspace, updateAirspace, updateLoadout, addUpdateAircrewFormInputChange, addUpdateAircrewFormAddQual, addUpdateAircrewFormDelQual, setAircrewForm } from './actions/index'
+import { addUpdateAircrewFormValues, addUpdateAircrew, delAircrew, setCurrentDay, addDay, addFlight, delFlight, updateFlightTime, toggleFlightType, addUpdateNote, delNote, addCrewRefToNote, delCrewRefFromNote, addSortie, delSortie, updatePuckName, updatePuckCode, updatePuckSymbol, addAirspace, delAirspace, updateAirspace, updateLoadout, addUpdateAircrewFormInputChange, addUpdateAircrewFormAddQual, addUpdateAircrewFormDelQual, setAircrewForm } from './actions/index'
 // import { INITIAL_STATE } from './reducers/initialstate'
 
 // it('renders without crashing', () => {
@@ -286,7 +286,7 @@ const nextState8 =  {
 		},
 	},
 	allFlights: [1,2],
-}
+};
 
 test('add flights', () => {
 	expect(runningState8)
@@ -325,7 +325,7 @@ const nextState9 = {
 		},
 	},
 	'allFlights': [1]
-}
+};
 
 test('del flights', () => {
 	expect(runningState9)
@@ -357,7 +357,7 @@ const nextState10 = {
 			notes: [],
 		},
 	},
-}
+};
 
 test('update flight times', () => {
 	expect(runningState10)
@@ -379,7 +379,7 @@ const nextState11 = {
 			sim: true,
 		},
 	},
-}
+};
 
 test('toggle flight type', () => {
 	expect(runningState11)
@@ -411,15 +411,17 @@ const nextState12 = {
 	notesById: {
 		1: {
 			id: 1,
-			content: ''
+			content: '',
+			aircrewRefIds: [],
 		},
 		2: {
 			id: 2,
-			content: 'nothing'
+			content: 'nothing',
+			aircrewRefIds: [],
 		},
 	},
 	allNotes: [1,2],
-}
+};
 
 test('add flight notes', () => {
 	expect(runningState12)
@@ -432,7 +434,7 @@ let runningState13 = whiteboardApp(runningState12,addUpdateNote({
 	id: 1,
 	entity: 'flight',
 	entityId: 1,
-	content: '0800: test',
+	content: '0800: test steam',
 }));
 
 runningState13 = whiteboardApp(runningState13,delNote({
@@ -453,11 +455,12 @@ const nextState13 = {
 	notesById: {
 		1: {
 			id: 1,
-			content: '0800: test'
+			content: '0800: test steam',
+			aircrewRefIds: [],
 		},
 	},
 	allNotes: [1],
-}
+};
 
 test('update / del notes', () => {
 	expect(runningState13)
@@ -513,17 +516,20 @@ const nextState14 = {
 		3: {
 			id: 3,
 			content: '0900: test test',
+			aircrewRefIds: [],
 		},
 		4: {
 			id: 4,
 			content: 'test aircrew note',
+			aircrewRefIds: [],
 		},
 		5: {
 			id: 5,
 			content: 'test flight note',
+			aircrewRefIds: [],
 		},
 	}
-}
+};
 
 test('add day aircrew and flight notes', () => {
 	expect(runningState14)
@@ -548,7 +554,7 @@ const nextState15 = {
 			content: '1000: testing',
 		}
 	}
-}
+};
 
 test('update day notes', () => {
 	expect(runningState15)
@@ -580,7 +586,7 @@ const nextState16 = {
 			notes: nextState15.daysById['2018-01-24'].notes.filter(noteId => noteId != 3)
 		}
 	}
-}
+};
 
 test('del day notes', () => {
 	expect(runningState16)
@@ -737,9 +743,10 @@ const nextState19 = {
 		6: {
 			id: 6,
 			content: 'changed note text',
+			aircrewRefIds: [],
 		},
 	}
-}
+};
 
 test('add del sortie note', () => {
 	expect(runningState19)
@@ -787,8 +794,171 @@ test('update puck info', () => {
 	.toEqual(nextState20);
 });
 
+// *************** test add del aircrewIds in note refs
+
+let runningState203 = whiteboardApp(runningState20,addCrewRefToNote
+	(1,4)
+);
+
+runningState203 = whiteboardApp(runningState203,addCrewRefToNote
+	(1,2)
+);
+
+runningState203 = whiteboardApp(runningState203,addCrewRefToNote
+	(6,4)
+);
+
+runningState203 = whiteboardApp(runningState203,addCrewRefToNote
+	(6,1)
+);
+
+runningState203 = whiteboardApp(runningState203,delCrewRefFromNote
+	(1,2)
+);
+
+const nextState202 = {
+	...nextState20,
+	"notesById": {
+		...nextState20.notesById,
+		1: {
+			...nextState20.notesById[1],
+			aircrewRefIds: nextState20.notesById[1].aircrewRefIds.concat(4),
+		},
+		6: {
+			...nextState20.notesById[6],
+			aircrewRefIds: nextState20.notesById[6].aircrewRefIds.concat([4,1]),
+		},
+	},
+};
+
+test('add del aircrew refs in notes', () => {
+	expect(runningState203)
+	.toEqual(nextState202);
+});
+
+
+// ********** test that del aircrew gets rid of sorties and notes too
+
+let runningState201 = whiteboardApp(runningState203,addUpdateAircrew({
+	callsign: 'Dump',
+	rank: 3,
+	first: "Mark",
+	last: "Infante",
+	seat: "pilot",
+	quals: ['FAI']
+}));
+		// add another sortie
+		
+runningState201 = whiteboardApp(runningState201,addSortie(1));
+
+		// adds dump to sortie and random aircrew to other sorties
+
+let runningState205 = {
+	...runningState201,
+	"sortiesById": {
+		...runningState201.sortiesById,
+		1: {
+			...runningState201.sortiesById[1],
+			front: {
+				...runningState201.sortiesById[1].front,
+				inputName: "Dump",
+				crewId: 4,
+			},
+			back: {
+				...runningState201.sortiesById[1].back,
+				inputName: "test",
+				crewId: 1,
+			},
+		},
+		3: {
+			...runningState201.sortiesById[3],
+			front: {
+				...runningState201.sortiesById[3].front,
+				inputName: "steam",
+				crewId: 1,
+			},
+			back: {
+				...runningState201.sortiesById[3].back,
+				inputName: "someone",
+				crewId: 5,
+			},
+		},
+	},
+	"allSorties": [1,3],
+	"flightsById": {
+		...runningState201.flightsById,
+		1: {
+			...runningState201.flightsById[1],
+			sorties: [1,3],
+		},
+	},
+};
+
+const runningState204 = whiteboardApp(runningState205,delAircrew(4));
+
+const nextState201 = {
+	...nextState202,
+	"sortiesById": {
+		...nextState202.sortiesById,
+		1: {
+			...nextState202.sortiesById[1],
+			front: {
+				...nextState202.sortiesById[1].front,
+				inputName: "",
+				crewId: null,
+			},
+			back: {
+				...nextState202.sortiesById[1].back,
+				inputName: "test",
+				crewId: 1,
+			},
+		},
+		3: {
+			id: 3,
+			front: {
+				inputName: "steam",
+				crewId: 1,
+				codes: [],
+				symbols: [],
+			},
+			back: {
+				inputName: "someone",
+				crewId: 5,
+				codes: [],
+				symbols: [],
+			},
+			loadout: "",
+			notes: [],
+		},
+	},
+	"allSorties": [1,3],
+	"flightsById": {
+		...nextState202.flightsById,
+		1: {
+			...nextState202.flightsById[1],
+			sorties: [1,3],
+		},
+	},
+	"notesById": {
+		...nextState202.notesById,
+		1: {
+			...nextState202.notesById[1],
+			aircrewRefIds: [],
+		},
+		6: {
+			...nextState202.notesById[6],
+			aircrewRefIds: [1],
+		},
+	},
+};
+
+test('test del_aircrew clears sorties and notes', () => {
+	expect(runningState204)
+	.toEqual(nextState201);
+});
 
 // test add / del airspace
+	// skips state 201!!!
 
 let runningState21 = whiteboardApp(runningState20,addAirspace(1));
 runningState21 = whiteboardApp(runningState21,addAirspace(1));

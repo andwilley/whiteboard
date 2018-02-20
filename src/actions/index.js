@@ -20,6 +20,8 @@ export const UPDATE_FLIGHT_TIME = "UPDATE_FLIGHT_TIME";
 export const TOGGLE_FLIGHT_TYPE = "TOGGLE_FLIGHT_TYPE";
 export const ADD_UPDATE_NOTE = "ADD_UPDATE_NOTE";
 export const DEL_NOTE = "DEL_NOTE";
+export const ADD_CREW_REF_TO_NOTE = "ADD_CREW_REF_TO_NOTE";
+export const DEL_CREW_REF_FROM_NOTE = "DEL_CREW_REF_FROM_NOTE";
 export const ADD_SORTIE = "ADD_SORTIE";
 export const DEL_SORTIE = "DEL_SORTIE";
 export const UPDATE_PUCK_NAME = "UPDATE_PUCK_NAME";
@@ -64,16 +66,16 @@ export const setAircrewForm = args => {
 	};
 };
 
-// let crewId = 0;			// for testing
+let crewId = 0;			// for testing
 export const addUpdateAircrew = args => {
-	const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
-	// let aircrewId; // for testing
-	// if (args.id) {
-	// 	aircrewId = args.id;
-	// } else {
-	// 	crewId++; 
-	// 	aircrewId = crewId;
-	// }// for testing
+	// const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
+	let aircrewId; // for testing
+	if (args.id) {
+		aircrewId = args.id;
+	} else {
+		crewId++; 
+		aircrewId = crewId;
+	}// for testing
 	return {
 		type: ADD_UPDATE_AIRCREW,
 		id: aircrewId,
@@ -181,6 +183,22 @@ export const delNote = args => { // maybe the note could store the entity and en
 	};
 };
 
+export const addCrewRefToNote = (noteId, aircrewId) => {
+	return {
+		type: ADD_CREW_REF_TO_NOTE,
+		noteId,
+		aircrewId,
+	};
+};
+
+export const delCrewRefFromNote = (noteId, aircrewId) => {
+	return {
+		type: DEL_CREW_REF_FROM_NOTE,
+		noteId,
+		aircrewId,
+	};
+};
+
 let sortieId = 0;			// for testing
 export const addSortie = flightId => {
 	// sortieId = cuid();
@@ -197,8 +215,8 @@ export const delSortie = (id, flightId) => {
 		type: DEL_SORTIE,
 		id,
 		flightId,
-	}
-}
+	};
+};
 
 export const updatePuckName = args => {
 	return {
@@ -206,8 +224,8 @@ export const updatePuckName = args => {
 		sortieId: args.sortieId,
 		crewPosition: args.crewPosition,
 		name: args.name,
-	}
-}
+	};
+};
 
 export const updatePuckCode = args => {
 	// strip non-numeric chars from front and back of input
@@ -248,8 +266,8 @@ export const updatePuckCode = args => {
 		sortieId: args.sortieId,
 		crewPosition: args.crewPosition,
 		codes,
-	}
-}
+	};
+};
 
 export const updatePuckSymbol = args => {
 	// strip all non-symbols

@@ -102,6 +102,7 @@ notesById: {
 	1: {
 		id: 1,
 		content: "provided by MACS 2",
+		aircrewRefIds: [],
 	},
 	//2: {...},
 },
