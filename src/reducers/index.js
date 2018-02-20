@@ -377,6 +377,7 @@ const notesById = (state = {}, action) => {
 		case DEL_AIRCREW:
 			let newNotesById = Object.assign({},state);
 			Object.keys(newNotesById).forEach(noteId => {
+				newNotesById[noteId] = Object.assign({},state[noteId]);
 				newNotesById[noteId].aircrewRefIds = newNotesById[noteId].aircrewRefIds.filter(id => id !== action.id);
 			});
 			return newNotesById;
@@ -427,23 +428,27 @@ const sortiesById = (state = {}, action) => {
 			delete rest[action.id];
 			return rest;
 		case DEL_AIRCREW:
+			console.log("sortiesById");
+			console.log(state);
 			let newSortiesById = Object.assign({},state);
 			Object.keys(newSortiesById).forEach(sortieId => {
+				newSortiesById[sortieId] = Object.assign({},state[sortieId]);
 				if (action.id === newSortiesById[sortieId].front.crewId) {
-					newSortiesById[sortieId].front = {
-						...newSortiesById[sortieId].front,
-						inputName: "",
-						crewId: null,
-					};
+					newSortiesById[sortieId].front = Object.assign({}, state[sortieId].front, {
+							inputName: "",
+							crewId: null,
+						}
+					);
 				}
 				if (action.id === newSortiesById[sortieId].back.crewId) {
-					newSortiesById[sortieId].back = {
-						...newSortiesById[sortieId].back,
-						inputName: "",
-						crewId: null,
-					};
+					newSortiesById[sortieId].back = Object.assign({}, state[sortieId].back, {
+							inputName: "",
+							crewId: null,
+						}
+					);
 				}
 			});
+			console.log(newSortiesById);
 			return newSortiesById;
 		case ADD_UPDATE_NOTE:
 			if (action.entity !== 'sortie' || state[action.entityId].notes.indexOf(action.id) > -1) {

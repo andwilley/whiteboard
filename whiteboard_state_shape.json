@@ -25,7 +25,7 @@ snivsById: {
 	1: {
 		id: 1,
 		day: 1,
-		crew: 1,
+		crewId: 1,
 		start: 1200,
 		end: 1400,
 		content: "dental",
