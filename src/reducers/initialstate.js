@@ -65,7 +65,7 @@ export const INITIAL_STATE = {
 	flightsById: {
 		1: {
 			id: 1,
-			sim: false,
+			sim: true,
 			// flow: "pit",
 			times: {
 				brief: "",

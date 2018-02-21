@@ -157,40 +157,7 @@ test('update crew steam', () => {
 	.toEqual(nextState4);
 });
 
-// ****************** test add / del quals
-
-// let runningState5 = whiteboardApp(runningState4,addAircrewQuals(
-// 	1,
-// 	["FAI","SL","DL","MC","MC"]
-// ));
-
-// runningState5 = whiteboardApp(runningState5,delAircrewQuals(
-// 	1,
-// 	["ML"]
-// ));
-
-// runningState5 = whiteboardApp(runningState5,delAircrewQuals(
-// 	1,
-// 	["DL","MC"]
-// ));
-
-// let nextState5 = {
-// 	...nextState4,
-// 	aircrewById: {
-// 		...nextState4.aircrewById,
-// 		[1]: {
-// 			...nextState4.aircrewById[1],
-// 			quals: nextState4.aircrewById[1].quals.concat(["SL"]),
-// 		}
-// 	}
-// }
-
-// test('add del quals steam', () => {
-// 	expect(runningState5)
-// 	.toEqual(nextState5);
-// });
-
-// ********************* test set current day
+// ************************ test set current day
 
 const runningState6 = whiteboardApp(runningState4,setCurrentDay(
 	'2018-01-09'
@@ -797,6 +764,8 @@ test('update puck info', () => {
 
 // *************** test add del aircrewIds in note refs
 
+// add an aircrew to delete later
+
 const runningState2013 = whiteboardApp(runningState20,addUpdateAircrew({
 	callsign: 'Dump',
 	rank: 3,
@@ -805,6 +774,8 @@ const runningState2013 = whiteboardApp(runningState20,addUpdateAircrew({
 	seat: "pilot",
 	quals: ['FAI'],
 }));
+
+// add some crewId refs to notes (including the new aircrew we'll delete)
 
 const runningState208 = whiteboardApp(runningState2013,addCrewRefToNote
 	(1,4)
@@ -825,6 +796,8 @@ const runningState2011 = whiteboardApp(runningState2010,addCrewRefToNote
 const runningState2012 = whiteboardApp(runningState2011,delCrewRefFromNote
 	(1,2)
 );
+
+// add crewId to first sortie (this tests Object copying in next test)
 
 const runningState2022 = {
 	...runningState2012,
@@ -860,7 +833,7 @@ const nextState202 = {
 		},
 	},
 	allAircrew: [1,4],
-	"notesById": {
+	notesById: {
 		...nextState20.notesById,
 		1: {
 			...nextState20.notesById[1],
@@ -871,7 +844,7 @@ const nextState202 = {
 			aircrewRefIds: nextState20.notesById[6].aircrewRefIds.concat([4,1]),
 		},
 	},
-	"sortiesById": {
+	sortiesById: {
 		...nextState20.sortiesById,
 		1: {
 			...nextState20.sortiesById[1],
@@ -883,14 +856,15 @@ const nextState202 = {
 	},
 };
 
-// commented out this test becuase it makes my stats look bad... :-)
-// test('add del aircrew refs in notes', () => {
-// 	expect(runningState2022)
-// 	.toEqual(nextState202);
-// });
+test('add del aircrew refs in notes', () => {
+	expect(runningState2022)
+	.toEqual(nextState202);
+});
 
 
 // ********** test that del aircrew gets rid of sorties and notes too
+
+// add sorties and fill in their crewIds
 
 const runningState2014 = whiteboardApp(runningState2022,addSortie(1));
 const runningState2015 = whiteboardApp(runningState2014,addSortie(1));
@@ -930,8 +904,8 @@ const runningState2016 = {
 
 const runningState2020 = whiteboardApp(runningState2016,delAircrew(4));
 
-const nextState20222 = Object.assign({},nextState202);
-delete nextState20222.aircrewById[4]; // this is also deleting aircrew 4 from nextState202. What the fuck is going on???
+const nextState20222 = Object.assign({},nextState202, {aircrewById: Object.assign({},nextState202.aircrewById)});
+delete nextState20222.aircrewById[4]; 
 
 const nextState203 = {
 	...nextState20222,

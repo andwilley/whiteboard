@@ -428,8 +428,6 @@ const sortiesById = (state = {}, action) => {
 			delete rest[action.id];
 			return rest;
 		case DEL_AIRCREW:
-			console.log("sortiesById");
-			console.log(state);
 			let newSortiesById = Object.assign({},state);
 			Object.keys(newSortiesById).forEach(sortieId => {
 				newSortiesById[sortieId] = Object.assign({},state[sortieId]);
@@ -448,7 +446,6 @@ const sortiesById = (state = {}, action) => {
 					);
 				}
 			});
-			console.log(newSortiesById);
 			return newSortiesById;
 		case ADD_UPDATE_NOTE:
 			if (action.entity !== 'sortie' || state[action.entityId].notes.indexOf(action.id) > -1) {
