@@ -44,8 +44,22 @@ export const INITIAL_STATE = {
 			odos: 0,
 			notes: [],
 		},
+		4: {
+			id: 4,
+			rank: 3,
+			first: "Steve",
+			last: "Hand",
+			callsign: "Cox",
+			seat: "wso",
+			quals: ['FAC(A)'],
+			flightPucks: [],
+			simPucks: [],
+			snivs: [],
+			odos: 0,
+			notes: [],
+		},
 	},
-	allAircrew: [1,2,3],
+	allAircrew: [1,2,3,4],
 	daysById: {
 		'2018-01-24': {
 			id: '2018-01-24',
@@ -58,7 +72,7 @@ export const INITIAL_STATE = {
 			// 	set: 2031,
 			// },
 			flights: [1,2],
-			notes: [],
+			notes: [2],
 		},
 	},
 	allDays: ['2018-01-24'],
@@ -74,7 +88,7 @@ export const INITIAL_STATE = {
 			},
 			airspace: [],
 			sorties: [1,2],
-			notes: [],
+			notes: [1],
 		},
 		2: {
 			id: 2,
@@ -91,8 +105,19 @@ export const INITIAL_STATE = {
 		},
 	},
 	allFlights: [1,2],
-	notesById: {},
-	allNotes: [],
+	notesById: {
+		1: {
+			id: 1,
+			content: "test flight note",
+			aircrewRefIds: [1,2,3],
+		},
+		2: {
+			id: 2,
+			content: "test day note",
+			aircrewRefIds: [1,2,3],
+		},
+	},
+	allNotes: [1,2],
 	crewList: {
 		currentDay: "2018-01-24",
 	},

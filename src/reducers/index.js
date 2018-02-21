@@ -356,7 +356,7 @@ const notesById = (state = {}, action) => {
 			delete rest[action.id];
 			return rest;
 		case ADD_CREW_REF_TO_NOTE:
-			if (state[action.noteId].aircrewRefIds.indexOf(action.id) > -1) {
+			if (state[action.noteId].aircrewRefIds.indexOf(action.aircrewId) > -1) {
 				return state;
 			}
 			return {

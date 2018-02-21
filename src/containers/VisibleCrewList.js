@@ -20,45 +20,36 @@ const blankForm = {
 
 const getDayPucks = (state) => {
 	let crewId, eventType;
+	const seats = ["front", "back"];
 	let newPuck = {
 		flight: 0,
 		sim: 0,
-		flightNote: 0
+		flightNote: 0,
+		dayNote: 0,
 	};
-	let pucks = {};
 	const aircrewCurrentDayPucks = state.daysById[state.crewList.currentDay].flights
 		.reduce((flightPucks,flightId) => {
 			eventType = state.flightsById[flightId].sim ? "sim" : "flight";
-			pucks = state.flightsById[flightId].sorties
-				.reduce((sortiePucks, sortieId) => {
-					crewId = state.sortiesById[sortieId].front.crewId;
-					sortiePucks[crewId] = sortiePucks[crewId] ? 
+			state.flightsById[flightId].sorties.forEach(sortieId => {
+				seats.forEach(seat => {
+					crewId = state.sortiesById[sortieId][seat].crewId;
+					flightPucks[crewId] = flightPucks[crewId] ? 
 						{
-							...sortiePucks[crewId],
-							[eventType]: sortiePucks[crewId][eventType] + 1,
+							...flightPucks[crewId],
+							[eventType]: flightPucks[crewId][eventType] + 1,
 						} :
 						{
 							...newPuck,
 							[eventType]: 1,
 						};
-					crewId = state.sortiesById[sortieId].back.crewId;
-					sortiePucks[crewId] = sortiePucks[crewId] ? 
-						{
-							...sortiePucks[crewId],
-							[eventType]: sortiePucks[crewId][eventType] + 1,
-						} :
-						{
-							...newPuck,
-							[eventType]: 1,
-						};
-					return sortiePucks;
-				},{});
+				});
+			});
 			state.flightsById[flightId].notes.forEach(noteId => {
 				state.notesById[noteId].aircrewRefIds.forEach(id => {
-					pucks[id] = pucks[id] ?
+					flightPucks[id] = flightPucks[id] ?
 						{
-							...pucks[id],
-							flightNote: pucks[id].flightNote + 1,
+							...flightPucks[id],
+							flightNote: flightPucks[id].flightNote + 1,
 						} :
 						{
 							...newPuck,
@@ -66,27 +57,21 @@ const getDayPucks = (state) => {
 						};
 				});
 			});
-			Object.keys(pucks).forEach(key => {
-				flightPucks[key] = flightPucks[key] ? 
-					{
-						flight: flightPucks[key].flight + pucks[key].flight,
-						sim: flightPucks[key].sim + pucks[key].sim,
-						flightNote: flightPucks[key].flightNote + pucks[key].flightNote,
-					} :
-					{
-						...pucks[key],
-					};
-			});
 			return flightPucks;
-		},{});
-	const aircrewDayNotePucks = state.daysById[state.crewList.currentDay].notes
-		.reduce((dayNotePucks, noteId) => {
-			state.notesById[noteId].aircrewRefIds.forEach(id => {
-				dayNotePucks[id] = dayNotePucks[id] ? dayNotePucks[id] + 1 : 1;
-			});
-			return dayNotePucks;
-		},{});
-	// merge aircrewDayNotePucks with aircrewCurrentDayPucks. The keys won't necessarily be the same.
+	},{});
+	state.daysById[state.crewList.currentDay].notes.forEach(noteId => {
+		state.notesById[noteId].aircrewRefIds.forEach(aircrewId => {
+			aircrewCurrentDayPucks[aircrewId] = aircrewCurrentDayPucks[aircrewId] ?
+				{
+					...aircrewCurrentDayPucks[aircrewId],
+					dayNote: aircrewCurrentDayPucks[aircrewId].dayNote + 1,
+				} :
+				{
+					...newPuck,
+					dayNote: 1,
+				};
+		});
+	});
 	return aircrewCurrentDayPucks;
 };
 
@@ -94,7 +79,7 @@ const getAircrewList = state => {
   const aircrewDayPucks = getDayPucks(state);
   return state.allAircrew.map( aircrewId => {
   	const aircrewWithPucks = Object.assign({},state.aircrewById[aircrewId]);
-  	aircrewWithPucks["pucks"] = aircrewDayPucks[aircrewId] ? aircrewDayPucks[aircrewId] : {flight: 0, sim: 0, flightNote: 0};
+  	aircrewWithPucks["pucks"] = aircrewDayPucks[aircrewId] ? Object.assign({},aircrewDayPucks[aircrewId]) : {flight: 0, sim: 0, flightNote: 0, dayNote: 0};
   	return aircrewWithPucks;
   });
 };
