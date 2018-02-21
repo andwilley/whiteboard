@@ -84,12 +84,12 @@ const intToRank = rank => {
     }
 };
 
-const AddUpdateAircrewForm = ({ onInputChange, onSubmit, addUpdateAircrewFormValues }) => {
+const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpdateAircrewFormValues }) => {
     const rankIsValid = addUpdateAircrewFormValues.rank === 0 ? true : parseRank(addUpdateAircrewFormValues.rank);
-    return addUpdateAircrewFormValues.display ? (
+    return (
         <form onSubmit={e => {
             e.preventDefault();
-            onSubmit({
+            onAddUpdateAircrewSubmit({
                 id: addUpdateAircrewFormValues.id,
                 callsign: addUpdateAircrewFormValues.callsign,
                 first: addUpdateAircrewFormValues.first,
@@ -119,8 +119,7 @@ const AddUpdateAircrewForm = ({ onInputChange, onSubmit, addUpdateAircrewFormVal
             })}<br />
             <button type="submit" disabled={addUpdateAircrewFormValues.callsign === "" ? "disabled" : ""}>{addUpdateAircrewFormValues.existingAircrewUnchanged ? "Clear" : "Submit"}</button>
         </form>
-    ) :
-    "";
+    );
 };
 
 export default AddUpdateAircrewForm;   

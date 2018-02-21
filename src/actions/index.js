@@ -66,16 +66,16 @@ export const setAircrewForm = args => {
 	};
 };
 
-let crewId = 0;			// for testing
+// let crewId = 0;			// for testing
 export const addUpdateAircrew = args => {
-	// const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
-	let aircrewId; // for testing
-	if (args.id) {
-		aircrewId = args.id;
-	} else {
-		crewId++; 
-		aircrewId = crewId;
-	}// for testing
+	const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
+	// let aircrewId; // for testing
+	// if (args.id) {
+	// 	aircrewId = args.id;
+	// } else {
+	// 	crewId++; 
+	// 	aircrewId = crewId;
+	// }// for testing
 	return {
 		type: ADD_UPDATE_AIRCREW,
 		id: aircrewId,

@@ -1,22 +1,8 @@
-import { connect } from 'react-redux'
-import { addUpdateAircrew,
-				 delAircrew,
-				 addUpdateAircrewFormAddQual,
-				 addUpdateAircrewFormDelQual,
-				 setAircrewForm} from '../actions/index'
-import CrewList from '../components/CrewList'
-
-const blankForm = {
-	id: "",
-	callsign: "",
-	first: "",
-	last: "",
-	rank: 0,
-	seat: "pilot",
-	quals: [],
-	existingAircrewUnchanged: false,
-	display: false,
-};
+import { connect } from 'react-redux';
+import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
+import { delAircrew,
+				 setAircrewForm} from '../actions/index';
+import CrewList from '../components/CrewList';
 
 const getDayPucks = (state) => {
 	let crewId, eventType;
@@ -84,15 +70,15 @@ const getAircrewList = state => {
   });
 };
 
-const getAddUpdateAircrewFormValues = state => {
-	return state.addUpdateAircrewFormValues;
+const getAddUpdateAircrewFormDisplay = state => {
+	return state.addUpdateAircrewFormValues.display;
 };
 
 const mapStateToProps = state => {
   return {
     aircrewList: getAircrewList(state),
-    // need something to validate unique callsigns from server.
-    addUpdateAircrewFormValues: getAddUpdateAircrewFormValues(state),
+    addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
+    // need something to validate unique callsigns from server async.
   };
 };
 
@@ -110,37 +96,11 @@ const mapDispatchToProps = dispatch => {
     	aircrew["display"] = true;
     	dispatch(setAircrewForm(aircrew));
     },
-    onAddUpdateAircrewSubmit: aircrew => {
-      if (aircrew.callsign === "") {
-          return;
-      }
-    	if (!aircrew.existingAircrewUnchanged) {
-    		dispatch(addUpdateAircrew(aircrew));
-    	}
-    	dispatch(setAircrewForm(blankForm));
-    },
-    // need async action to validate unique callsign on server.
-    onInputChange: event => {
-    	const target = event.target;
-    	const name = target.name;
-    	let value;
-    	switch (name) {
-    		case "quals":
-    			value = target.value;
-    			dispatch(target.checked ? addUpdateAircrewFormAddQual(value) : addUpdateAircrewFormDelQual(value));
-    			break;
-    		default:
-    			value = target.value;
-    			dispatch(setAircrewForm({[name]: value}));
-    			break;
-    	}
-    	dispatch(setAircrewForm({"existingAircrewUnchanged":false}));
-    },
     onAddAircrewFormButtonClick: () => {
     	dispatch(setAircrewForm({"display": true}));
     },
     onDelAircrewFormButtonClick: () => {
-    	dispatch(setAircrewForm(blankForm));
+    	dispatch(setAircrewForm(blankAddUpdateAircrewForm));
     },
   };
 };

@@ -1,7 +1,7 @@
 // reducers
 
 import { combineReducers } from 'redux';
-import { qualsList } from '../whiteboard-config';
+import { qualsList } from '../whiteboard-constants';
 import {
 		ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
 		ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,

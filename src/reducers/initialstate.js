@@ -1,4 +1,4 @@
-import { qualsList } from "../whiteboard-config";
+import { qualsList } from "../whiteboard-constants";
 
 export const INITIAL_STATE = {
 	aircrewById: {

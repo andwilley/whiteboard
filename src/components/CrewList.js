@@ -2,19 +2,17 @@ import React from 'react';
 import Aircrew from './Aircrew';
 import AddButton from '../components/AddButton';
 import DelButton from '../components/DelButton';
-import AddUpdateAircrewForm from './AddUpdateAircrewForm';
+import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 import PropTypes from 'prop-types';
 
 const CrewList = ({ 
     aircrewList,
+    addUpdateAircrewFormDisplay,
     onAircrewClick,
     onXClick,
     onEditClick,
     onAddAircrewFormButtonClick,
     onDelAircrewFormButtonClick,
-    addUpdateAircrewFormValues,
-    onInputChange,
-    onAddUpdateAircrewSubmit,
     }) => (
     <div>
         <ul>
@@ -28,14 +26,14 @@ const CrewList = ({
                 />
             ))}
         </ul>
-        {addUpdateAircrewFormValues.display ? 
-            <DelButton onClick={() => onDelAircrewFormButtonClick()} /> :
-            <AddButton onClick={() => onAddAircrewFormButtonClick()} />}
-        <AddUpdateAircrewForm 
-            addUpdateAircrewFormValues={addUpdateAircrewFormValues} 
-            onInputChange={event => onInputChange(event)} 
-            onSubmit={input => onAddUpdateAircrewSubmit(input)} 
-        />
+        {addUpdateAircrewFormDisplay ? 
+            <div>
+                <DelButton onClick={() => onDelAircrewFormButtonClick()} />
+                <AddUpdateAircrewFormContainer />
+            </div> :
+            <div>
+                <AddButton onClick={() => onAddAircrewFormButtonClick()} />
+            </div>}
     </div>
 );
 
