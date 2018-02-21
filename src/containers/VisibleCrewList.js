@@ -1,3 +1,5 @@
+// @flow
+
 import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
 import { delAircrew,

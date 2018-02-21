@@ -48,7 +48,7 @@ daysById: {
 		notes: [3,2,6],
 	},
 	//20180110: {...},
-}
+},
 allDays: [1,2],
 flightsById: {
 	1: {
@@ -65,7 +65,7 @@ flightsById: {
 		notes: [1,2,3],
 	},
 	//2: {...},
-}
+},
 allFlights: [1,2],
 sortiesById: {
 	1: {
@@ -86,7 +86,7 @@ sortiesById: {
 		notes: [8,9],
 	},
 	//2: {...},
-}
+},
 allSorties: [1,2],
 airspaceById: {
 	1: {
@@ -113,7 +113,7 @@ crewList: {
 	qualfilter: [],
 	rankfilter: [],
 },
-settings {
+settings: {
 	display: {
 		panes: 1,											// default should be 2 as soon as I can figure it out
 		baseDay: 20180109,									// determines which day is furthest left in the view, distict from currentDay for the crewList
