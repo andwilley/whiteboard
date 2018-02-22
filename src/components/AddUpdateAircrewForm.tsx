@@ -1,7 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const parseRank = rank => {
+const parseRank = (rank: string | number) => {
     const validRanks = {
         "second lieutenant": 1,
         "2nd lieutenant": 1,
@@ -39,7 +38,7 @@ const parseRank = rank => {
         "general": 10,
         "gen": 10,
     };
-    if (rank === parseInt(rank,10)) {
+    if (typeof rank === "number") {
         return rank;
     }
     rank = rank.toLowerCase();
@@ -54,8 +53,8 @@ const parseRank = rank => {
     return 0;
 };
 
-const intToRank = rank => {
-    if (rank !== parseInt(rank,10)) {
+const intToRank = (rank: string | number) => {
+    if (typeof rank !== "number") {
         return rank;
     }
     switch (rank) {
@@ -84,7 +83,7 @@ const intToRank = rank => {
     }
 };
 
-const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpdateAircrewFormValues }) => {
+const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpdateAircrewFormValues }: any) => {
     const rankIsValid = addUpdateAircrewFormValues.rank === 0 ? true : parseRank(addUpdateAircrewFormValues.rank);
     return (
         <form onSubmit={e => {
@@ -106,7 +105,7 @@ const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpda
             <input type="text" placeholder="First" name="first" value={addUpdateAircrewFormValues.first} onChange={onInputChange} />
             <input type="text" placeholder="Last" name="last" value={addUpdateAircrewFormValues.last} onChange={onInputChange} />
             <input type="text" placeholder="Rank" name="rank" style={{borderColor: rankIsValid ? "" : "red",}} value={intToRank(addUpdateAircrewFormValues.rank)} onChange={onInputChange} />
-            <select type="select" name="seat" value={addUpdateAircrewFormValues.seat} onChange={onInputChange}>
+            <select name="seat" value={addUpdateAircrewFormValues.seat} onChange={onInputChange}>
                 <option value="pilot">
                     Pilot
                 </option>
@@ -114,7 +113,7 @@ const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpda
                     WSO
                 </option>
             </select><br />
-            { addUpdateAircrewFormValues.qualsList.map( qual => {
+            { addUpdateAircrewFormValues.qualsList.map( (qual: number) => {
                 return (<label htmlFor="qual" key={qual}><input type="checkbox" name="quals" value={qual} checked={addUpdateAircrewFormValues.quals.indexOf(qual) > -1 ? "checked" : ""} onChange={onInputChange} />{qual}</label>);
             })}<br />
             <button type="submit" disabled={addUpdateAircrewFormValues.callsign === "" ? "disabled" : ""}>{addUpdateAircrewFormValues.existingAircrewUnchanged ? "Clear" : "Submit"}</button>

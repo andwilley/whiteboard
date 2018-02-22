@@ -1,4 +1,4 @@
-import cuid from "cuid";
+import * as cuid from "cuid";
 
 // Action Types
 
@@ -43,21 +43,21 @@ export const UPDATE_LOADOUT = "UPDATE_LOADOUT";
 //     return result;
 // };
 
-export const addUpdateAircrewFormAddQual = qual => {
+export const addUpdateAircrewFormAddQual = (qual: string[]) => {
 	return {
 		type: ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
 		qual,
 	};
 };
 
-export const addUpdateAircrewFormDelQual = qual => {
+export const addUpdateAircrewFormDelQual = (qual: string[]) => {
 	return {
 		type: ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
 		qual,
 	};
 };
 
-export const setAircrewForm = args => {
+export const setAircrewForm = (args: any) => {
 	return {
 		type: SET_AIRCREW_FORM,
 		payload: {
@@ -67,7 +67,7 @@ export const setAircrewForm = args => {
 };
 
 // let crewId = 0;			// for testing
-export const addUpdateAircrew = args => {
+export const addUpdateAircrew = (args: any) => {
 	const aircrewId = args.id === "" ? cuid() : args.id; // uncomment after testing
 	// let aircrewId; // for testing
 	// if (args.id) {
@@ -88,21 +88,21 @@ export const addUpdateAircrew = args => {
 	};
 };
 
-export const delAircrew = id => {
+export const delAircrew = (id: number) => {
 	return {
 		type: DEL_AIRCREW,
 		id,
 	};
 };
 
-export const setCurrentDay = (day) => {
+export const setCurrentDay = (day: string) => {
 	return {
 		type: SET_CURRENT_DAY,
 		day,
 	};
 };
 
-export const addDay = day => {
+export const addDay = (day: Date) => {
 	day = new Date(day);
 	return {
 		type: ADD_DAY,
@@ -115,7 +115,7 @@ export const addDay = day => {
 };
 
 let flightId = 0;		// for testing
-export const addFlight = (dayId, sim=false) => {
+export const addFlight = (dayId: number, sim: boolean = false) => {
 	// flightId = cuid();
 	flightId++;			// for testing
 	return {
@@ -126,7 +126,7 @@ export const addFlight = (dayId, sim=false) => {
 	};
 };
 
-export const delFlight = (id, dayId) => {
+export const delFlight = (id: number, dayId: number) => {
 	return {
 		type: DEL_FLIGHT,
 		id,
@@ -134,7 +134,7 @@ export const delFlight = (id, dayId) => {
 	};
 };
 
-export const updateFlightTime = (id, timeType, time) => {
+export const updateFlightTime = (id: number, timeType: string, time: string) => {
 	return {
 		type: UPDATE_FLIGHT_TIME,
 		id,
@@ -143,7 +143,7 @@ export const updateFlightTime = (id, timeType, time) => {
 	};
 };
 
-export const toggleFlightType = id => {
+export const toggleFlightType = (id: number) => {
 	return {
 		type: TOGGLE_FLIGHT_TYPE,
 		id,
@@ -151,7 +151,7 @@ export const toggleFlightType = id => {
 };
 
 let cnoteId = 0;			// for testing
-export const addUpdateNote = args => {
+export const addUpdateNote = (args: any) => {
 	if (!args.content) {
 		args.content = '';
 	}
@@ -174,7 +174,7 @@ export const addUpdateNote = args => {
 	};
 };
 
-export const delNote = args => { // maybe the note could store the entity and entityId so we don't have to specify in the args
+export const delNote = (args: any) => { // maybe the note could store the entity and entityId so we don't have to specify in the args
 	return {
 		type: DEL_NOTE,
 		id: args.id,
@@ -183,7 +183,7 @@ export const delNote = args => { // maybe the note could store the entity and en
 	};
 };
 
-export const addCrewRefToNote = (noteId, aircrewId) => {
+export const addCrewRefToNote = (noteId: number, aircrewId: number) => {
 	return {
 		type: ADD_CREW_REF_TO_NOTE,
 		noteId,
@@ -191,7 +191,7 @@ export const addCrewRefToNote = (noteId, aircrewId) => {
 	};
 };
 
-export const delCrewRefFromNote = (noteId, aircrewId) => {
+export const delCrewRefFromNote = (noteId: number, aircrewId: number) => {
 	return {
 		type: DEL_CREW_REF_FROM_NOTE,
 		noteId,
@@ -200,7 +200,7 @@ export const delCrewRefFromNote = (noteId, aircrewId) => {
 };
 
 let sortieId = 0;			// for testing
-export const addSortie = flightId => {
+export const addSortie = (flightId: number) => {
 	// sortieId = cuid();
 	sortieId++;				// for testing
 	return {
@@ -210,7 +210,7 @@ export const addSortie = flightId => {
 	};
 };
 
-export const delSortie = (id, flightId) => {
+export const delSortie = (id: number, flightId: number) => {
 	return {
 		type: DEL_SORTIE,
 		id,
@@ -218,7 +218,7 @@ export const delSortie = (id, flightId) => {
 	};
 };
 
-export const updatePuckName = args => {
+export const updatePuckName = (args: any) => {
 	return {
 		type: UPDATE_PUCK_NAME,
 		sortieId: args.sortieId,
@@ -227,20 +227,21 @@ export const updatePuckName = args => {
 	};
 };
 
-export const updatePuckCode = args => {
+export const updatePuckCode = (args: any) => {
 	// strip non-numeric chars from front and back of input
-	let newCodes = codes => {
-		let codesStartIndex, codesEndIndex;
+	let newCodes = (codes: string) => {
+		let codesStartIndex: number = 0
+		let codesEndIndex: number = codes.length;
 		const lenCodes = codes.length;
 		for (let i = 0; i < lenCodes; i++) {
+			codesStartIndex = i;
 			if (codes[i].match(/\d/)) {
-				codesStartIndex = i;
 				break;
 			}
 		}
-		for (let lenCodes = codes.length, i = lenCodes - 1; i > 0; i--) {
+		for (let i = lenCodes - 1; i > 0; i--) {
+			codesEndIndex = i+1;
 			if (codes[i].match(/\d/)) {
-				codesEndIndex = i+1;
 				break;
 			}
 		}
@@ -250,11 +251,11 @@ export const updatePuckCode = args => {
 	let codes = newCodes(args.codes);
 	
 	// make it an array
-	codes = codes.split(/[^\d]+/);
+	let codesList: string[] = codes.split(/[^\d]+/);
 	
 	// get rid of duplicates or empty strings
 	let codeCount = {};
-	codes = codes.filter(code => {
+	codesList = codesList.filter(code => {
 		if (codeCount[code] || code === "") {
 			return false;
 		}
@@ -265,11 +266,11 @@ export const updatePuckCode = args => {
 		type: UPDATE_PUCK_CODE,
 		sortieId: args.sortieId,
 		crewPosition: args.crewPosition,
-		codes,
+		codes: codesList,
 	};
 };
 
-export const updatePuckSymbol = args => {
+export const updatePuckSymbol = (args: any) => {
 	// strip all non-symbols
 	let symbols = args.symbols.replace(/[^@!?~#$%*+=]+/g,""); // [^@!\?~#\$%\*\+=+]
 	
@@ -279,7 +280,7 @@ export const updatePuckSymbol = args => {
 	// get rid of duplicates and empty strings
 	// this is inefficient. can do it all in one step. this array will never be longer than 10 items, though.
 	let symbolCount = {};
-	symbols = symbols.filter(symbol => {
+	symbols = symbols.filter((symbol: string) => {
 		if (symbolCount[symbol] || symbol === "") {
 			return false;
 		}
@@ -295,7 +296,7 @@ export const updatePuckSymbol = args => {
 };
 
 let airspaceId = 0;			// for testing
-export const addAirspace = flightId => {
+export const addAirspace = (flightId: number) => {
 	// airspaceId = cuid();
 	airspaceId++;			// for testing
 	return {
@@ -305,7 +306,7 @@ export const addAirspace = flightId => {
 	};
 };
 
-export const delAirspace = (id, flightId) => {
+export const delAirspace = (id: number, flightId: number) => {
 	return {
 		type: DEL_AIRSPACE,
 		id,
@@ -313,7 +314,7 @@ export const delAirspace = (id, flightId) => {
 	};
 };
 
-export const updateAirspace = args => {
+export const updateAirspace = (args: any) => {
 	return {
 		type: UPDATE_AIRSPACE,
 		id: args.id,
@@ -322,7 +323,7 @@ export const updateAirspace = args => {
 	};
 };
 
-export const updateLoadout = (sortieId, input) => {
+export const updateLoadout = (sortieId: number, input: string) => {
 	return {
 		type: UPDATE_LOADOUT,
 		sortieId,
