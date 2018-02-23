@@ -25,6 +25,7 @@
     "webpack",
     "jest",
     "src/setupTests.ts",
+    "src/App.test.js",
     "src/whiteboard_state_shape.json"
   ]
 }
