@@ -1,9 +1,8 @@
-import React from 'react';
+import * as React from 'react';
 import Aircrew from './Aircrew';
 import AddButton from '../components/AddButton';
 import DelButton from '../components/DelButton';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
-import PropTypes from 'prop-types';
 
 const CrewList = ({ 
     aircrewList,
@@ -13,10 +12,10 @@ const CrewList = ({
     onEditClick,
     onAddAircrewFormButtonClick,
     onDelAircrewFormButtonClick,
-    }) => (
+    }: any) => (
     <div>
         <ul>
-            { aircrewList.map(aircrew => (
+            { aircrewList.map((aircrew: any) => (
                 <Aircrew 
                     key={aircrew.id} 
                     aircrew={aircrew} 

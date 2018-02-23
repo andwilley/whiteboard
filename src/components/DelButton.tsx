@@ -1,7 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const DelButton = ({onClick}) => {
+const DelButton = ({onClick}: any) => {
     return (
         <span onClick={onClick}>[-]</span>
     );
