@@ -85,57 +85,70 @@ const intToRank = (rank: string | number) => {
 
 const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpdateAircrewFormValues }: any) => {
     const rankIsValid = addUpdateAircrewFormValues.rank === 0 ? true : parseRank(addUpdateAircrewFormValues.rank);
+    const onSubmit = (e: any) => {
+        e.preventDefault();
+        onAddUpdateAircrewSubmit({
+            id: addUpdateAircrewFormValues.id,
+            callsign: addUpdateAircrewFormValues.callsign,
+            first: addUpdateAircrewFormValues.first,
+            last: addUpdateAircrewFormValues.last,
+            rank: parseRank(addUpdateAircrewFormValues.rank),
+            seat: addUpdateAircrewFormValues.seat,
+            quals: addUpdateAircrewFormValues.quals,
+            existingAircrewUnchanged: addUpdateAircrewFormValues.existingAircrewUnchanged,
+        });
+    };
+    const qualCheckboxList = addUpdateAircrewFormValues.qualsList.map( (qual: string) => (
+        <label htmlFor="qual" key={qual}>
+            <input
+                type="checkbox"
+                name="quals"
+                value={qual}
+                checked={addUpdateAircrewFormValues.quals.indexOf(qual) > -1 ? true : false}
+                onChange={onInputChange}
+            />
+            {qual}
+        </label>
+    ));
     return (
         <form
-            onSubmit={e => {
-                e.preventDefault();
-                onAddUpdateAircrewSubmit({
-                    id: addUpdateAircrewFormValues.id,
-                    callsign: addUpdateAircrewFormValues.callsign,
-                    first: addUpdateAircrewFormValues.first,
-                    last: addUpdateAircrewFormValues.last,
-                    rank: parseRank(addUpdateAircrewFormValues.rank),
-                    seat: addUpdateAircrewFormValues.seat,
-                    quals: addUpdateAircrewFormValues.quals,
-                    existingAircrewUnchanged: addUpdateAircrewFormValues.existingAircrewUnchanged,
-                });
-            }}
+            onSubmit={e => onSubmit(e)}
         >
             {addUpdateAircrewFormValues.id === '' ? 'Add' : 'Update'} Aircrew:<br />
-            <input 
-                type="hidden" 
-                name="id" 
-                value={addUpdateAircrewFormValues.id} 
+            <input
+                type="hidden"
+                name="id"
+                value={addUpdateAircrewFormValues.id}
             />
-            <input 
-                type="text" 
-                placeholder="Callsign*" 
-                name="callsign" 
-                value={addUpdateAircrewFormValues.callsign} 
-                onChange={onInputChange} 
-                required={true} 
+            <input
+                type="text"
+                placeholder="Callsign*"
+                name="callsign"
+                value={addUpdateAircrewFormValues.callsign}
+                onChange={onInputChange}
+                required={true}
             />
-            <input 
-                type="text" 
-                placeholder="First" 
-                name="first" 
-                value={addUpdateAircrewFormValues.first} 
-                onChange={onInputChange} 
+            <input
+                type="text"
+                placeholder="First"
+                name="first"
+                value={addUpdateAircrewFormValues.first}
+                onChange={onInputChange}
             />
-            <input 
-                type="text" 
-                placeholder="Last" 
-                name="last" 
-                value={addUpdateAircrewFormValues.last} 
-                onChange={onInputChange} 
+            <input
+                type="text"
+                placeholder="Last"
+                name="last"
+                value={addUpdateAircrewFormValues.last}
+                onChange={onInputChange}
             />
-            <input 
-                type="text" 
-                placeholder="Rank" 
-                name="rank" 
-                style={{borderColor: rankIsValid ? '' : 'red', }} 
-                value={intToRank(addUpdateAircrewFormValues.rank)} 
-                onChange={onInputChange} 
+            <input
+                type="text"
+                placeholder="Rank"
+                name="rank"
+                style={{borderColor: rankIsValid ? '' : 'red' }}
+                value={intToRank(addUpdateAircrewFormValues.rank)}
+                onChange={onInputChange}
             />
             <select name="seat" value={addUpdateAircrewFormValues.seat} onChange={onInputChange}>
                 <option value="pilot">
@@ -145,21 +158,9 @@ const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpda
                     WSO
                 </option>
             </select><br />
-            { addUpdateAircrewFormValues.qualsList.map( (qual: number) => {
-                return (
-                    <label htmlFor="qual" key={qual}>
-                        <input 
-                            type="checkbox" 
-                            name="quals" 
-                            value={qual} 
-                            checked={addUpdateAircrewFormValues.quals.indexOf(qual) > -1 ? true : false} 
-                            onChange={onInputChange} 
-                        />
-                            {qual}
-                        </label>);
-            })}<br />
-            <button 
-                type="submit" 
+            {qualCheckboxList}<br />
+            <button
+                type="submit"
                 disabled={addUpdateAircrewFormValues.callsign === '' ? true : false}
             >
                 {addUpdateAircrewFormValues.existingAircrewUnchanged ? 'Clear' : 'Submit'}
@@ -168,4 +169,4 @@ const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpda
     );
 };
 
-export default AddUpdateAircrewForm;   
+export default AddUpdateAircrewForm;

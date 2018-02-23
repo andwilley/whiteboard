@@ -4,7 +4,7 @@ import AddButton from '../components/AddButton';
 import DelButton from '../components/DelButton';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 
-const CrewList = ({ 
+const CrewList = ({
     aircrewList,
     addUpdateAircrewFormDisplay,
     onAircrewClick,
@@ -12,28 +12,36 @@ const CrewList = ({
     onEditClick,
     onAddAircrewFormButtonClick,
     onDelAircrewFormButtonClick,
-    }: any) => (
-    <div>
-        <ul>
-            { aircrewList.map((aircrew: any) => (
-                <Aircrew 
-                    key={aircrew.id} 
-                    aircrew={aircrew} 
-                    onAircrewClick={() => onAircrewClick(aircrew)} 
-                    onXClick={() => onXClick(aircrew.id)} 
-                    onEditClick={() => onEditClick(aircrew)} 
-                />
-            ))}
-        </ul>
-        {addUpdateAircrewFormDisplay ? 
-            <div>
-                <DelButton onClick={() => onDelAircrewFormButtonClick()} />
-                <AddUpdateAircrewFormContainer />
-            </div> :
-            <div>
-                <AddButton onClick={() => onAddAircrewFormButtonClick()} />
-            </div>}
-    </div>
-);
+    }: any) => {
+    const aircrewCompList = aircrewList.map((aircrew: any) => (
+        <Aircrew
+            key={aircrew.id}
+            aircrew={aircrew}
+            onAircrewClick={() => onAircrewClick(aircrew)}
+            onXClick={() => onXClick(aircrew.id)}
+            onEditClick={() => onEditClick(aircrew)}
+        />
+    ));
+    const formDisplayButton = addUpdateAircrewFormDisplay ?
+                (
+                <div>
+                    <DelButton onClick={() => onDelAircrewFormButtonClick()} />
+                    <AddUpdateAircrewFormContainer />
+                </div>
+                ) :
+                (
+                <div>
+                    <AddButton onClick={() => onAddAircrewFormButtonClick()} />
+                </div>
+                );
+    return (
+        <div>
+            <ul>
+                {aircrewCompList}
+            </ul>
+            {formDisplayButton}
+        </div>
+    );
+};
 
 export default CrewList;

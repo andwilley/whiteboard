@@ -73,7 +73,7 @@ export const addUpdateAircrew = (args: any) => {
     // if (args.id) {
     // 	aircrewId = args.id;
     // } else {
-    // 	crewId++; 
+    // 	crewId++;
     // 	aircrewId = crewId;
     // }// for testing
     return {
@@ -114,7 +114,7 @@ export const addDay = (day: Date) => {
     };
 };
 
-let testFlightId = 0;		// for testing
+const testFlightId = 0;		// for testing
 export const addFlight = (dayId: number, sim: boolean = false) => {
     // flightId = cuid();
     let flightId = testFlightId;
@@ -200,7 +200,7 @@ export const delCrewRefFromNote = (noteId: number, aircrewId: number) => {
     };
 };
 
-let testSortieId = 0;			// for testing
+const testSortieId = 0;			// for testing
 export const addSortie = (flightId: number) => {
     // const sortieId = cuid();
     let sortieId = testSortieId;
@@ -231,8 +231,8 @@ export const updatePuckName = (args: any) => {
 
 export const updatePuckCode = (args: any) => {
     // strip non-numeric chars from front and back of input
-    let newCodes = (codes: string) => {
-        let codesStartIndex: number = 0;
+    const newCodes = (codes: string) => {
+        let codesStartIndex = 0;
         let codesEndIndex: number = codes.length;
         const lenCodes = codes.length;
         for (let i = 0; i < lenCodes; i++) {
@@ -250,14 +250,14 @@ export const updatePuckCode = (args: any) => {
         codes = codes.slice(codesStartIndex, codesEndIndex);
         return codes;
     };
-    
-    let strippedCodes = newCodes(args.codes);
-    
+
+    const strippedCodes = newCodes(args.codes);
+
     // make it an array
     let codesList: string[] = strippedCodes.split(/[^\d]+/);
-    
+
     // get rid of duplicates or empty strings
-    let codeCount = {};
+    const codeCount = {};
     codesList = codesList.filter(code => {
         if (codeCount[code] || code === '') {
             return false;
@@ -276,13 +276,13 @@ export const updatePuckCode = (args: any) => {
 export const updatePuckSymbol = (args: any) => {
     // strip all non-symbols
     let symbols = args.symbols.replace(/[^@!?~#$%*+=]+/g, ''); // [^@!\?~#\$%\*\+=+]
-    
+
     // make it an array
     symbols = symbols.split('');
-    
+
     // get rid of duplicates and empty strings
     // this is inefficient. can do it all in one step. this array will never be longer than 10 items, though.
-    let symbolCount = {};
+    const symbolCount = {};
     symbols = symbols.filter((symbol: string) => {
         if (symbolCount[symbol] || symbol === '') {
             return false;

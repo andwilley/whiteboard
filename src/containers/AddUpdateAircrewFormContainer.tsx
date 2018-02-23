@@ -5,7 +5,7 @@ import { addUpdateAircrew,
          addUpdateAircrewFormAddQual,
          addUpdateAircrewFormDelQual,
          setAircrewForm } from '../actions/index';
-     
+
 const getAddUpdateAircrewFormValues = (state: any) => {
   return state.addUpdateAircrewFormValues;
 };
@@ -43,7 +43,7 @@ const mapDispatchToProps = (dispatch: any) => {
           dispatch(setAircrewForm({[name]: value}));
           break;
       }
-      dispatch(setAircrewForm({'existingAircrewUnchanged' : false}));
+      dispatch(setAircrewForm({existingAircrewUnchanged : false}));
     },
   };
 };

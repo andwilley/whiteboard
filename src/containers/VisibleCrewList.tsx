@@ -7,7 +7,7 @@ import CrewList from '../components/CrewList';
 const getDayPucks = (state: any) => {
   let crewId: number, eventType: string;
   const seats = ['front', 'back'];
-  let newPuck = {
+  const newPuck = {
     flight: 0,
     sim: 0,
     flightNote: 0,
@@ -19,7 +19,7 @@ const getDayPucks = (state: any) => {
       state.flightsById[flightId].sorties.forEach((sortieId: number) => {
         seats.forEach(seat => {
           crewId = state.sortiesById[sortieId][seat].crewId;
-          flightPucks[crewId] = flightPucks[crewId] ? 
+          flightPucks[crewId] = flightPucks[crewId] ?
             {
               ...flightPucks[crewId],
               [eventType]: flightPucks[crewId][eventType] + 1,
@@ -66,8 +66,8 @@ const getAircrewList = (state: any) => {
   const aircrewDayPucks = getDayPucks(state);
   return state.allAircrew.map( (aircrewId: number) => {
     const aircrewWithPucks = Object.assign({}, state.aircrewById[aircrewId]);
-    aircrewWithPucks.pucks = aircrewDayPucks[aircrewId] ? 
-      Object.assign({}, aircrewDayPucks[aircrewId]) : 
+    aircrewWithPucks.pucks = aircrewDayPucks[aircrewId] ?
+      Object.assign({}, aircrewDayPucks[aircrewId]) :
       {flight: 0, sim: 0, flightNote: 0, dayNote: 0};
     return aircrewWithPucks;
   });
@@ -89,7 +89,7 @@ const mapDispatchToProps = (dispatch: any) => {
   return {
     onAircrewClick: (aircrew: any) => {
       // dispatch(something(id)); not sure I'm going to need this. below is for test.
-      alert(Object.keys(aircrew).map(key => key + ': ' + aircrew[key]).join('\r'));
+      alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));
     },
     onXClick: (id: number) => {
       dispatch(delAircrew(id));
@@ -100,7 +100,7 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(setAircrewForm(aircrew));
     },
     onAddAircrewFormButtonClick: () => {
-      dispatch(setAircrewForm({'display': true}));
+      dispatch(setAircrewForm({display: true}));
     },
     onDelAircrewFormButtonClick: () => {
       dispatch(setAircrewForm(blankAddUpdateAircrewForm));

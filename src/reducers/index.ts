@@ -84,7 +84,7 @@ const aircrewById = (state = {}, action: any) => {
                 },
             };
         case DEL_AIRCREW:
-            let rest = Object.assign({}, state);
+            const rest = Object.assign({}, state);
             delete rest[action.id];
             // why doesn't this work??? rest is returning the entire state...???
             // let { [action.id]: delcrew, ...rest } = state;
@@ -159,7 +159,7 @@ const daysById = (state = {}, action: any) => {
                     // },
                     flights: [],
                     notes: [],
-                }
+                },
             };
         case ADD_FLIGHT:
             if (state[action.dayId].flights.indexOf(action.id) > -1) {
@@ -178,7 +178,7 @@ const daysById = (state = {}, action: any) => {
                 [action.dayId]: {
                     ...state[action.dayId],
                     flights: state[action.dayId].flights.filter((flightId: number) => flightId !== action.id),
-                }
+                },
             };
         case ADD_UPDATE_NOTE:
             if (action.entity !== 'day' || state[action.entityId].notes.indexOf(action.id) > -1) {
@@ -233,10 +233,10 @@ const flightsById = (state = {}, action: any) => {
                     airspace: [],
                     sorties: [],
                     notes: [],
-                }
+                },
             };
         case DEL_FLIGHT:
-            let rest = Object.assign({}, state);
+            const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
         case UPDATE_FLIGHT_TIME:
@@ -353,7 +353,7 @@ const notesById = (state = {}, action: any) => {
                 },
             };
         case DEL_NOTE:
-            let rest = Object.assign({}, state);
+            const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
         case ADD_CREW_REF_TO_NOTE:
@@ -376,7 +376,7 @@ const notesById = (state = {}, action: any) => {
                 },
             };
         case DEL_AIRCREW:
-            let newNotesById = Object.assign({}, state);
+            const newNotesById = Object.assign({}, state);
             Object.keys(newNotesById).forEach(noteId => {
                 newNotesById[noteId] = Object.assign({}, state[noteId]);
                 newNotesById[noteId].aircrewRefIds = newNotesById[noteId].aircrewRefIds
@@ -426,11 +426,11 @@ const sortiesById = (state = {}, action: any) => {
                 },
             };
         case DEL_SORTIE:
-            let rest = Object.assign({}, state);
+            const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
         case DEL_AIRCREW:
-            let newSortiesById = Object.assign({}, state);
+            const newSortiesById = Object.assign({}, state);
             Object.keys(newSortiesById).forEach(sortieId => {
                 newSortiesById[sortieId] = Object.assign({}, state[sortieId]);
                 if (action.id === newSortiesById[sortieId].front.crewId) {
@@ -547,7 +547,7 @@ const airspaceById = (state = {}, action: any) => {
                 },
             };
         case DEL_AIRSPACE:
-            let rest = Object.assign({}, state);
+            const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
         case UPDATE_AIRSPACE:
@@ -589,5 +589,5 @@ export const whiteboardApp = combineReducers ({
     allSorties,
     crewList,
     airspaceById,
-    allAirspace
+    allAirspace,
 });
