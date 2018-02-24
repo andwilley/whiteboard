@@ -2,45 +2,90 @@ import * as cuid from 'cuid';
 
 // Action Types
 
-export const ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE = 'ADD_UPDATE_AIRCREW_FORM_INPUT_CHANGE';
-export const ADD_UPDATE_AIRCREW_FORM_ADD_QUAL = 'ADD_UPDATE_AIRCREW_FORM_ADD_QUAL';
-export const ADD_UPDATE_AIRCREW_FORM_DEL_QUAL = 'ADD_UPDATE_AIRCREW_FORM_DEL_QUAL';
-export const SET_AIRCREW_FORM = 'SET_AIRCREW_FORM';
-export const ADD_UPDATE_AIRCREW = 'ADD_AIRCREW';
-// export const UPDATE_AIRCREW = 'UPDATE_AIRCREW';
-export const DEL_AIRCREW = 'DEL_AIRCREW';
-// export const ADD_AIRCREW_QUALS = 'ADD_AIRCREW_QUALS';
-// export const DEL_AIRCREW_QUALS = 'DEL_AIRCREW_QUALS';
-export const SET_QUAL_FILTER = 'SET_QUAL_FILTER';
-export const SET_CURRENT_DAY = 'SET_CURRENT_DAY';
-export const ADD_DAY = 'ADD_DAY';
-export const ADD_FLIGHT = 'ADD_FLIGHT';
-export const DEL_FLIGHT = 'DEL_FLIGHT';
-export const UPDATE_FLIGHT_TIME = 'UPDATE_FLIGHT_TIME';
-export const TOGGLE_FLIGHT_TYPE = 'TOGGLE_FLIGHT_TYPE';
-export const ADD_UPDATE_NOTE = 'ADD_UPDATE_NOTE';
-export const DEL_NOTE = 'DEL_NOTE';
-export const ADD_CREW_REF_TO_NOTE = 'ADD_CREW_REF_TO_NOTE';
-export const DEL_CREW_REF_FROM_NOTE = 'DEL_CREW_REF_FROM_NOTE';
-export const ADD_SORTIE = 'ADD_SORTIE';
-export const DEL_SORTIE = 'DEL_SORTIE';
-export const UPDATE_PUCK_NAME = 'UPDATE_PUCK_NAME';
-export const UPDATE_PUCK_CODE = 'UPDATE_PUCK_CODE';
-export const UPDATE_PUCK_SYMBOL = 'UPDATE_PUCK_SYMBOL';
-export const ADD_AIRSPACE = 'ADD_AIRSPACE';
-export const DEL_AIRSPACE = 'DEL_AIRSPACE';
-export const UPDATE_AIRSPACE = 'UPDATE_AIRSPACE';
+export type ADD_UPDATE_AIRCREW_FORM_ADD_QUAL = 'ADD_UPDATE_AIRCREW_FORM_ADD_QUAL';
+export const ADD_UPDATE_AIRCREW_FORM_ADD_QUAL: ADD_UPDATE_AIRCREW_FORM_ADD_QUAL = 'ADD_UPDATE_AIRCREW_FORM_ADD_QUAL';
+
+export type ADD_UPDATE_AIRCREW_FORM_DEL_QUAL = 'ADD_UPDATE_AIRCREW_FORM_DEL_QUAL';
+export const ADD_UPDATE_AIRCREW_FORM_DEL_QUAL: ADD_UPDATE_AIRCREW_FORM_DEL_QUAL = 'ADD_UPDATE_AIRCREW_FORM_DEL_QUAL';
+
+export type SET_AIRCREW_FORM = 'SET_AIRCREW_FORM';
+export const SET_AIRCREW_FORM: SET_AIRCREW_FORM = 'SET_AIRCREW_FORM';
+
+export type ADD_UPDATE_AIRCREW = 'ADD_UPDATE_AIRCREW';
+export const ADD_UPDATE_AIRCREW: ADD_UPDATE_AIRCREW = 'ADD_UPDATE_AIRCREW';
+
+export type DEL_AIRCREW = 'DEL_AIRCREW';
+export const DEL_AIRCREW: DEL_AIRCREW = 'DEL_AIRCREW';
+
+export type SET_QUAL_FILTER = 'SET_QUAL_FILTER';
+export const SET_QUAL_FILTER: SET_QUAL_FILTER = 'SET_QUAL_FILTER';
+
+export type SET_CURRENT_DAY = 'SET_CURRENT_DAY';
+export const SET_CURRENT_DAY: SET_CURRENT_DAY = 'SET_CURRENT_DAY';
+
+export type ADD_DAY = 'ADD_DAY';
+export const ADD_DAY: ADD_DAY = 'ADD_DAY';
+
+export type ADD_FLIGHT = 'ADD_FLIGHT';
+export const ADD_FLIGHT: ADD_FLIGHT = 'ADD_FLIGHT';
+
+export type DEL_FLIGHT = 'DEL_FLIGHT';
+export const DEL_FLIGHT: DEL_FLIGHT = 'DEL_FLIGHT';
+
+export type UPDATE_FLIGHT_TIME = 'UPDATE_FLIGHT_TIME';
+export const UPDATE_FLIGHT_TIME: UPDATE_FLIGHT_TIME = 'UPDATE_FLIGHT_TIME';
+
+export type TOGGLE_FLIGHT_TYPE = 'TOGGLE_FLIGHT_TYPE';
+export const TOGGLE_FLIGHT_TYPE: TOGGLE_FLIGHT_TYPE = 'TOGGLE_FLIGHT_TYPE';
+
+export type ADD_UPDATE_NOTE = 'ADD_UPDATE_NOTE';
+export const ADD_UPDATE_NOTE: ADD_UPDATE_NOTE = 'ADD_UPDATE_NOTE';
+
+export type DEL_NOTE = 'DEL_NOTE';
+export const DEL_NOTE: DEL_NOTE = 'DEL_NOTE';
+
+export type ADD_CREW_REF_TO_NOTE = 'ADD_CREW_REF_TO_NOTE';
+export const ADD_CREW_REF_TO_NOTE: ADD_CREW_REF_TO_NOTE = 'ADD_CREW_REF_TO_NOTE';
+
+export type DEL_CREW_REF_FROM_NOTE = 'DEL_CREW_REF_FROM_NOTE';
+export const DEL_CREW_REF_FROM_NOTE: DEL_CREW_REF_FROM_NOTE = 'DEL_CREW_REF_FROM_NOTE';
+
+export type ADD_SORTIE = 'ADD_SORTIE';
+export const ADD_SORTIE: ADD_SORTIE = 'ADD_SORTIE';
+
+export type DEL_SORTIE = 'DEL_SORTIE';
+export const DEL_SORTIE: DEL_SORTIE = 'DEL_SORTIE';
+
+export type UPDATE_PUCK_NAME = 'UPDATE_PUCK_NAME';
+export const UPDATE_PUCK_NAME: UPDATE_PUCK_NAME = 'UPDATE_PUCK_NAME';
+
+export type UPDATE_PUCK_CODE = 'UPDATE_PUCK_CODE';
+export const UPDATE_PUCK_CODE: UPDATE_PUCK_CODE = 'UPDATE_PUCK_CODE';
+
+export type UPDATE_PUCK_SYMBOL = 'UPDATE_PUCK_SYMBOL';
+export const UPDATE_PUCK_SYMBOL: UPDATE_PUCK_SYMBOL = 'UPDATE_PUCK_SYMBOL';
+
+export type ADD_AIRSPACE = 'ADD_AIRSPACE';
+export const ADD_AIRSPACE: ADD_AIRSPACE = 'ADD_AIRSPACE';
+
+export type DEL_AIRSPACE = 'DEL_AIRSPACE';
+export const DEL_AIRSPACE: DEL_AIRSPACE = 'DEL_AIRSPACE';
+
+export type UPDATE_AIRSPACE = 'UPDATE_AIRSPACE';
+export const UPDATE_AIRSPACE: UPDATE_AIRSPACE = 'UPDATE_AIRSPACE';
+
+export type UPDATE_LOADOUT = 'UPDATE_LOADOUT';
 export const UPDATE_LOADOUT = 'UPDATE_LOADOUT';
 
-// const genUniqueId = entity => {
-// 	let result = '';
-// 	const idLength = 4;
-// 	const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-// 	for (var i = idLength; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
-//     if (store.getState()[entity].hasOwnProperty(result)) {
-//     	return genUniqueId(entity);
-//     }
-//     return result;
+// action creator maker...
+// const makeActionCreator = (type, ...payloadNames) => {
+//     return (...payloadValues) => {
+//         const action = { type, payload: {} };
+//         payloadNames.forEach((name, index) => {
+//             action.payload[payloadName[index]] = payloadValues[index];
+//         })
+//         return action;
+//     };
 // };
 
 export const addUpdateAircrewFormAddQual = (qual: string[]) => {
