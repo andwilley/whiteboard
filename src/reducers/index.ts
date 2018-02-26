@@ -1,7 +1,9 @@
 // reducers
 
 import { combineReducers } from 'redux';
+import { actions } from '../actions';
 import { qualsList } from '../whiteboard-constants';
+import { getType } from 'typesafe-actions';
 import {
         ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
         ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
@@ -30,18 +32,18 @@ import {
        } from '../actions/index';
 
 const addUpdateAircrewFormValues = (state = {
-                                        id: '',
-                                        callsign: '',
-                                        first: '',
-                                        last: '',
-                                        rank: 0,
-                                        seat: 'pilot',
-                                        quals: [],
-                                        existingAircrewUnchanged: false,
-                                        qualsList,
-                                        display: false,
-                                    },
-                                    action: any) => {
+        id: '',
+        callsign: '',
+        first: '',
+        last: '',
+        rank: 0,
+        seat: 'pilot',
+        quals: [],
+        existingAircrewUnchanged: false,
+        qualsList,
+        display: false,
+    },
+    action) => {
     switch (action.type) {
         case ADD_UPDATE_AIRCREW_FORM_ADD_QUAL:
             return {
