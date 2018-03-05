@@ -65,6 +65,24 @@ interface Airspace {
     readonly end: string;
 }
 
+interface CrewList {
+    readonly currentDay: string;
+}
+
+interface AddUpdateAircrewFormValues {
+    readonly id: string;
+    readonly callsign: string;
+    readonly first: string;
+    readonly last: string;
+    readonly rank: number;
+    readonly seat: string;
+    readonly quals: string[];
+    readonly existingAircrewUnchanged: boolean;
+    readonly qualsList: string[];
+    readonly display: boolean;
+}
+
+
 interface State {
     readonly aircrew: Entity<Aircrew>;
     readonly days: Entity<Days>;
@@ -73,5 +91,5 @@ interface State {
     readonly notes: Entity<Notes>;
     readonly airspace: Entity<Airspace>;
     readonly crewList: CrewList;
-    readonly addUpdateAircrewFormValues: addUpdateAircrewFormValues;
+    readonly addUpdateAircrewFormValues: AddUpdateAircrewFormValues;
 }
