@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
-import { delAircrew,
-         setAircrewForm } from '../actions/index';
+import actions, { delAircrew,
+         setAircrewForm } from '../actions';
 import CrewList from '../components/CrewList';
 
 const getDayPucks = (state: any) => {

@@ -40,7 +40,7 @@ export const UPDATE_LOADOUT = 'UPDATE_LOADOUT';
 // };
 
 export interface ISetAircrewArgs {
-    id?: number;
+    id?: string;
     callsign: string;
     first: string;
     last: string;
@@ -51,7 +51,7 @@ export interface ISetAircrewArgs {
 }
 
 export interface IAddAircrewArgs {
-    id?: number;
+    id?: string;
     callsign: string;
     first: string;
     last: string;
@@ -63,44 +63,44 @@ export interface IAddAircrewArgs {
 
 export interface IAddUpdateNoteArgs {
     entity: string;
-    entityId: number;
+    entityId: string;
     content?: string;
 }
 
 export interface IDelNoteArgs {
     entity: string;
-    entityId: number;
+    entityId: string;
 }
 
 export interface IUpdatePuckNameArgs {
-    sortieId: number;
+    sortieId: string;
     crewPosition: string;
     name: string;
 }
 
 export interface IUpdatePuckCodeArgs {
-    sortieId: number;
+    sortieId: string;
     crewPosition: string;
     codes: string;
 }
 
 export interface IUpdatePuckSymbolArgs {
-    sortieId: number;
+    sortieId: string;
     crewPosition: string;
     symbols: string;
 }
 
 export interface IUpdateAirspace {
-    id: number;
+    id: string;
     field: string;
     input: string;
 }
 
 // let crewId = 0;
-let testFlightId = 0;
-let cnoteId = 0;
-let testSortieId = 0;
-let airspaceId = 0;
+// let testFlightId = 0;
+// let cnoteId = 0;
+// let testSortieId = 0;
+// let airspaceId = 0;
 
 export const actions = {
     addUpdateAircrewFormAddQual: createAction(ADD_UPDATE_AIRCREW_FORM_ADD_QUAL, (qual: string[]) => ({
@@ -143,7 +143,7 @@ export const actions = {
             },
         };
     }),
-    delAircrew: createAction(DEL_AIRCREW, (id: number) => ({
+    delAircrew: createAction(DEL_AIRCREW, (id: string) => ({
         type: DEL_AIRCREW,
         payload: {
             id,
@@ -169,9 +169,9 @@ export const actions = {
         };
     }),
     addFlight: createAction(ADD_FLIGHT, (dayId: string, sim: boolean = false) => {
-        // const flightId = cuid();
-        testFlightId++;
-        const flightId = testFlightId;
+        const flightId = cuid();
+        // testFlightId++;
+        // const flightId = testFlightId;
         return {
             type: ADD_FLIGHT,
             payload: {
@@ -181,14 +181,14 @@ export const actions = {
             },
         };
     }),
-    delFlight: createAction(DEL_FLIGHT, (id: number, dayId: string) => ({
+    delFlight: createAction(DEL_FLIGHT, (id: string, dayId: string) => ({
         type: DEL_FLIGHT,
         payload: {
             id,
             dayId,
         },
     })),
-    updateFlightTime: createAction(UPDATE_FLIGHT_TIME, (id: number, timeType: string, time: string) => ({
+    updateFlightTime: createAction(UPDATE_FLIGHT_TIME, (id: string, timeType: string, time: string) => ({
         type: UPDATE_FLIGHT_TIME,
         payload: {
             id,
@@ -196,22 +196,22 @@ export const actions = {
             time,
         },
     })),
-    toggleFlightType: createAction(TOGGLE_FLIGHT_TYPE, (id: number) => ({
+    toggleFlightType: createAction(TOGGLE_FLIGHT_TYPE, (id: string) => ({
         type: TOGGLE_FLIGHT_TYPE,
         payload: {
             id,
         },
     })),
     addUpdateNote: createAction(ADD_UPDATE_NOTE, (args: IAddUpdateNoteArgs) => {
-        // let noteId = args.id ? args.id : cuid();
+        const noteId = args.id ? args.id : cuid();
         // below for testing
-        let noteId;
-        if (args.id) {
-            noteId = args.id;
-        } else {
-            cnoteId++;
-            noteId = cnoteId;
-        }
+        // let noteId;
+        // if (args.id) {
+        //     noteId = args.id;
+        // } else {
+        //     cnoteId++;
+        //     noteId = cnoteId;
+        // }
         // end testing code
         return {
             type: ADD_UPDATE_NOTE,
@@ -231,24 +231,24 @@ export const actions = {
             entityId: args.entityId,
         },
     })),
-    addCrewRefToNote: createAction(ADD_CREW_REF_TO_NOTE, (noteId: number, aircrewId: number) => ({
+    addCrewRefToNote: createAction(ADD_CREW_REF_TO_NOTE, (noteId: string, aircrewId: string) => ({
         type: ADD_CREW_REF_TO_NOTE,
         payload: {
             noteId,
             aircrewId,
         },
     })),
-    delCrewRefFromNote: createAction(DEL_CREW_REF_FROM_NOTE, (noteId: number, aircrewId: number) => ({
+    delCrewRefFromNote: createAction(DEL_CREW_REF_FROM_NOTE, (noteId: string, aircrewId: string) => ({
         type: DEL_CREW_REF_FROM_NOTE,
         payload: {
             noteId,
             aircrewId,
         },
     })),
-    addSortie: createAction(ADD_SORTIE, (flightId: number) => {
-        // const sortieId = cuid();
-        testSortieId++;
-        const sortieId = testSortieId;
+    addSortie: createAction(ADD_SORTIE, (flightId: string) => {
+        const sortieId = cuid();
+        // testSortieId++;
+        // const sortieId = testSortieId;
         return {
             type: ADD_SORTIE,
             payload: {
@@ -257,7 +257,7 @@ export const actions = {
             },
         };
     }),
-    delSortie: createAction(DEL_SORTIE, (id: number, flightId: number) => ({
+    delSortie: createAction(DEL_SORTIE, (id: string, flightId: string) => ({
         type: DEL_SORTIE,
         payload: {
             id,
@@ -343,9 +343,9 @@ export const actions = {
             },
         };
     }),
-    addAirspace: createAction(ADD_AIRSPACE, (flightId: number) => {
-        // cosnt airspaceId = cuid();
-        airspaceId++;			// for testing
+    addAirspace: createAction(ADD_AIRSPACE, (flightId: string) => {
+        const airspaceId = cuid();
+        // airspaceId++;			// for testing
         return {
             type: ADD_AIRSPACE,
             payload: {
@@ -354,7 +354,7 @@ export const actions = {
             },
         };
     }),
-    delAirspace: createAction(DEL_AIRSPACE, (id: number, flightId: number) => ({
+    delAirspace: createAction(DEL_AIRSPACE, (id: string, flightId: string) => ({
         type: DEL_AIRSPACE,
         payload: {
             id,
@@ -369,7 +369,7 @@ export const actions = {
             input: args.input,
         },
     })),
-    updateLoadout: createAction(UPDATE_LOADOUT, (sortieId: number, input: string) => ({
+    updateLoadout: createAction(UPDATE_LOADOUT, (sortieId: string, input: string) => ({
         type: UPDATE_LOADOUT,
         payload: {
             sortieId,

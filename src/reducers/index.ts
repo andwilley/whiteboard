@@ -4,58 +4,60 @@ import { combineReducers } from 'redux';
 import { actions } from '../actions';
 import { qualsList } from '../whiteboard-constants';
 import { getType } from 'typesafe-actions';
-import {
-        ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
-        ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
-        SET_AIRCREW_FORM,
-        ADD_UPDATE_AIRCREW,
-        DEL_AIRCREW,
-        SET_CURRENT_DAY,
-        ADD_DAY,
-        ADD_FLIGHT,
-        DEL_FLIGHT,
-        UPDATE_FLIGHT_TIME,
-        TOGGLE_FLIGHT_TYPE,
-        ADD_UPDATE_NOTE,
-        DEL_NOTE,
-        ADD_CREW_REF_TO_NOTE,
-        DEL_CREW_REF_FROM_NOTE,
-        ADD_SORTIE,
-        DEL_SORTIE,
-        UPDATE_PUCK_NAME,
-        UPDATE_PUCK_CODE,
-        UPDATE_PUCK_SYMBOL,
-        ADD_AIRSPACE,
-        DEL_AIRSPACE,
-        UPDATE_AIRSPACE,
-        UPDATE_LOADOUT,
-       } from '../actions/index';
+import { IState } from '../reducers/State';
+import { actions, IAction } from '../actions';
+    //  , {
+    //     ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
+    //     ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
+    //     SET_AIRCREW_FORM,
+    //     ADD_UPDATE_AIRCREW,
+    //     DEL_AIRCREW,
+    //     SET_CURRENT_DAY,
+    //     ADD_DAY,
+    //     ADD_FLIGHT,
+    //     DEL_FLIGHT,
+    //     UPDATE_FLIGHT_TIME,
+    //     TOGGLE_FLIGHT_TYPE,
+    //     ADD_UPDATE_NOTE,
+    //     DEL_NOTE,
+    //     ADD_CREW_REF_TO_NOTE,
+    //     DEL_CREW_REF_FROM_NOTE,
+    //     ADD_SORTIE,
+    //     DEL_SORTIE,
+    //     UPDATE_PUCK_NAME,
+    //     UPDATE_PUCK_CODE,
+    //     UPDATE_PUCK_SYMBOL,
+    //     ADD_AIRSPACE,
+    //     DEL_AIRSPACE,
+    //     UPDATE_AIRSPACE,
+    //     UPDATE_LOADOUT,
+    //   }
 
 const addUpdateAircrewFormValues = (state = {
-        id: '',
-        callsign: '',
-        first: '',
-        last: '',
-        rank: 0,
-        seat: 'pilot',
-        quals: [],
-        existingAircrewUnchanged: false,
-        qualsList,
-        display: false,
-    },
-    action) => {
+                                        id: '',
+                                        callsign: '',
+                                        first: '',
+                                        last: '',
+                                        rank: 0,
+                                        seat: 'pilot',
+                                        quals: [],
+                                        existingAircrewUnchanged: false,
+                                        qualsList,
+                                        display: false,
+                                    },
+                                    action) => {
     switch (action.type) {
-        case ADD_UPDATE_AIRCREW_FORM_ADD_QUAL:
+        case getType(actions.addUpdateAircrewFormAddQual):
             return {
                 ...state,
                 quals: state.quals.concat(action.qual),
             };
-        case ADD_UPDATE_AIRCREW_FORM_DEL_QUAL:
+        case getType(actions.addUpdateAircrewFormDelQual):
             return {
                 ...state,
                 quals: state.quals.filter(qual => qual !== action.qual),
             };
-        case SET_AIRCREW_FORM:
+        case getType(actions.setAircrewForm):
             return {
                 ...state,
                 ...action.payload,
@@ -65,9 +67,9 @@ const addUpdateAircrewFormValues = (state = {
     }
 };
 
-const aircrewById = (state = {}, action: any) => {
+const aircrewById = (state = {}, action) => {
     switch (action.type) {
-        case ADD_UPDATE_AIRCREW:
+        case getType(actions.addUpdateAircrew):
             return {
                 ...state,
                 [action.id]: {
@@ -85,13 +87,13 @@ const aircrewById = (state = {}, action: any) => {
                     notes: [],
                 },
             };
-        case DEL_AIRCREW:
+        case getType(actions.delAircrew):
             const rest = Object.assign({}, state);
             delete rest[action.id];
             // why doesn't this work??? rest is returning the entire state...???
             // let { [action.id]: delcrew, ...rest } = state;
             return rest;
-        case ADD_UPDATE_NOTE:
+        case getType(actions.addUpdateNote):
             if (action.entity !== 'aircrew' || state[action.entityId].notes.indexOf(action.id) > -1) {
                 return state;
             }
@@ -102,7 +104,7 @@ const aircrewById = (state = {}, action: any) => {
                     notes: state[action.entityId].notes.concat(action.id),
                 },
             };
-        case DEL_NOTE:
+        case getType(actions.delNote):
             if (action.entity !== 'aircrew') {
                 return state;
             }
@@ -118,23 +120,23 @@ const aircrewById = (state = {}, action: any) => {
     }
 };
 
-const allAircrew = (state: number[] = [], action: any) => {
+const allAircrew = (state = [], action) => {
     switch (action.type) {
-        case ADD_UPDATE_AIRCREW:
+        case getType(actions.addUpdateAircrew):
             if (state.indexOf(action.id) > -1) {
                 return state;
             }
             return state.concat(action.id);
-        case DEL_AIRCREW:
+        case getType(actions.delAircrew):
             return state.filter(item => item !== action.id);
         default:
             return state;
     }
 };
 
-const crewList = (state = {}, action: any) => {
+const crewList = (state = {}, action) => {
     switch (action.type) {
-        case SET_CURRENT_DAY:
+        case getType(actions.setCurrentDay):
             return {
                 ...state,
                 currentDay: action.day,
@@ -144,9 +146,9 @@ const crewList = (state = {}, action: any) => {
     }
 };
 
-const daysById = (state = {}, action: any) => {
+const daysById = (state = {}, action) => {
     switch (action.type) {
-        case ADD_DAY:
+        case getType(actions.addDay):
             return {
                 ...state,
                 [action.id]: {
@@ -163,7 +165,7 @@ const daysById = (state = {}, action: any) => {
                     notes: [],
                 },
             };
-        case ADD_FLIGHT:
+        case getType(actions.addFlight):
             if (state[action.dayId].flights.indexOf(action.id) > -1) {
                 return state;
             }
@@ -174,7 +176,7 @@ const daysById = (state = {}, action: any) => {
                     flights: state[action.dayId].flights.concat(action.id),
                 },
             };
-        case DEL_FLIGHT:
+        case getType(actions.delFlight):
             return {
                 ...state,
                 [action.dayId]: {
@@ -182,7 +184,7 @@ const daysById = (state = {}, action: any) => {
                     flights: state[action.dayId].flights.filter((flightId: number) => flightId !== action.id),
                 },
             };
-        case ADD_UPDATE_NOTE:
+        case getType(actions.addUpdateNote):
             if (action.entity !== 'day' || state[action.entityId].notes.indexOf(action.id) > -1) {
                 return state;
             }
@@ -193,7 +195,7 @@ const daysById = (state = {}, action: any) => {
                     notes: state[action.entityId].notes.concat(action.id),
                 },
             };
-        case DEL_NOTE:
+        case getType(actions.delNote):
             if (action.entity !== 'day') {
                 return state;
             }
@@ -209,18 +211,18 @@ const daysById = (state = {}, action: any) => {
     }
 };
 
-const allDays = (state = [], action: any) => {
+const allDays = (state = [], action) => {
     switch (action.type) {
-        case ADD_DAY:
+        case getType(actions.addDay):
             return state.concat(action.id);
         default:
             return state;
     }
 };
 
-const flightsById = (state = {}, action: any) => {
+const flightsById = (state = {}, action) => {
     switch (action.type) {
-        case ADD_FLIGHT:
+        case getType(actions.addFlight):
             return {
                 ...state,
                 [action.id]: {
@@ -237,11 +239,11 @@ const flightsById = (state = {}, action: any) => {
                     notes: [],
                 },
             };
-        case DEL_FLIGHT:
+        case getType(actions.delFlight):
             const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
-        case UPDATE_FLIGHT_TIME:
+        case getType(actions.updateFlightTime):
             if (['brief', 'takeoff', 'land'].indexOf(action.timeType) === -1) {
                 return state;
             }
@@ -255,7 +257,7 @@ const flightsById = (state = {}, action: any) => {
                     },
                 },
             };
-        case TOGGLE_FLIGHT_TYPE:
+        case getType(actions.toggleFlightType):
             return {
                 ...state,
                 [action.id]: {
@@ -263,7 +265,7 @@ const flightsById = (state = {}, action: any) => {
                     sim: !state[action.id].sim,
                 },
             };
-        case ADD_SORTIE:
+        case getType(actions.addSortie):
             if (state[action.flightId].sorties.indexOf(action.id) > -1) {
                 return state;
             }
@@ -274,7 +276,7 @@ const flightsById = (state = {}, action: any) => {
                     sorties: state[action.flightId].sorties.concat(action.id),
                 },
             };
-        case DEL_SORTIE:
+        case getType(actions.delSortie):
             return {
                 ...state,
                 [action.flightId]: {
@@ -282,7 +284,7 @@ const flightsById = (state = {}, action: any) => {
                     sorties: state[action.flightId].sorties.filter((sortieId: number) => sortieId !== action.id),
                 },
             };
-        case ADD_UPDATE_NOTE:
+        case getType(actions.addUpdateNote):
             if (action.entity !== 'flight' || state[action.entityId].notes.indexOf(action.id) > -1) {
                 return state;
             }
@@ -293,7 +295,7 @@ const flightsById = (state = {}, action: any) => {
                     notes: state[action.entityId].notes.concat(action.id),
                 },
             };
-        case DEL_NOTE:
+        case getType(actions.delNote):
             if (action.entity !== 'flight') {
                 return state;
             }
@@ -304,7 +306,7 @@ const flightsById = (state = {}, action: any) => {
                     notes: state[action.entityId].notes.filter((noteId: number) => noteId !== action.id),
                 },
             };
-        case ADD_AIRSPACE:
+        case getType(actions.addAirspace):
             if (state[action.flightId].airspace.indexOf(action.id) > -1) {
                 return state;
             }
@@ -315,7 +317,7 @@ const flightsById = (state = {}, action: any) => {
                     airspace: state[action.flightId].airspace.concat(action.id),
                 },
             };
-        case DEL_AIRSPACE:
+        case getType(actions.delAirspace):
             return {
                 ...state,
                 [action.flightId]: {
@@ -328,23 +330,23 @@ const flightsById = (state = {}, action: any) => {
     }
 };
 
-const allFlights = (state: number[] = [], action: any) => {
+const allFlights = (state = [], action) => {
     switch (action.type) {
-        case ADD_FLIGHT:
+        case getType(actions.addFlight):
             if (state.indexOf(action.id) > -1) {
                 return state;
             }
             return state.concat(action.id);
-        case DEL_FLIGHT:
+        case getType(actions.delFlight):
             return state.filter(id => id !== action.id);
         default:
             return state;
     }
 };
 
-const notesById = (state = {}, action: any) => {
+const notesById = (state = {}, action) => {
     switch (action.type) {
-        case ADD_UPDATE_NOTE:
+        case getType(actions.addUpdateNote):
             return {
                 ...state,
                 [action.id]: {
@@ -354,11 +356,11 @@ const notesById = (state = {}, action: any) => {
                     // keep track of who added, edited, time added etc later
                 },
             };
-        case DEL_NOTE:
+        case getType(actions.delNote):
             const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
-        case ADD_CREW_REF_TO_NOTE:
+        case getType(actions.addCrewRefToNote):
             if (state[action.noteId].aircrewRefIds.indexOf(action.aircrewId) > -1) {
                 return state;
             }
@@ -369,7 +371,7 @@ const notesById = (state = {}, action: any) => {
                     aircrewRefIds: state[action.noteId].aircrewRefIds.concat(action.aircrewId),
                 },
             };
-        case DEL_CREW_REF_FROM_NOTE:
+        case getType(actions.delCrewRefFromNote):
             return {
                 ...state,
                 [action.noteId]: {
@@ -377,7 +379,7 @@ const notesById = (state = {}, action: any) => {
                     aircrewRefIds: state[action.noteId].aircrewRefIds.filter((id: number) => id !== action.aircrewId),
                 },
             };
-        case DEL_AIRCREW:
+        case getType(actions.delAircrew):
             const newNotesById = Object.assign({}, state);
             Object.keys(newNotesById).forEach(noteId => {
                 newNotesById[noteId] = Object.assign({}, state[noteId]);
@@ -390,23 +392,23 @@ const notesById = (state = {}, action: any) => {
     }
 };
 
-const allNotes = (state: number[] = [], action: any) => {
+const allNotes = (state = [], action) => {
     switch (action.type) {
-        case ADD_UPDATE_NOTE:
+        case getType(actions.addUpdateNote):
             if (state.indexOf(action.id) > -1) {
                 return state;
             }
             return state.concat(action.id);
-        case DEL_NOTE:
+        case getType(actions.delNote):
             return state.filter(id => id !== action.id);
         default:
             return state;
     }
 };
 
-const sortiesById = (state = {}, action: any) => {
+const sortiesById = (state = {}, action) => {
     switch (action.type) {
-        case ADD_SORTIE:
+        case getType(actions.addSortie):
             return {
                 ...state,
                 [action.id]: {
@@ -427,11 +429,11 @@ const sortiesById = (state = {}, action: any) => {
                     notes: [],
                 },
             };
-        case DEL_SORTIE:
+        case getType(actions.delSortie):
             const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
-        case DEL_AIRCREW:
+        case getType(actions.delAircrew):
             const newSortiesById = Object.assign({}, state);
             Object.keys(newSortiesById).forEach(sortieId => {
                 newSortiesById[sortieId] = Object.assign({}, state[sortieId]);
@@ -451,7 +453,7 @@ const sortiesById = (state = {}, action: any) => {
                 }
             });
             return newSortiesById;
-        case ADD_UPDATE_NOTE:
+        case getType(actions.addUpdateNote):
             if (action.entity !== 'sortie' || state[action.entityId].notes.indexOf(action.id) > -1) {
                 return state;
             }
@@ -462,7 +464,7 @@ const sortiesById = (state = {}, action: any) => {
                     notes: state[action.entityId].notes.concat(action.id),
                 },
             };
-        case DEL_NOTE:
+        case getType(actions.delNote):
             if (action.entity !== 'sortie') {
                 return state;
             }
@@ -473,7 +475,7 @@ const sortiesById = (state = {}, action: any) => {
                     notes: state[action.entityId].notes.filter((noteId: number) => noteId !== action.id),
                 },
             };
-        case UPDATE_PUCK_NAME:
+        case getType(actions.updatePuckName):
             // match name to list of crew
             // if its a match, set crewId to aircrew id
             // if not:
@@ -489,7 +491,7 @@ const sortiesById = (state = {}, action: any) => {
                     },
                 },
             };
-        case UPDATE_PUCK_CODE:
+        case getType(actions.updatePuckCode):
             return {
                 ...state,
                 [action.sortieId]: {
@@ -500,7 +502,7 @@ const sortiesById = (state = {}, action: any) => {
                     },
                 },
             };
-        case UPDATE_PUCK_SYMBOL:
+        case getType(actions.updatePuckSymbol):
             return {
                 ...state,
                 [action.sortieId]: {
@@ -511,7 +513,7 @@ const sortiesById = (state = {}, action: any) => {
                     },
                 },
             };
-        case UPDATE_LOADOUT:
+        case getType(actions.updateLoadout):
             return {
                 ...state,
                 [action.sortieId]: {
@@ -524,21 +526,21 @@ const sortiesById = (state = {}, action: any) => {
     }
 };
 
-const allSorties = (state: number[] = [], action: any) => {
+const allSorties = (state = [], action) => {
     switch (action.type) {
-        case ADD_SORTIE:
+        case getType(actions.addSortie):
             return state.concat(action.id);
-        case DEL_SORTIE:
+        case getType(actions.delSortie):
             return state.filter(sortieId => sortieId !== action.id);
         default:
             return state;
     }
 };
 
-const airspaceById = (state = {}, action: any) => {
+const airspaceById = (state = {}, action) => {
     // add these cases to sortiesById as well
     switch (action.type) {
-        case ADD_AIRSPACE:
+        case getType(actions.addAirspace):
             return {
                 ...state,
                 [action.id]: {
@@ -548,11 +550,11 @@ const airspaceById = (state = {}, action: any) => {
                     end: '',
                 },
             };
-        case DEL_AIRSPACE:
+        case getType(actions.delAirspace):
             const rest = Object.assign({}, state);
             delete rest[action.id];
             return rest;
-        case UPDATE_AIRSPACE:
+        case getType(actions.updateAirspace):
             // handle this input better?
             return {
                 ...state,
@@ -566,30 +568,54 @@ const airspaceById = (state = {}, action: any) => {
     }
 };
 
-const allAirspace = (state = [], action: any) => {
+const allAirspace = (state = [], action) => {
     switch (action.type) {
-        case ADD_AIRSPACE:
+        case getType(actions.addAirspace):
             return state.concat(action.id);
-        case DEL_AIRSPACE:
+        case getType(actions.delAirspace):
             return state.filter(sortieId => sortieId !== action.id);
         default:
             return state;
     }
 };
 
-export const whiteboardApp = combineReducers ({
-    addUpdateAircrewFormValues,
-    aircrewById,
-    allAircrew,
-    daysById,
-    allDays,
-    flightsById,
-    allFlights,
-    notesById,
-    allNotes,
-    sortiesById,
-    allSorties,
+const aircrewReducer = combineReducers({
+   byId: aircrewById,
+   allIds: allAircrew,
+});
+
+const daysReducer = combineReducers({
+    byId: daysById,
+    allIds: allDays,
+});
+
+const flightsReducer = combineReducers({
+    byId: flightsById,
+    allIds: allFlights,
+});
+
+const notesReducer = combineReducers({
+    byId: notesById,
+    allIds: allNotes,
+});
+
+const sortiesReducer = combineReducers({
+    byId: sortiesById,
+    allIds: allSorties,
+});
+
+const airspaceReducer = combineReducers({
+    byId: aircrewById,
+    allIds: allAircrew,
+});
+
+export const whiteboardApp = combineReducers<IState, IAction>({
+    aircrew: aircrewReducer,
+    days: daysReducer,
+    flights: flightsReducer,
+    sorties: sortiesReducer,
+    notes: notesReducer,
+    airspace: airspaceReducer,
     crewList,
-    airspaceById,
-    allAirspace,
+    addUpdateAircrewFormValues,
 });

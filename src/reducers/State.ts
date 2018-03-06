@@ -1,9 +1,9 @@
-interface Entity<E> {
+interface IEntity<E> {
     readonly byId: { [id: string]: E };
     readonly allIds: string[];
 }
 
-interface Aircrew {
+interface IAircrew {
     readonly id: string;
     readonly callsign: string;
     readonly first: string;
@@ -18,13 +18,13 @@ interface Aircrew {
     readonly snivs: string[];
 }
 
-interface Days {
+interface IDays {
     readonly id: string;
     readonly flights: string[];
     readonly notes: string[];
 }
 
-interface Flights {
+interface IFlights {
     readonly id: string;
     readonly sim: boolean;
     readonly times: {
@@ -37,20 +37,20 @@ interface Flights {
     readonly notes: string[];
 }
 
-interface Notes {
+interface INotes {
     readonly id: string;
     readonly content: string;
     readonly aircrewRefIds: string[];
 }
 
-interface Seat {
+interface ISeat {
     readonly inputName: string;
     readonly crewId: string;
     readonly codes: string[];
     readonly symbols: string[];
 }
 
-interface Sorties {
+interface ISorties {
     readonly id: string;
     readonly front: Seat;
     readonly back: Seat;
@@ -58,18 +58,18 @@ interface Sorties {
     readonly notes: string[];
 }
 
-interface Airspace {
+interface IAirspace {
     readonly id: string;
     readonly name: string;
     readonly start: string;
     readonly end: string;
 }
 
-interface CrewList {
+interface ICrewList {
     readonly currentDay: string;
 }
 
-interface AddUpdateAircrewFormValues {
+interface IAddUpdateAircrewFormValues {
     readonly id: string;
     readonly callsign: string;
     readonly first: string;
@@ -82,14 +82,13 @@ interface AddUpdateAircrewFormValues {
     readonly display: boolean;
 }
 
-
-interface State {
-    readonly aircrew: Entity<Aircrew>;
-    readonly days: Entity<Days>;
-    readonly flights: Entity<Flights>;
-    readonly sorties: Entity<Sorties>;
-    readonly notes: Entity<Notes>;
-    readonly airspace: Entity<Airspace>;
-    readonly crewList: CrewList;
-    readonly addUpdateAircrewFormValues: AddUpdateAircrewFormValues;
+export interface IState {
+    readonly aircrew: IEntity<IAircrew>;
+    readonly days: IEntity<IDays>;
+    readonly flights: IEntity<IFlights>;
+    readonly sorties: IEntity<ISorties>;
+    readonly notes: IEntity<INotes>;
+    readonly airspace: IEntity<IAirspace>;
+    readonly crewList: ICrewList;
+    readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
 }

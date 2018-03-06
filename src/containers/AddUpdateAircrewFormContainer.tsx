@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import AddUpdateAircrewForm from '../components/AddUpdateAircrewForm';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
-import { addUpdateAircrew,
+import actions, { addUpdateAircrew,
          addUpdateAircrewFormAddQual,
          addUpdateAircrewFormDelQual,
-         setAircrewForm } from '../actions/index';
+         setAircrewForm } from '../actions';
 
 const getAddUpdateAircrewFormValues = (state: any) => {
   return state.addUpdateAircrewFormValues;
