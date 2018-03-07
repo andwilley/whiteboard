@@ -1,10 +1,8 @@
 import { connect } from 'react-redux';
 import AddUpdateAircrewForm from '../components/AddUpdateAircrewForm';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
-import actions, { addUpdateAircrew,
-         addUpdateAircrewFormAddQual,
-         addUpdateAircrewFormDelQual,
-         setAircrewForm } from '../actions';
+import { actions } from '../actions';
+const { addUpdateAircrew, addUpdateAircrewFormAddQual, addUpdateAircrewFormDelQual, setAircrewForm } = actions;
 
 const getAddUpdateAircrewFormValues = (state: any) => {
   return state.addUpdateAircrewFormValues;
@@ -31,19 +29,17 @@ const mapDispatchToProps = (dispatch: any) => {
     // need async action to validate unique callsign on server.
     onInputChange: (event: any) => {
       const target = event.target;
-      const name = target.name;
-      let value;
+      const name: string = target.name;
+      const value: string = target.value;
       switch (name) {
         case 'quals':
-          value = target.value;
           dispatch(target.checked ? addUpdateAircrewFormAddQual(value) : addUpdateAircrewFormDelQual(value));
           break;
         default:
-          value = target.value;
           dispatch(setAircrewForm({[name]: value}));
           break;
       }
-      dispatch(setAircrewForm({existingAircrewUnchanged : false}));
+      dispatch(setAircrewForm({existingAircrewUnchanged: false}));
     },
   };
 };

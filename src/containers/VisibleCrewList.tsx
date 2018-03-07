@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
-import actions, { delAircrew,
-         setAircrewForm } from '../actions';
+import { actions } from '../actions';
 import CrewList from '../components/CrewList';
+const { delAircrew, setAircrewForm } = actions;
 
 const getDayPucks = (state: any) => {
   let crewId: number, eventType: string;
@@ -13,12 +13,12 @@ const getDayPucks = (state: any) => {
     flightNote: 0,
     dayNote: 0,
   };
-  const aircrewCurrentDayPucks = state.daysById[state.crewList.currentDay].flights
-    .reduce((flightPucks: any, flightId: number) => {
-      eventType = state.flightsById[flightId].sim ? 'sim' : 'flight';
-      state.flightsById[flightId].sorties.forEach((sortieId: number) => {
+  const aircrewCurrentDayPucks = state.days.byId[state.crewList.currentDay].flights
+    .reduce((flightPucks: any, flightId: string) => {
+      eventType = state.flights.byId[flightId].sim ? 'sim' : 'flight';
+      state.flights.byId[flightId].sorties.forEach((sortieId: string) => {
         seats.forEach(seat => {
-          crewId = state.sortiesById[sortieId][seat].crewId;
+          crewId = state.sorties.byId[sortieId][seat].crewId;
           flightPucks[crewId] = flightPucks[crewId] ?
             {
               ...flightPucks[crewId],
@@ -30,8 +30,8 @@ const getDayPucks = (state: any) => {
             };
         });
       });
-      state.flightsById[flightId].notes.forEach((noteId: number) => {
-        state.notesById[noteId].aircrewRefIds.forEach((id: number) => {
+      state.flights.byId[flightId].notes.forEach((noteId: string) => {
+        state.notes.byId[noteId].aircrewRefIds.forEach((id: string) => {
           flightPucks[id] = flightPucks[id] ?
             {
               ...flightPucks[id],
@@ -46,8 +46,8 @@ const getDayPucks = (state: any) => {
       return flightPucks;
     },
             {});
-  state.daysById[state.crewList.currentDay].notes.forEach((noteId: number) => {
-    state.notesById[noteId].aircrewRefIds.forEach((aircrewId: number) => {
+  state.days.byId[state.crewList.currentDay].notes.forEach((noteId: string) => {
+    state.notes.byId[noteId].aircrewRefIds.forEach((aircrewId: string) => {
       aircrewCurrentDayPucks[aircrewId] = aircrewCurrentDayPucks[aircrewId] ?
         {
           ...aircrewCurrentDayPucks[aircrewId],
@@ -64,8 +64,8 @@ const getDayPucks = (state: any) => {
 
 const getAircrewList = (state: any) => {
   const aircrewDayPucks = getDayPucks(state);
-  return state.allAircrew.map( (aircrewId: number) => {
-    const aircrewWithPucks = Object.assign({}, state.aircrewById[aircrewId]);
+  return state.aircrew.allIds.map( (aircrewId: string) => {
+    const aircrewWithPucks = Object.assign({}, state.aircrew.byId[aircrewId]);
     aircrewWithPucks.pucks = aircrewDayPucks[aircrewId] ?
       Object.assign({}, aircrewDayPucks[aircrewId]) :
       {flight: 0, sim: 0, flightNote: 0, dayNote: 0};
@@ -91,7 +91,7 @@ const mapDispatchToProps = (dispatch: any) => {
       // dispatch(something(id)); not sure I'm going to need this. below is for test.
       alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));
     },
-    onXClick: (id: number) => {
+    onXClick: (id: string) => {
       dispatch(delAircrew(id));
     },
     onEditClick: (aircrew: any) => {

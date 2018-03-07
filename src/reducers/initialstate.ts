@@ -3,7 +3,7 @@ import { qualsList } from '../whiteboard-constants';
 export const INITIAL_STATE = {
     aircrew: {
         byId: {
-            'a': {
+            a: {
                 callsign: 'Steamboat',
                 first: 'Drew',
                 flightPucks: [],
@@ -17,7 +17,7 @@ export const INITIAL_STATE = {
                 simPucks: [],
                 snivs: [],
             },
-            'b': {
+            b: {
                 callsign: 'Jambo',
                 first: 'Alex',
                 flightPucks: [],
@@ -31,7 +31,7 @@ export const INITIAL_STATE = {
                 simPucks: [],
                 snivs: [],
             },
-            'c': {
+            c: {
                 callsign: 'Dump',
                 first: 'Mark',
                 flightPucks: [],
@@ -45,7 +45,7 @@ export const INITIAL_STATE = {
                 simPucks: [],
                 snivs: [],
             },
-            'd': {
+            d: {
                 callsign: 'Cox',
                 first: 'Steve',
                 flightPucks: [],
@@ -60,12 +60,12 @@ export const INITIAL_STATE = {
                 snivs: [],
             },
         },
-        allIds: ['a','b','c','d'],
+        allIds: ['a', 'b', 'c', 'd'],
     },
     days: {
         byId: {
             '2018-01-24': {
-                flights: ['a','b'],
+                flights: ['a', 'b'],
                 id: '2018-01-24',
                 // flow: {
                 // 	numJets: [],
@@ -82,7 +82,7 @@ export const INITIAL_STATE = {
     },
     flights: {
         byId: {
-            'a': {
+            a: {
                 id: 'a',
                 sim: true,
                 // flow: 'pit',
@@ -92,10 +92,10 @@ export const INITIAL_STATE = {
                     land: '',
                 },
                 airspace: [],
-                sorties: ['a','b'],
+                sorties: ['a', 'b'],
                 notes: ['a'],
             },
-            'b': {
+            b: {
                 id: 'b',
                 sim: false,
                 // flow: 'pit',
@@ -113,25 +113,25 @@ export const INITIAL_STATE = {
     },
     notes: {
         byId: {
-            1: {
+            a: {
                 id: 'a',
                 content: 'test flight note',
                 aircrewRefIds: ['a', 'b', 'c'],
             },
-            2: {
+            b: {
                 id: 'b',
                 content: 'test day note',
                 aircrewRefIds: ['a', 'b', 'c'],
             },
         },
-        allIds: ['a','b'],
+        allIds: ['a', 'b'],
     },
     crewList: {
         currentDay: '2018-01-24',
     },
     sorties: {
         byId: {
-            'a': {
+            a: {
                 id: 'a',
                 front: {
                     inputName: '',
@@ -148,7 +148,7 @@ export const INITIAL_STATE = {
                 loadout: '',
                 notes: [],
             },
-            'b': {
+            b: {
                 id: 'b',
                 front: {
                     inputName: '',
@@ -165,7 +165,7 @@ export const INITIAL_STATE = {
                 loadout: '',
                 notes: [],
             },
-            'c': {
+            c: {
                 id: 'c',
                 front: {
                     inputName: '',
@@ -182,7 +182,7 @@ export const INITIAL_STATE = {
                 loadout: '',
                 notes: [],
             },
-            'd': {
+            d: {
                 id: 'd',
                 front: {
                     inputName: '',
@@ -200,7 +200,7 @@ export const INITIAL_STATE = {
                 notes: [],
             },
         },
-        allIds: ['a','b','c','d'],
+        allIds: ['a', 'b', 'c', 'd'],
     },
     airspace: {
         byId: {},

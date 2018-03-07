@@ -1,5 +1,5 @@
 import * as cuid from 'cuid';
-import { createAction } from 'type-safe-actions';
+import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 
 // Action Types
@@ -41,11 +41,11 @@ export const UPDATE_LOADOUT = 'UPDATE_LOADOUT';
 
 export interface ISetAircrewArgs {
     id?: string;
-    callsign: string;
-    first: string;
-    last: string;
-    rank: number;
-    seat: string;
+    callsign?: string;
+    first?: string;
+    last?: string;
+    rank?: number;
+    seat?: string;
     existingAircrewUnchanged?: boolean;
     display?: boolean;
 }
@@ -62,12 +62,14 @@ export interface IAddAircrewArgs {
 }
 
 export interface IAddUpdateNoteArgs {
+    id?: string;
     entity: string;
     entityId: string;
     content?: string;
 }
 
 export interface IDelNoteArgs {
+    id: string;
     entity: string;
     entityId: string;
 }
@@ -103,13 +105,13 @@ export interface IUpdateAirspace {
 // let airspaceId = 0;
 
 export const actions = {
-    addUpdateAircrewFormAddQual: createAction(ADD_UPDATE_AIRCREW_FORM_ADD_QUAL, (qual: string[]) => ({
+    addUpdateAircrewFormAddQual: createAction(ADD_UPDATE_AIRCREW_FORM_ADD_QUAL, (qual: string) => ({
         type: ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
         payload: {
             qual,
         },
     })),
-    addUpdateAircrewFormDelQual: createAction(ADD_UPDATE_AIRCREW_FORM_DEL_QUAL, (qual: string[]) => ({
+    addUpdateAircrewFormDelQual: createAction(ADD_UPDATE_AIRCREW_FORM_DEL_QUAL, (qual: string) => ({
         type: ADD_UPDATE_AIRCREW_FORM_DEL_QUAL,
         payload: {
             qual,
@@ -319,15 +321,15 @@ export const actions = {
     }),
     updatePuckSymbol: createAction(UPDATE_PUCK_SYMBOL, (args: IUpdatePuckSymbolArgs) => {
         // strip all non-symbols
-        let symbols = args.symbols.replace(/[^@!?~#$%*+=]+/g, ''); // [^@!\?~#\$%\*\+=+]
+        const symbols = args.symbols.replace(/[^@!?~#$%*+=]+/g, ''); // [^@!\?~#\$%\*\+=+]
 
         // make it an array
-        symbols = symbols.split('');
+        let symbolList = symbols.split('');
 
         // get rid of duplicates and empty strings
         // this is inefficient. can do it all in one step. this array will never be longer than 10 items, though.
         const symbolCount = {};
-        symbols = symbols.filter((symbol: string) => {
+        symbolList = symbolList.filter((symbol: string) => {
             if (symbolCount[symbol] || symbol === '') {
                 return false;
             }
@@ -339,7 +341,7 @@ export const actions = {
             payload: {
                 sortieId: args.sortieId,
                 crewPosition: args.crewPosition,
-                symbols,
+                symbolList,
             },
         };
     }),
@@ -378,8 +380,8 @@ export const actions = {
     })),
 };
 
-const returnsOfActions = Object.values(actions).map($call);
-export type Action = typeof returnsOfActions[number];
+const returnsOfActions = (Object as any).values(actions).map($call);
+export type IAction = typeof returnsOfActions[number];
 
 // export const addUpdateAircrewFormAddQual = (qual: string[]) => {
 //     return {

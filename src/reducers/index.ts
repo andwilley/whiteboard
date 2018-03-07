@@ -1,7 +1,6 @@
 // reducers
 
 import { combineReducers } from 'redux';
-import { actions } from '../actions';
 import { qualsList } from '../whiteboard-constants';
 import { getType } from 'typesafe-actions';
 import { IState } from '../reducers/State';
@@ -45,7 +44,7 @@ const addUpdateAircrewFormValues = (state = {
                                         qualsList,
                                         display: false,
                                     },
-                                    action) => {
+                                    action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateAircrewFormAddQual):
             return {
@@ -67,7 +66,7 @@ const addUpdateAircrewFormValues = (state = {
     }
 };
 
-const aircrewById = (state = {}, action) => {
+const aircrewById = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateAircrew):
             return {
@@ -120,7 +119,7 @@ const aircrewById = (state = {}, action) => {
     }
 };
 
-const allAircrew = (state = [], action) => {
+const allAircrew = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateAircrew):
             if (state.indexOf(action.id) > -1) {
@@ -134,7 +133,7 @@ const allAircrew = (state = [], action) => {
     }
 };
 
-const crewList = (state = {}, action) => {
+const crewList = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.setCurrentDay):
             return {
@@ -146,7 +145,7 @@ const crewList = (state = {}, action) => {
     }
 };
 
-const daysById = (state = {}, action) => {
+const daysById = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addDay):
             return {
@@ -211,7 +210,7 @@ const daysById = (state = {}, action) => {
     }
 };
 
-const allDays = (state = [], action) => {
+const allDays = (state = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addDay):
             return state.concat(action.id);
@@ -220,7 +219,7 @@ const allDays = (state = [], action) => {
     }
 };
 
-const flightsById = (state = {}, action) => {
+const flightsById = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
             return {
@@ -330,7 +329,7 @@ const flightsById = (state = {}, action) => {
     }
 };
 
-const allFlights = (state = [], action) => {
+const allFlights = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
             if (state.indexOf(action.id) > -1) {
@@ -344,7 +343,7 @@ const allFlights = (state = [], action) => {
     }
 };
 
-const notesById = (state = {}, action) => {
+const notesById = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateNote):
             return {
@@ -392,7 +391,7 @@ const notesById = (state = {}, action) => {
     }
 };
 
-const allNotes = (state = [], action) => {
+const allNotes = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateNote):
             if (state.indexOf(action.id) > -1) {
@@ -406,7 +405,7 @@ const allNotes = (state = [], action) => {
     }
 };
 
-const sortiesById = (state = {}, action) => {
+const sortiesById = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addSortie):
             return {
@@ -526,7 +525,7 @@ const sortiesById = (state = {}, action) => {
     }
 };
 
-const allSorties = (state = [], action) => {
+const allSorties = (state = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addSortie):
             return state.concat(action.id);
@@ -537,7 +536,7 @@ const allSorties = (state = [], action) => {
     }
 };
 
-const airspaceById = (state = {}, action) => {
+const airspaceById = (state = {}, action: IAction) => {
     // add these cases to sortiesById as well
     switch (action.type) {
         case getType(actions.addAirspace):
@@ -568,7 +567,7 @@ const airspaceById = (state = {}, action) => {
     }
 };
 
-const allAirspace = (state = [], action) => {
+const allAirspace = (state = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addAirspace):
             return state.concat(action.id);
@@ -605,11 +604,11 @@ const sortiesReducer = combineReducers({
 });
 
 const airspaceReducer = combineReducers({
-    byId: aircrewById,
-    allIds: allAircrew,
+    byId: airspaceById,
+    allIds: allAirspace,
 });
 
-export const whiteboardApp = combineReducers<IState, IAction>({
+export const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
     days: daysReducer,
     flights: flightsReducer,

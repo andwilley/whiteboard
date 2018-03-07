@@ -52,8 +52,8 @@ interface ISeat {
 
 interface ISorties {
     readonly id: string;
-    readonly front: Seat;
-    readonly back: Seat;
+    readonly front: ISeat;
+    readonly back: ISeat;
     readonly loadout: string;
     readonly notes: string[];
 }
