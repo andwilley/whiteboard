@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const parseRank = (rank: string | number) => {
+const parseRank = (rank: string | number): number => {
     const validRanks = {
         'second lieutenant': 1,
         '2nd lieutenant': 1,
@@ -53,7 +53,7 @@ const parseRank = (rank: string | number) => {
     return 0;
 };
 
-const intToRank = (rank: string | number) => {
+const intToRank = (rank: string | number): string => {
     if (typeof rank !== 'number') {
         return rank;
     }
