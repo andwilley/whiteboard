@@ -69,8 +69,6 @@ const addUpdateAircrewFormValues = (state = {
 const aircrewById = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateAircrew):
-            // tslint:disable-next-line
-            console.log(action.payload.id);
             return {
                 ...state,
                 [action.payload.id]: {
