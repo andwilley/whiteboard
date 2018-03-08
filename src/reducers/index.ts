@@ -49,12 +49,12 @@ const addUpdateAircrewFormValues = (state = {
         case getType(actions.addUpdateAircrewFormAddQual):
             return {
                 ...state,
-                quals: state.quals.concat(action.qual),
+                quals: state.quals.concat(action.payload.qual),
             };
         case getType(actions.addUpdateAircrewFormDelQual):
             return {
                 ...state,
-                quals: state.quals.filter(qual => qual !== action.qual),
+                quals: state.quals.filter(qual => qual !== action.payload.qual),
             };
         case getType(actions.setAircrewForm):
             return {
@@ -69,16 +69,18 @@ const addUpdateAircrewFormValues = (state = {
 const aircrewById = (state = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateAircrew):
+            // tslint:disable-next-line
+            console.log(action.payload.id);
             return {
                 ...state,
-                [action.id]: {
-                    id: action.id,
-                    rank: action.rank,
-                    first: action.first,
-                    last: action.last,
-                    callsign: action.callsign,
-                    seat: action.seat,
-                    quals: action.quals,
+                [action.payload.id]: {
+                    id: action.payload.id,
+                    rank: action.payload.rank,
+                    first: action.payload.first,
+                    last: action.payload.last,
+                    callsign: action.payload.callsign,
+                    seat: action.payload.seat,
+                    quals: action.payload.quals,
                     flightPucks: [],
                     simPucks: [],
                     odos: 0,
@@ -88,30 +90,32 @@ const aircrewById = (state = {}, action: IAction) => {
             };
         case getType(actions.delAircrew):
             const rest = Object.assign({}, state);
-            delete rest[action.id];
+            delete rest[action.payload.id];
             // why doesn't this work??? rest is returning the entire state...???
             // let { [action.id]: delcrew, ...rest } = state;
             return rest;
         case getType(actions.addUpdateNote):
-            if (action.entity !== 'aircrew' || state[action.entityId].notes.indexOf(action.id) > -1) {
+            if (action.payload.entity !== 'aircrew' ||
+                state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.concat(action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes.concat(action.payload.id),
                 },
             };
         case getType(actions.delNote):
-            if (action.entity !== 'aircrew') {
+            if (action.payload.entity !== 'aircrew') {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.filter((noteId: number) => noteId !== action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes
+                        .filter((noteId: number) => noteId !== action.payload.id),
                 },
             };
         default:
@@ -122,12 +126,12 @@ const aircrewById = (state = {}, action: IAction) => {
 const allAircrew = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateAircrew):
-            if (state.indexOf(action.id) > -1) {
+            if (state.indexOf(action.payload.id) > -1) {
                 return state;
             }
-            return state.concat(action.id);
+            return state.concat(action.payload.id);
         case getType(actions.delAircrew):
-            return state.filter(item => item !== action.id);
+            return state.filter(item => item !== action.payload.id);
         default:
             return state;
     }
@@ -138,7 +142,7 @@ const crewList = (state = {}, action: IAction) => {
         case getType(actions.setCurrentDay):
             return {
                 ...state,
-                currentDay: action.day,
+                currentDay: action.payload.day,
             };
         default:
             return state;
@@ -150,8 +154,8 @@ const daysById = (state = {}, action: IAction) => {
         case getType(actions.addDay):
             return {
                 ...state,
-                [action.id]: {
-                    id: action.id,
+                [action.payload.id]: {
+                    id: action.payload.id,
                     // flow: {
                     // 	numJets: [],
                     // 	method: [],
@@ -165,44 +169,47 @@ const daysById = (state = {}, action: IAction) => {
                 },
             };
         case getType(actions.addFlight):
-            if (state[action.dayId].flights.indexOf(action.id) > -1) {
+            if (state[action.payload.dayId].flights.indexOf(action.payload.id) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.dayId]: {
-                    ...state[action.dayId],
-                    flights: state[action.dayId].flights.concat(action.id),
+                [action.payload.dayId]: {
+                    ...state[action.payload.dayId],
+                    flights: state[action.payload.dayId].flights.concat(action.payload.id),
                 },
             };
         case getType(actions.delFlight):
             return {
                 ...state,
-                [action.dayId]: {
-                    ...state[action.dayId],
-                    flights: state[action.dayId].flights.filter((flightId: number) => flightId !== action.id),
+                [action.payload.dayId]: {
+                    ...state[action.payload.dayId],
+                    flights: state[action.payload.dayId].flights
+                        .filter((flightId: number) => flightId !== action.payload.id),
                 },
             };
         case getType(actions.addUpdateNote):
-            if (action.entity !== 'day' || state[action.entityId].notes.indexOf(action.id) > -1) {
+            if (action.payload.entity !== 'day' ||
+                state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.concat(action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes.concat(action.payload.id),
                 },
             };
         case getType(actions.delNote):
-            if (action.entity !== 'day') {
+            if (action.payload.entity !== 'day') {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.filter((noteId: number) => noteId !== action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes
+                        .filter((noteId: number) => noteId !== action.payload.id),
                 },
             };
         default:
@@ -213,7 +220,7 @@ const daysById = (state = {}, action: IAction) => {
 const allDays = (state = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addDay):
-            return state.concat(action.id);
+            return state.concat(action.payload.id);
         default:
             return state;
     }
@@ -224,9 +231,9 @@ const flightsById = (state = {}, action: IAction) => {
         case getType(actions.addFlight):
             return {
                 ...state,
-                [action.id]: {
-                    id: action.id,
-                    sim: action.sim,
+                [action.payload.id]: {
+                    id: action.payload.id,
+                    sim: action.payload.sim,
                     // flow: 'pit',
                     times: {
                         brief: '',
@@ -240,88 +247,92 @@ const flightsById = (state = {}, action: IAction) => {
             };
         case getType(actions.delFlight):
             const rest = Object.assign({}, state);
-            delete rest[action.id];
+            delete rest[action.payload.id];
             return rest;
         case getType(actions.updateFlightTime):
-            if (['brief', 'takeoff', 'land'].indexOf(action.timeType) === -1) {
+            if (['brief', 'takeoff', 'land'].indexOf(action.payload.timeType) === -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.id]: {
-                    ...state[action.id],
+                [action.payload.id]: {
+                    ...state[action.payload.id],
                     times: {
-                        ...state[action.id].times,
-                        [action.timeType]: action.time,
+                        ...state[action.payload.id].times,
+                        [action.payload.timeType]: action.payload.time,
                     },
                 },
             };
         case getType(actions.toggleFlightType):
             return {
                 ...state,
-                [action.id]: {
-                    ...state[action.id],
-                    sim: !state[action.id].sim,
+                [action.payload.id]: {
+                    ...state[action.payload.id],
+                    sim: !state[action.payload.id].sim,
                 },
             };
         case getType(actions.addSortie):
-            if (state[action.flightId].sorties.indexOf(action.id) > -1) {
+            if (state[action.payload.flightId].sorties.indexOf(action.payload.id) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.flightId]: {
-                    ...state[action.flightId],
-                    sorties: state[action.flightId].sorties.concat(action.id),
+                [action.payload.flightId]: {
+                    ...state[action.payload.flightId],
+                    sorties: state[action.payload.flightId].sorties.concat(action.payload.id),
                 },
             };
         case getType(actions.delSortie):
             return {
                 ...state,
-                [action.flightId]: {
-                    ...state[action.flightId],
-                    sorties: state[action.flightId].sorties.filter((sortieId: number) => sortieId !== action.id),
+                [action.payload.flightId]: {
+                    ...state[action.payload.flightId],
+                    sorties: state[action.payload.flightId].sorties
+                        .filter((sortieId: number) => sortieId !== action.payload.id),
                 },
             };
         case getType(actions.addUpdateNote):
-            if (action.entity !== 'flight' || state[action.entityId].notes.indexOf(action.id) > -1) {
+            if (action.payload.entity !== 'flight' ||
+                state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.concat(action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes.concat(action.payload.id),
                 },
             };
         case getType(actions.delNote):
-            if (action.entity !== 'flight') {
+            if (action.payload.entity !== 'flight') {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.filter((noteId: number) => noteId !== action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes
+                        .filter((noteId: number) => noteId !== action.payload.id),
                 },
             };
         case getType(actions.addAirspace):
-            if (state[action.flightId].airspace.indexOf(action.id) > -1) {
+            if (state[action.payload.flightId].airspace.indexOf(action.payload.id) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.flightId]: {
-                    ...state[action.flightId],
-                    airspace: state[action.flightId].airspace.concat(action.id),
+                [action.payload.flightId]: {
+                    ...state[action.payload.flightId],
+                    airspace: state[action.payload.flightId].airspace.concat(action.payload.id),
                 },
             };
         case getType(actions.delAirspace):
             return {
                 ...state,
-                [action.flightId]: {
-                    ...state[action.flightId],
-                    airspace: state[action.flightId].airspace.filter((airspaceId: number) => airspaceId !== action.id),
+                [action.payload.flightId]: {
+                    ...state[action.payload.flightId],
+                    airspace: state[action.payload.flightId].airspace
+                        .filter((airspaceId: number) => airspaceId !== action.payload.id),
                 },
             };
         default:
@@ -332,12 +343,12 @@ const flightsById = (state = {}, action: IAction) => {
 const allFlights = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
-            if (state.indexOf(action.id) > -1) {
+            if (state.indexOf(action.payload.id) > -1) {
                 return state;
             }
-            return state.concat(action.id);
+            return state.concat(action.payload.id);
         case getType(actions.delFlight):
-            return state.filter(id => id !== action.id);
+            return state.filter(id => id !== action.payload.id);
         default:
             return state;
     }
@@ -348,34 +359,35 @@ const notesById = (state = {}, action: IAction) => {
         case getType(actions.addUpdateNote):
             return {
                 ...state,
-                [action.id]: {
-                    id: action.id,
-                    content: action.content,
+                [action.payload.id]: {
+                    id: action.payload.id,
+                    content: action.payload.content,
                     aircrewRefIds: [],
                     // keep track of who added, edited, time added etc later
                 },
             };
         case getType(actions.delNote):
             const rest = Object.assign({}, state);
-            delete rest[action.id];
+            delete rest[action.payload.id];
             return rest;
         case getType(actions.addCrewRefToNote):
-            if (state[action.noteId].aircrewRefIds.indexOf(action.aircrewId) > -1) {
+            if (state[action.payload.noteId].aircrewRefIds.indexOf(action.payload.aircrewId) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.noteId]: {
-                    ...state[action.noteId],
-                    aircrewRefIds: state[action.noteId].aircrewRefIds.concat(action.aircrewId),
+                [action.payload.noteId]: {
+                    ...state[action.payload.noteId],
+                    aircrewRefIds: state[action.payload.noteId].aircrewRefIds.concat(action.payload.aircrewId),
                 },
             };
         case getType(actions.delCrewRefFromNote):
             return {
                 ...state,
-                [action.noteId]: {
-                    ...state[action.noteId],
-                    aircrewRefIds: state[action.noteId].aircrewRefIds.filter((id: number) => id !== action.aircrewId),
+                [action.payload.noteId]: {
+                    ...state[action.payload.noteId],
+                    aircrewRefIds: state[action.payload.noteId].aircrewRefIds
+                        .filter((id: number) => id !== action.payload.aircrewId),
                 },
             };
         case getType(actions.delAircrew):
@@ -383,7 +395,7 @@ const notesById = (state = {}, action: IAction) => {
             Object.keys(newNotesById).forEach(noteId => {
                 newNotesById[noteId] = Object.assign({}, state[noteId]);
                 newNotesById[noteId].aircrewRefIds = newNotesById[noteId].aircrewRefIds
-                    .filter((id: number) => id !== action.id);
+                    .filter((id: number) => id !== action.payload.id);
             });
             return newNotesById;
         default:
@@ -394,12 +406,12 @@ const notesById = (state = {}, action: IAction) => {
 const allNotes = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateNote):
-            if (state.indexOf(action.id) > -1) {
+            if (state.indexOf(action.payload.id) > -1) {
                 return state;
             }
-            return state.concat(action.id);
+            return state.concat(action.payload.id);
         case getType(actions.delNote):
-            return state.filter(id => id !== action.id);
+            return state.filter(id => id !== action.payload.id);
         default:
             return state;
     }
@@ -410,8 +422,8 @@ const sortiesById = (state = {}, action: IAction) => {
         case getType(actions.addSortie):
             return {
                 ...state,
-                [action.id]: {
-                    id: action.id,
+                [action.payload.id]: {
+                    id: action.payload.id,
                     front: {
                         inputName: '',
                         crewId: null,
@@ -430,20 +442,20 @@ const sortiesById = (state = {}, action: IAction) => {
             };
         case getType(actions.delSortie):
             const rest = Object.assign({}, state);
-            delete rest[action.id];
+            delete rest[action.payload.id];
             return rest;
         case getType(actions.delAircrew):
             const newSortiesById = Object.assign({}, state);
             Object.keys(newSortiesById).forEach(sortieId => {
                 newSortiesById[sortieId] = Object.assign({}, state[sortieId]);
-                if (action.id === newSortiesById[sortieId].front.crewId) {
+                if (action.payload.id === newSortiesById[sortieId].front.crewId) {
                     newSortiesById[sortieId].front = Object.assign({}, state[sortieId].front, {
                             inputName: '',
                             crewId: null,
                         }
                     );
                 }
-                if (action.id === newSortiesById[sortieId].back.crewId) {
+                if (action.payload.id === newSortiesById[sortieId].back.crewId) {
                     newSortiesById[sortieId].back = Object.assign({}, state[sortieId].back, {
                             inputName: '',
                             crewId: null,
@@ -453,25 +465,27 @@ const sortiesById = (state = {}, action: IAction) => {
             });
             return newSortiesById;
         case getType(actions.addUpdateNote):
-            if (action.entity !== 'sortie' || state[action.entityId].notes.indexOf(action.id) > -1) {
+            if (action.payload.entity !== 'sortie' ||
+                state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.concat(action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes.concat(action.payload.id),
                 },
             };
         case getType(actions.delNote):
-            if (action.entity !== 'sortie') {
+            if (action.payload.entity !== 'sortie') {
                 return state;
             }
             return {
                 ...state,
-                [action.entityId]: {
-                    ...state[action.entityId],
-                    notes: state[action.entityId].notes.filter((noteId: number) => noteId !== action.id),
+                [action.payload.entityId]: {
+                    ...state[action.payload.entityId],
+                    notes: state[action.payload.entityId].notes
+                        .filter((noteId: number) => noteId !== action.payload.id),
                 },
             };
         case getType(actions.updatePuckName):
@@ -481,11 +495,11 @@ const sortiesById = (state = {}, action: IAction) => {
             const crewId = null;
             return {
                 ...state,
-                [action.sortieId]: {
-                    ...state[action.sortieId],
-                    [action.crewPosition]: {
-                        ...state[action.sortieId][action.crewPosition],
-                        inputName: action.name,
+                [action.payload.sortieId]: {
+                    ...state[action.payload.sortieId],
+                    [action.payload.crewPosition]: {
+                        ...state[action.payload.sortieId][action.payload.crewPosition],
+                        inputName: action.payload.name,
                         crewId, // *******************TODO ***
                     },
                 },
@@ -493,31 +507,31 @@ const sortiesById = (state = {}, action: IAction) => {
         case getType(actions.updatePuckCode):
             return {
                 ...state,
-                [action.sortieId]: {
-                    ...state[action.sortieId],
-                    [action.crewPosition]: {
-                        ...state[action.sortieId][action.crewPosition],
-                        codes: action.codes,
+                [action.payload.sortieId]: {
+                    ...state[action.payload.sortieId],
+                    [action.payload.crewPosition]: {
+                        ...state[action.payload.sortieId][action.payload.crewPosition],
+                        codes: action.payload.codes,
                     },
                 },
             };
         case getType(actions.updatePuckSymbol):
             return {
                 ...state,
-                [action.sortieId]: {
-                    ...state[action.sortieId],
-                    [action.crewPosition]: {
-                        ...state[action.sortieId][action.crewPosition],
-                        symbols: action.symbols,
+                [action.payload.sortieId]: {
+                    ...state[action.payload.sortieId],
+                    [action.payload.crewPosition]: {
+                        ...state[action.payload.sortieId][action.payload.crewPosition],
+                        symbols: action.payload.symbols,
                     },
                 },
             };
         case getType(actions.updateLoadout):
             return {
                 ...state,
-                [action.sortieId]: {
-                    ...state[action.sortieId],
-                    loadout: action.input,
+                [action.payload.sortieId]: {
+                    ...state[action.payload.sortieId],
+                    loadout: action.payload.input,
                 },
             };
         default:
@@ -528,9 +542,9 @@ const sortiesById = (state = {}, action: IAction) => {
 const allSorties = (state = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addSortie):
-            return state.concat(action.id);
+            return state.concat(action.payload.id);
         case getType(actions.delSortie):
-            return state.filter(sortieId => sortieId !== action.id);
+            return state.filter(sortieId => sortieId !== action.payload.id);
         default:
             return state;
     }
@@ -542,8 +556,8 @@ const airspaceById = (state = {}, action: IAction) => {
         case getType(actions.addAirspace):
             return {
                 ...state,
-                [action.id]: {
-                    id: action.id,
+                [action.payload.id]: {
+                    id: action.payload.id,
                     name: '',
                     start: '',
                     end: '',
@@ -551,15 +565,15 @@ const airspaceById = (state = {}, action: IAction) => {
             };
         case getType(actions.delAirspace):
             const rest = Object.assign({}, state);
-            delete rest[action.id];
+            delete rest[action.payload.id];
             return rest;
         case getType(actions.updateAirspace):
             // handle this input better?
             return {
                 ...state,
-                [action.id]: {
-                    ...state[action.id],
-                    [action.field]: action.input,
+                [action.payload.id]: {
+                    ...state[action.payload.id],
+                    [action.payload.field]: action.payload.input,
                 },
             };
         default:
@@ -570,9 +584,9 @@ const airspaceById = (state = {}, action: IAction) => {
 const allAirspace = (state = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addAirspace):
-            return state.concat(action.id);
+            return state.concat(action.payload.id);
         case getType(actions.delAirspace):
-            return state.filter(sortieId => sortieId !== action.id);
+            return state.filter(sortieId => sortieId !== action.payload.id);
         default:
             return state;
     }
