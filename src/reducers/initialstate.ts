@@ -126,8 +126,10 @@ export const INITIAL_STATE = {
         },
         allIds: ['a', 'b'],
     },
-    crewList: {
+    crewListUI: {
         currentDay: '2018-01-24',
+        qualsList,
+        addUpdateAircrewFormDisplay: false,
     },
     sorties: {
         byId: {
@@ -215,7 +217,5 @@ export const INITIAL_STATE = {
         seat: 'pilot',
         quals: [],
         existingAircrewUnchanged: false,
-        qualsList,
-        display: false,
     },
 };

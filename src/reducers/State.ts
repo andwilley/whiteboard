@@ -1,9 +1,16 @@
-interface IEntity<E> {
+export interface IEntity<E> {
     readonly byId: { [id: string]: E };
     readonly allIds: string[];
 }
 
-interface IAircrew {
+export interface IPucks {
+    flight: number;
+    sim: number;
+    flightNote: number;
+    dayNote: number;
+}
+
+export interface IAircrew {
     readonly id: string;
     readonly callsign: string;
     readonly first: string;
@@ -16,15 +23,16 @@ interface IAircrew {
     readonly flightPucks: string[];
     readonly simPucks: string[];
     readonly snivs: string[];
+    pucks?: IPucks;
 }
 
-interface IDays {
+export interface IDays {
     readonly id: string;
     readonly flights: string[];
     readonly notes: string[];
 }
 
-interface IFlights {
+export interface IFlights {
     readonly id: string;
     readonly sim: boolean;
     readonly times: {
@@ -37,20 +45,20 @@ interface IFlights {
     readonly notes: string[];
 }
 
-interface INotes {
+export interface INotes {
     readonly id: string;
     readonly content: string;
     readonly aircrewRefIds: string[];
 }
 
-interface ISeat {
+export interface ISeat {
     readonly inputName: string;
     readonly crewId: string;
     readonly codes: string[];
     readonly symbols: string[];
 }
 
-interface ISorties {
+export interface ISorties {
     readonly id: string;
     readonly front: ISeat;
     readonly back: ISeat;
@@ -58,18 +66,20 @@ interface ISorties {
     readonly notes: string[];
 }
 
-interface IAirspace {
+export interface IAirspace {
     readonly id: string;
     readonly name: string;
     readonly start: string;
     readonly end: string;
 }
 
-interface ICrewList {
+export interface ICrewListUI {
     readonly currentDay: string;
+    readonly qualsList: string[];
+    readonly addUpdateAircrewFormDisplay: boolean;
 }
 
-interface IAddUpdateAircrewFormValues {
+export interface IAddUpdateAircrewFormValues {
     readonly id: string;
     readonly callsign: string;
     readonly first: string;
@@ -77,9 +87,7 @@ interface IAddUpdateAircrewFormValues {
     readonly rank: number;
     readonly seat: string;
     readonly quals: string[];
-    readonly existingAircrewUnchanged: boolean;
-    readonly qualsList: string[];
-    readonly display: boolean;
+    existingAircrewUnchanged: boolean;
 }
 
 export interface IState {
@@ -89,6 +97,6 @@ export interface IState {
     readonly sorties: IEntity<ISorties>;
     readonly notes: IEntity<INotes>;
     readonly airspace: IEntity<IAirspace>;
-    readonly crewList: ICrewList;
+    readonly crewListUI: ICrewListUI;
     readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
 }

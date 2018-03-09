@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { IAddUpdateAircrewFormValues } from '../reducers/State';
 
 const parseRank = (rank: string | number): number => {
     const validRanks = {
@@ -83,7 +84,17 @@ const intToRank = (rank: string | number): string => {
     }
 };
 
-const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpdateAircrewFormValues }: any) => {
+interface IAddUpdateAircrewFormProps {
+    onInputChange: () => any;
+    onAddUpdateAircrewSubmit: (crew: IAddUpdateAircrewFormValues) => any;
+    addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
+    qualsList: string[];
+}
+
+const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputChange,
+                                                                       onAddUpdateAircrewSubmit,
+                                                                       addUpdateAircrewFormValues,
+                                                                       qualsList }) => {
     const rankIsValid = addUpdateAircrewFormValues.rank === 0 ? true : parseRank(addUpdateAircrewFormValues.rank);
     const onSubmit = (e: any) => {
         e.preventDefault();
@@ -98,7 +109,7 @@ const AddUpdateAircrewForm = ({ onInputChange, onAddUpdateAircrewSubmit, addUpda
             existingAircrewUnchanged: addUpdateAircrewFormValues.existingAircrewUnchanged,
         });
     };
-    const qualCheckboxList = addUpdateAircrewFormValues.qualsList.map( (qual: string) => (
+    const qualCheckboxList = qualsList.map( (qual: string) => (
         <label htmlFor="qual" key={qual}>
             <input
                 type="checkbox"

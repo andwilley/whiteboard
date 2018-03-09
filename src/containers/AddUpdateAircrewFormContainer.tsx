@@ -1,23 +1,33 @@
 import { connect } from 'react-redux';
 import AddUpdateAircrewForm from '../components/AddUpdateAircrewForm';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
+import { IState, IAddUpdateAircrewFormValues } from '../reducers/State';
 import { actions } from '../actions';
-const { addUpdateAircrew, addUpdateAircrewFormAddQual, addUpdateAircrewFormDelQual, setAircrewForm } = actions;
+const { addUpdateAircrew,
+        addUpdateAircrewFormAddQual,
+        addUpdateAircrewFormDelQual,
+        setAircrewForm,
+        addUpdateAircrewFormDisplay } = actions;
 
-const getAddUpdateAircrewFormValues = (state: any) => {
+const getAddUpdateAircrewFormValues = (state: IState) => {
   return state.addUpdateAircrewFormValues;
 };
 
-const mapStateToProps = (state: any) => {
+const getQualsList = (state: IState): string[] => {
+  return state.crewListUI.qualsList;
+};
+
+const mapStateToProps = (state: IState) => {
   return {
     // need something to validate unique callsigns from server.
     addUpdateAircrewFormValues: getAddUpdateAircrewFormValues(state),
+    qualsList: getQualsList(state),
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onAddUpdateAircrewSubmit: (aircrew: any) => {
+    onAddUpdateAircrewSubmit: (aircrew: IAddUpdateAircrewFormValues) => {
       if (aircrew.callsign === '') {
           return;
       }
@@ -25,6 +35,7 @@ const mapDispatchToProps = (dispatch: any) => {
         dispatch(addUpdateAircrew(aircrew));
       }
       dispatch(setAircrewForm(blankAddUpdateAircrewForm));
+      dispatch(addUpdateAircrewFormDisplay(false));
     },
     // need async action to validate unique callsign on server.
     onInputChange: (event: any) => {

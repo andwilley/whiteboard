@@ -41,8 +41,6 @@ const addUpdateAircrewFormValues = (state = {
                                         seat: 'pilot',
                                         quals: [],
                                         existingAircrewUnchanged: false,
-                                        qualsList,
-                                        display: false,
                                     },
                                     action: IAction) => {
     switch (action.type) {
@@ -135,12 +133,20 @@ const allAircrew = (state: string[] = [], action: IAction) => {
     }
 };
 
-const crewList = (state = {}, action: IAction) => {
+const crewListUI = (state = { qualsList,
+                              addUpdateAircrewFormDisplay: false,
+                              currentDay: '' },
+                    action: IAction) => {
     switch (action.type) {
         case getType(actions.setCurrentDay):
             return {
                 ...state,
                 currentDay: action.payload.day,
+            };
+        case getType(actions.addUpdateAircrewFormDisplay):
+            return {
+                ...state,
+                addUpdateAircrewFormDisplay: action.payload.display,
             };
         default:
             return state;
@@ -627,6 +633,6 @@ export const whiteboardApp = combineReducers<IState>({
     sorties: sortiesReducer,
     notes: notesReducer,
     airspace: airspaceReducer,
-    crewList,
+    crewListUI,
     addUpdateAircrewFormValues,
 });

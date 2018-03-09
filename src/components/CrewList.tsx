@@ -2,9 +2,20 @@ import * as React from 'react';
 import Aircrew from './Aircrew';
 import AddButton from '../components/AddButton';
 import DelButton from '../components/DelButton';
+import { IAircrew, IAddUpdateAircrewFormValues } from '../reducers/State';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 
-const CrewList = ({
+interface ICrewListProps {
+    aircrewList: IAircrew[];
+    addUpdateAircrewFormDisplay: boolean;
+    onAircrewClick: (id: IAddUpdateAircrewFormValues) => any;
+    onXClick: (id: string) => any;
+    onEditClick: (crew: IAddUpdateAircrewFormValues) => any;
+    onAddAircrewFormButtonClick: () => any;
+    onDelAircrewFormButtonClick: () => any;
+}
+
+const CrewList: React.SFC<ICrewListProps> = ({
     aircrewList,
     addUpdateAircrewFormDisplay,
     onAircrewClick,
@@ -12,7 +23,7 @@ const CrewList = ({
     onEditClick,
     onAddAircrewFormButtonClick,
     onDelAircrewFormButtonClick,
-    }: any) => {
+    }) => {
     const aircrewCompList = aircrewList.map((aircrew: any) => (
         <Aircrew
             key={aircrew.id}

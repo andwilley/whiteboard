@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
 import { actions } from '../actions';
+import { IState, IAddUpdateAircrewFormValues } from '../reducers/State';
 import CrewList from '../components/CrewList';
-const { delAircrew, setAircrewForm } = actions;
+const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
 
-const getDayPucks = (state: any) => {
+const getDayPucks = (state: IState) => {
   let crewId: number, eventType: string;
   const seats = ['front', 'back'];
   const newPuck = {
@@ -13,7 +14,7 @@ const getDayPucks = (state: any) => {
     flightNote: 0,
     dayNote: 0,
   };
-  const aircrewCurrentDayPucks = state.days.byId[state.crewList.currentDay].flights
+  const aircrewCurrentDayPucks = state.days.byId[state.crewListUI.currentDay].flights
     .reduce((flightPucks: any, flightId: string) => {
       eventType = state.flights.byId[flightId].sim ? 'sim' : 'flight';
       state.flights.byId[flightId].sorties.forEach((sortieId: string) => {
@@ -46,7 +47,7 @@ const getDayPucks = (state: any) => {
       return flightPucks;
     },
             {});
-  state.days.byId[state.crewList.currentDay].notes.forEach((noteId: string) => {
+  state.days.byId[state.crewListUI.currentDay].notes.forEach((noteId: string) => {
     state.notes.byId[noteId].aircrewRefIds.forEach((aircrewId: string) => {
       aircrewCurrentDayPucks[aircrewId] = aircrewCurrentDayPucks[aircrewId] ?
         {
@@ -62,7 +63,7 @@ const getDayPucks = (state: any) => {
   return aircrewCurrentDayPucks;
 };
 
-const getAircrewList = (state: any) => {
+const getAircrewList = (state: IState) => {
   const aircrewDayPucks = getDayPucks(state);
   return state.aircrew.allIds.map( (aircrewId: string) => {
     const aircrewWithPucks = Object.assign({}, state.aircrew.byId[aircrewId]);
@@ -73,11 +74,11 @@ const getAircrewList = (state: any) => {
   });
 };
 
-const getAddUpdateAircrewFormDisplay = (state: any) => {
-  return state.addUpdateAircrewFormValues.display;
+const getAddUpdateAircrewFormDisplay = (state: IState) => {
+  return state.crewListUI.addUpdateAircrewFormDisplay;
 };
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: IState) => {
   return {
     aircrewList: getAircrewList(state),
     addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
@@ -87,23 +88,25 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onAircrewClick: (aircrew: any) => {
+    onAircrewClick: (aircrew: IAddUpdateAircrewFormValues) => {
       // dispatch(something(id)); not sure I'm going to need this. below is for test.
       alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));
     },
     onXClick: (id: string) => {
       dispatch(delAircrew(id));
+      dispatch(setAircrewForm({id: ''}));
     },
-    onEditClick: (aircrew: any) => {
+    onEditClick: (aircrew: IAddUpdateAircrewFormValues) => {
       aircrew.existingAircrewUnchanged = true;
-      aircrew.display = true;
       dispatch(setAircrewForm(aircrew));
+      dispatch(addUpdateAircrewFormDisplay(true));
     },
     onAddAircrewFormButtonClick: () => {
-      dispatch(setAircrewForm({display: true}));
+      dispatch(addUpdateAircrewFormDisplay(true));
     },
     onDelAircrewFormButtonClick: () => {
       dispatch(setAircrewForm(blankAddUpdateAircrewForm));
+      dispatch(addUpdateAircrewFormDisplay(false));
     },
   };
 };

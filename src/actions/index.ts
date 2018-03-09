@@ -10,6 +10,7 @@ export const ADD_UPDATE_AIRCREW = 'ADD_UPDATE_AIRCREW';
 export const DEL_AIRCREW = 'DEL_AIRCREW';
 export const SET_QUAL_FILTER = 'SET_QUAL_FILTER';
 export const SET_CURRENT_DAY = 'SET_CURRENT_DAY';
+export const ADD_UPDATE_AIRCREW_FORM_DISPLAY = 'ADD_UPDATE_AIRCREW_FORM_DISPLAY';
 export const ADD_DAY = 'ADD_DAY';
 export const ADD_FLIGHT = 'ADD_FLIGHT';
 export const DEL_FLIGHT = 'DEL_FLIGHT';
@@ -155,6 +156,12 @@ export const actions = {
         type: SET_CURRENT_DAY,
         payload: {
             day,
+        },
+    })),
+    addUpdateAircrewFormDisplay: createAction(ADD_UPDATE_AIRCREW_FORM_DISPLAY, (display: boolean) => ({
+        type: ADD_UPDATE_AIRCREW_FORM_DISPLAY,
+        payload: {
+            display,
         },
     })),
     addDay: createAction(ADD_DAY, (day: string) => {
