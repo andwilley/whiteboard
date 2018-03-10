@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
+import { IEntity, ISorties } from '../types/State';
 import { actions, IAction } from '../actions';
 
 const sortiesById = (state = {}, action: IAction) => {
@@ -135,7 +136,7 @@ const allSorties = (state = [], action: IAction) => {
     }
 };
 
-const sortiesReducer = combineReducers({
+const sortiesReducer = combineReducers<IEntity<ISorties>>({
     byId: sortiesById,
     allIds: allSorties,
 });

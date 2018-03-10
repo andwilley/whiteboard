@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
+import { IEntity, IAirspace } from '../types/State';
 import { actions, IAction } from '../actions';
 
 const airspaceById = (state = {}, action: IAction) => {
@@ -44,7 +45,7 @@ const allAirspace = (state = [], action: IAction) => {
     }
 };
 
-const airspaceReducer = combineReducers({
+const airspaceReducer = combineReducers<IEntity<IAirspace>>({
     byId: airspaceById,
     allIds: allAirspace,
 });

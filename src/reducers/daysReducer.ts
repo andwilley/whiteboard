@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
+import { IEntity, IDays } from '../types/State';
 import { actions, IAction } from '../actions';
 
 const daysById = (state = {}, action: IAction) => {
@@ -79,7 +80,7 @@ const allDays = (state = [], action: IAction) => {
     }
 };
 
-const daysReducer = combineReducers({
+const daysReducer = combineReducers<IEntity<IDays>>({
     byId: daysById,
     allIds: allDays,
 });
