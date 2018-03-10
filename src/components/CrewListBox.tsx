@@ -1,7 +1,7 @@
 import * as React from 'react';
 import VisibleCrewList from '../containers/VisibleCrewList';
 
-const CrewListBox = () => (
+const CrewListBox: React.SFC = () => (
     <VisibleCrewList />
 );
 

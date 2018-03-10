@@ -1,19 +1,21 @@
 import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
 import { actions } from '../actions';
-import { IState, IAddUpdateAircrewFormValues } from '../reducers/State';
+import { IState } from '../types/State';
+import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import CrewList from '../components/CrewList';
 const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
+
+const newPuck = {
+  flight: 0,
+  sim: 0,
+  flightNote: 0,
+  dayNote: 0,
+};
 
 const getDayPucks = (state: IState) => {
   let crewId: number, eventType: string;
   const seats = ['front', 'back'];
-  const newPuck = {
-    flight: 0,
-    sim: 0,
-    flightNote: 0,
-    dayNote: 0,
-  };
   const aircrewCurrentDayPucks = state.days.byId[state.crewListUI.currentDay].flights
     .reduce((flightPucks: any, flightId: string) => {
       eventType = state.flights.byId[flightId].sim ? 'sim' : 'flight';
@@ -63,18 +65,18 @@ const getDayPucks = (state: IState) => {
   return aircrewCurrentDayPucks;
 };
 
-const getAircrewList = (state: IState) => {
+const getAircrewList = (state: IState): IAircrewWithPucks[] => {
   const aircrewDayPucks = getDayPucks(state);
-  return state.aircrew.allIds.map( (aircrewId: string) => {
-    const aircrewWithPucks = Object.assign({}, state.aircrew.byId[aircrewId]);
+  return state.aircrew.allIds.map( (aircrewId: string): IAircrewWithPucks => {
+    const aircrewWithPucks: IAircrewWithPucks = Object.assign({}, state.aircrew.byId[aircrewId], {pucks: newPuck});
     aircrewWithPucks.pucks = aircrewDayPucks[aircrewId] ?
       Object.assign({}, aircrewDayPucks[aircrewId]) :
-      {flight: 0, sim: 0, flightNote: 0, dayNote: 0};
+      newPuck;
     return aircrewWithPucks;
   });
 };
 
-const getAddUpdateAircrewFormDisplay = (state: IState) => {
+const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
   return state.crewListUI.addUpdateAircrewFormDisplay;
 };
 
@@ -88,7 +90,7 @@ const mapStateToProps = (state: IState) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onAircrewClick: (aircrew: IAddUpdateAircrewFormValues) => {
+    onAircrewClick: (aircrew: IAircrewWithPucks) => {
       // dispatch(something(id)); not sure I'm going to need this. below is for test.
       alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));
     },
@@ -96,8 +98,8 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(delAircrew(id));
       dispatch(setAircrewForm({id: ''}));
     },
-    onEditClick: (aircrew: IAddUpdateAircrewFormValues) => {
-      aircrew.existingAircrewUnchanged = true;
+    onEditClick: (aircrew: IAircrewWithPucks) => {
+      dispatch(setAircrewForm({existingAircrewUnchanged: true}));
       dispatch(setAircrewForm(aircrew));
       dispatch(addUpdateAircrewFormDisplay(true));
     },

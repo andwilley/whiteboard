@@ -1,14 +1,25 @@
 import * as React from 'react';
+import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 
-const Aircrew = ({ aircrew, onAircrewClick, onXClick, onEditClick }: any) => {
-    const totalPucks = aircrew.pucks.flight +
-                       aircrew.pucks.sim +
-                       aircrew.pucks.flightNote +
-                       aircrew.pucks.dayNote;
+interface IAircrewProps {
+    aircrew: IAircrewWithPucks;
+    onAircrewClick: () => any;
+    onXClick: () => any;
+    onEditClick: () => any;
+}
+
+const Aircrew: React.SFC<IAircrewProps> = ({ aircrew, onAircrewClick, onXClick, onEditClick }) => {
+    const totalPucks = aircrew.pucks ? (aircrew.pucks.flight +
+                                          aircrew.pucks.sim +
+                                          aircrew.pucks.flightNote +
+                                          aircrew.pucks.dayNote)
+                                        : 0;
+    const aircrewStyle: React.CSSProperties = { cursor: 'pointer',
+                                                textDecoration: totalPucks === 0 ? '' : 'line-through' };
     return (
         <li>
             <span
-                style={{cursor: 'pointer', textDecoration: totalPucks === 0 ? '' : 'line-through'}}
+                style={aircrewStyle}
                 onClick={onAircrewClick}
             >
                 {aircrew.callsign}

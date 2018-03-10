@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IAddUpdateAircrewFormValues } from '../reducers/State';
+import { IAddUpdateAircrewFormValues } from '../types/State';
 
 const parseRank = (rank: string | number): number => {
     const validRanks = {

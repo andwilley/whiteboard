@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-const DelButton = ({onClick}: any) => {
+interface IDelButtonProps {
+    onClick: () => any;
+}
+
+const DelButton: React.SFC<IDelButtonProps> = ({onClick}) => {
     return (
         <span onClick={onClick}>[-]</span>
     );

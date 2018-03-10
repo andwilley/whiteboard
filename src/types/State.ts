@@ -3,13 +3,6 @@ export interface IEntity<E> {
     readonly allIds: string[];
 }
 
-export interface IPucks {
-    flight: number;
-    sim: number;
-    flightNote: number;
-    dayNote: number;
-}
-
 export interface IAircrew {
     readonly id: string;
     readonly callsign: string;
@@ -23,7 +16,6 @@ export interface IAircrew {
     readonly flightPucks: string[];
     readonly simPucks: string[];
     readonly snivs: string[];
-    pucks?: IPucks;
 }
 
 export interface IDays {

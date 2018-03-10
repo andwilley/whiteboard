@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import AddUpdateAircrewForm from '../components/AddUpdateAircrewForm';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
-import { IState, IAddUpdateAircrewFormValues } from '../reducers/State';
+import { IState, IAddUpdateAircrewFormValues } from '../types/State';
 import { actions } from '../actions';
 const { addUpdateAircrew,
         addUpdateAircrewFormAddQual,
