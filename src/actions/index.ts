@@ -8,7 +8,9 @@ export const ADD_UPDATE_AIRCREW_FORM_DEL_QUAL = 'ADD_UPDATE_AIRCREW_FORM_DEL_QUA
 export const SET_AIRCREW_FORM = 'SET_AIRCREW_FORM';
 export const ADD_UPDATE_AIRCREW = 'ADD_UPDATE_AIRCREW';
 export const DEL_AIRCREW = 'DEL_AIRCREW';
-export const SET_QUAL_FILTER = 'SET_QUAL_FILTER';
+export const SET_AIRCREW_SEARCH_FORM = 'SET_AIRCREW_SEARCH_FORM';
+export const ADD_QUAL_FILTER = 'ADD_QUAL_FILTER';
+export const DEL_QUAL_FILTER = 'DEL_QUAL_FILTER';
 export const SET_CURRENT_DAY = 'SET_CURRENT_DAY';
 export const ADD_UPDATE_AIRCREW_FORM_DISPLAY = 'ADD_UPDATE_AIRCREW_FORM_DISPLAY';
 export const ADD_DAY = 'ADD_DAY';
@@ -49,6 +51,12 @@ export interface ISetAircrewArgs {
     seat?: string;
     existingAircrewUnchanged?: boolean;
     display?: boolean;
+}
+
+export interface ISetAircrewSearchArgs {
+    crewSearchInput?: string;
+    qualFilter?: string[];
+    rankFilter?: string[];
 }
 
 export interface IAddAircrewArgs {
@@ -150,6 +158,24 @@ export const actions = {
         type: DEL_AIRCREW,
         payload: {
             id,
+        },
+    })),
+    setAircrewSearchForm: createAction(SET_AIRCREW_SEARCH_FORM, (args: ISetAircrewSearchArgs) => ({
+        type: SET_AIRCREW_SEARCH_FORM,
+        payload: {
+            ...args,
+        },
+    })),
+    addQualFilter: createAction(ADD_QUAL_FILTER, (qual: string) => ({
+        type: ADD_QUAL_FILTER,
+        payload: {
+            qual,
+        },
+    })),
+    delQualFilter: createAction(DEL_QUAL_FILTER, (qual: string) => ({
+        type: DEL_QUAL_FILTER,
+        payload: {
+            qual,
         },
     })),
     setCurrentDay: createAction(SET_CURRENT_DAY, (day: string) => ({

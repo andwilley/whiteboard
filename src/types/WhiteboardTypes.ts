@@ -10,3 +10,8 @@ export interface IPucks {
 export interface IAircrewWithPucks extends IAircrew {
     pucks: IPucks;
 }
+
+export interface IFilters {
+    qualFilter: string[];
+    rankFilter: number[];
+}

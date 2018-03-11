@@ -124,8 +124,8 @@ notes: {
 crewList: {
 	currentDay: 20180109,									// days.<id> of day with focus (used to update puck colors)
 	crewSearchInput: "",
-	qualfilter: [],
-	rankfilter: [],
+	qualFilter: [],
+	rankFilter: [],
 	addUpdateAircrewFormDisplay: false,
 	qualsList: ["FAI","ETC"],
 },

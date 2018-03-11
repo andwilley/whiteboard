@@ -1,2 +1,7 @@
 import * as React from 'react';
-import VisibleCrewList from '../containers/VisibleCrewList';
+
+const DayNoteBox: React.SFC = () => (
+    <span>HI!</span>
+);
+
+export default DayNoteBox;

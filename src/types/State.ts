@@ -69,6 +69,9 @@ export interface ICrewListUI {
     readonly currentDay: string;
     readonly qualsList: string[];
     readonly addUpdateAircrewFormDisplay: boolean;
+    readonly crewSearchInput: string;
+    readonly qualFilter: string[];
+    readonly rankFilter: number[];
 }
 
 export interface IAddUpdateAircrewFormValues {

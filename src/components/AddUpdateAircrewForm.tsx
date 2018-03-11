@@ -122,9 +122,7 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
         </label>
     ));
     return (
-        <form
-            onSubmit={e => onSubmit(e)}
-        >
+        <form onSubmit={e => onSubmit(e)}>
             {addUpdateAircrewFormValues.id === '' ? 'Add' : 'Update'} Aircrew:<br />
             <input
                 type="hidden"

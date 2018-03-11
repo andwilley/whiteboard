@@ -10,8 +10,6 @@ import notesReducer from './notesReducer';
 import sortiesReducer from './sortiesReducer';
 import airspaceReducer from './airspaceReducer';
 
-console.log('test');
-
 export const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
     days: daysReducer,

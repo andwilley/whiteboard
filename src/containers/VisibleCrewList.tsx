@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
 import { actions } from '../actions';
 import { IState } from '../types/State';
-import { IAircrewWithPucks } from '../types/WhiteboardTypes';
+import { IAircrewWithPucks, IFilters } from '../types/WhiteboardTypes';
 import CrewList from '../components/CrewList';
 const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
 
@@ -76,6 +76,17 @@ const getAircrewList = (state: IState): IAircrewWithPucks[] => {
   });
 };
 
+const getAircrewSearchFilters = (state: IState): IFilters => {
+  return {
+    qualFilter: state.crewListUI.qualFilter,
+    rankFilter: state.crewListUI.rankFilter,
+  };
+};
+
+const getCrewSearchValue = (state: IState): string => {
+  return state.crewListUI.crewSearchInput.toLowerCase();
+};
+
 const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
   return state.crewListUI.addUpdateAircrewFormDisplay;
 };
@@ -83,6 +94,8 @@ const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
 const mapStateToProps = (state: IState) => {
   return {
     aircrewList: getAircrewList(state),
+    filters: getAircrewSearchFilters(state),
+    crewSearchValue: getCrewSearchValue(state),
     addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
     // need something to validate unique callsigns from server async.
   };
