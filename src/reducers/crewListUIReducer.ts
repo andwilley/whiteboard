@@ -6,9 +6,13 @@ import { ICrewListUI } from '../types/State';
 const crewListUIReducer = (state: ICrewListUI = { qualsList,
                                                   addUpdateAircrewFormDisplay: false,
                                                   currentDay: '',
-                                                  crewSearchInput: '',
-                                                  qualFilter: [],
-                                                  rankFilter: [] },
+                                                  filters: {
+                                                      crewSearchInput: '',
+                                                      showAvailable: false,
+                                                      qualFilter: [],
+                                                      rankFilter: [],
+                                                  },
+                                                },
                            action: IAction) => {
     switch (action.type) {
         case getType(actions.setCurrentDay):
@@ -24,17 +28,26 @@ const crewListUIReducer = (state: ICrewListUI = { qualsList,
         case getType(actions.setAircrewSearchForm):
             return {
                 ...state,
-                ...action.payload,
+                filters: {
+                    ...state.filters,
+                    ...action.payload,
+                },
             };
         case getType(actions.addQualFilter):
             return {
                 ...state,
-                qualFilter: state.qualFilter.concat(action.payload.qual),
+                filters: {
+                    ...state.filters,
+                    qualFilter: state.filters.qualFilter.concat(action.payload.qual),
+                },
             };
         case getType(actions.delQualFilter):
             return {
                 ...state,
-                qualFilter: state.qualFilter.filter(qual => qual !== action.payload.qual),
+                filters: {
+                    ...state.filters,
+                    qualFilter: state.filters.qualFilter.filter(qual => qual !== action.payload.qual),
+                },
             };
         default:
             return state;

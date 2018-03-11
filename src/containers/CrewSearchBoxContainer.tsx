@@ -1,30 +1,23 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { IState } from '../types/State';
-import { IFilters } from '../types/WhiteboardTypes';
+import { IState, IFilters } from '../types/State';
 import CrewSearchBox from '../components/CrewSearchBox';
 const { setAircrewSearchForm,
         addQualFilter,
         delQualFilter } = actions;
-
-const getCrewSearchInput = (state: IState): string => {
-    return state.crewListUI.crewSearchInput;
-};
 
 const getQualsList = (state: IState): string[] => {
     return state.crewListUI.qualsList;
 };
 
 const getFilters = (state: IState): IFilters => {
-    return {
-        qualFilter: state.crewListUI.qualFilter,
-        rankFilter: state.crewListUI.rankFilter,
-    };
+  // slices of the state this needs for future optimization reference:
+  // state.crewListUI.filters
+    return state.crewListUI.filters;
 };
 
 const mapStateToProps = (state: IState) => {
     return {
-        crewSearchInput: getCrewSearchInput(state),
         qualsList: getQualsList(state),
         filters: getFilters(state),
     };
@@ -39,6 +32,9 @@ const mapDispatchToProps = (dispatch: any) => {
             switch (name) {
                 case 's_quals':
                     dispatch(target.checked ? addQualFilter(value) : delQualFilter(value));
+                    break;
+                case 'showAvailable':
+                    dispatch(setAircrewSearchForm({showAvailable: value === 'true' ? true : false}));
                     break;
                 default:
                     dispatch(setAircrewSearchForm({crewSearchInput: value}));

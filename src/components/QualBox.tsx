@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IFilters } from '../types/WhiteboardTypes';
+import { IFilters } from '../types/State';
 
 interface IQualBoxProps {
     qualsList: string[];

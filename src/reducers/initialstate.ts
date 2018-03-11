@@ -130,9 +130,12 @@ export const INITIAL_STATE = {
         currentDay: '2018-01-24',
         qualsList,
         addUpdateAircrewFormDisplay: false,
-        crewSearchInput: '',
-        qualFilter: [],
-        rankFilter: [],
+        filters: {
+            crewSearchInput: '',
+            showAvailable: false,
+            qualFilter: [],
+            rankFilter: [],
+        },
     },
     sorties: {
         byId: {

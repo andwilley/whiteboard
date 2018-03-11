@@ -2,13 +2,12 @@ import * as React from 'react';
 import Aircrew from './Aircrew';
 import AddButton from '../components/AddButton';
 import DelButton from '../components/DelButton';
-import { IAircrewWithPucks, IFilters } from '../types/WhiteboardTypes';
+import { IAircrewWithPucks } from '../types/WhiteboardTypes';
+import { ERR_NO_RESULTS_FOUND } from '../errors';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 
 interface ICrewListProps {
     aircrewList: IAircrewWithPucks[];
-    filters: IFilters;
-    crewSearchValue: string;
     addUpdateAircrewFormDisplay: boolean;
     onAircrewClick: (crew: IAircrewWithPucks) => any;
     onXClick: (id: string) => any;
@@ -19,8 +18,6 @@ interface ICrewListProps {
 
 const CrewList: React.SFC<ICrewListProps> = ({
     aircrewList,
-    filters,
-    crewSearchValue,
     addUpdateAircrewFormDisplay,
     onAircrewClick,
     onXClick,
@@ -28,56 +25,20 @@ const CrewList: React.SFC<ICrewListProps> = ({
     onAddAircrewFormButtonClick,
     onDelAircrewFormButtonClick,
     }) => {
-    const filteredAircrewList = aircrewList.filter((aircrew: IAircrewWithPucks) => {
-        if (filters.qualFilter.length === 0 && filters.rankFilter.length === 0 && crewSearchValue === '') {
-            return true;
-        }
-        if (filters.qualFilter.length > 0) {
-            let allQualsMatch = true;
-            filters.qualFilter.forEach((qual: string) => {
-                if (aircrew.quals.indexOf(qual) === -1) {
-                    allQualsMatch = false;
-                }
-            });
-            if (!allQualsMatch) {
-                return false;
-            }
-        }
-        if (filters.rankFilter.length > 0) {
-            let matchRank = false;
-            filters.rankFilter.forEach((rank: number) => {
-                if (aircrew.rank === rank) {
-                    matchRank = true;
-                }
-            });
-            if (!matchRank) {
-                return false;
-            }
-        }
-        if (crewSearchValue !== '') {
-            const callsign = aircrew.callsign.toLowerCase();
-            const first = aircrew.first.toLowerCase();
-            const last = aircrew.last.toLowerCase();
-            const searchMatch = callsign.includes(crewSearchValue) ||
-                                first.includes(crewSearchValue) ||
-                                `${first} ${last}`.includes(crewSearchValue) ||
-                                `${last} ${first}`.includes(crewSearchValue) ||
-                                `${last}, ${first}`.includes(crewSearchValue);
-            if (!searchMatch) {
-                return false;
-            }
-        }
-        return true;
+    const pilotList: JSX.Element[] = [];
+    const wsoList: JSX.Element[] = [];
+    aircrewList.forEach((aircrew: IAircrewWithPucks) => {
+        const aircrewComponent = (
+            <Aircrew
+                key={aircrew.id}
+                aircrew={aircrew}
+                onAircrewClick={() => onAircrewClick(aircrew)}
+                onXClick={() => onXClick(aircrew.id)}
+                onEditClick={() => onEditClick(aircrew)}
+            />
+        );
+        aircrew.seat === 'pilot' ? pilotList.push(aircrewComponent) : wsoList.push(aircrewComponent);
     });
-    const aircrewCompList = filteredAircrewList.map((aircrew: IAircrewWithPucks) => (
-        <Aircrew
-            key={aircrew.id}
-            aircrew={aircrew}
-            onAircrewClick={() => onAircrewClick(aircrew)}
-            onXClick={() => onXClick(aircrew.id)}
-            onEditClick={() => onEditClick(aircrew)}
-        />
-    ));
     const formDisplayButton = addUpdateAircrewFormDisplay ?
                 (
                 <div>
@@ -92,8 +53,13 @@ const CrewList: React.SFC<ICrewListProps> = ({
                 );
     return (
         <div>
+            <h3>Pilots</h3>
             <ul>
-                {aircrewCompList}
+                {pilotList.length > 0 ? pilotList : ERR_NO_RESULTS_FOUND}
+            </ul>
+            <h3>WSOs</h3>
+            <ul>
+                {wsoList.length > 0 ? wsoList : ERR_NO_RESULTS_FOUND}
             </ul>
             {formDisplayButton}
         </div>

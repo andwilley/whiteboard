@@ -1,10 +1,9 @@
 import * as React from 'react';
 import Search from './Search';
 import QualBox from './QualBox';
-import { IFilters } from '../types/WhiteboardTypes';
+import { IFilters } from '../types/State';
 
 interface ISearchBoxProps {
-    crewSearchInput: string;
     qualsList: string[];
     filters: IFilters;
     onInputChange: () => any;
@@ -12,7 +11,6 @@ interface ISearchBoxProps {
 }
 
 const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
-        crewSearchInput,
         qualsList,
         filters,
         onInputChange,
@@ -24,9 +22,16 @@ const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
     return (
         <form>
             <Search
-                inputValue={crewSearchInput}
+                inputValue={filters.crewSearchInput}
                 onInputChange={onInputChange}
             /><br />
+            <input
+                type="checkbox"
+                name="showAvailable"
+                value={filters.showAvailable ? 'false' : 'true'}
+                checked={filters.showAvailable ? true : false}
+                onChange={onInputChange}
+            />Show Only Available Aircrew<br />
             <QualBox
                 qualsList={qualsList}
                 onInputChange={onInputChange}

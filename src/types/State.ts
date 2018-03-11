@@ -65,13 +65,18 @@ export interface IAirspace {
     readonly end: string;
 }
 
+export interface IFilters {
+    readonly crewSearchInput: string;
+    readonly showAvailable: boolean;
+    readonly qualFilter: string[];
+    readonly rankFilter: number[];
+}
+
 export interface ICrewListUI {
     readonly currentDay: string;
     readonly qualsList: string[];
     readonly addUpdateAircrewFormDisplay: boolean;
-    readonly crewSearchInput: string;
-    readonly qualFilter: string[];
-    readonly rankFilter: number[];
+    readonly filters: IFilters;
 }
 
 export interface IAddUpdateAircrewFormValues {

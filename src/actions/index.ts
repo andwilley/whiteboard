@@ -55,6 +55,7 @@ export interface ISetAircrewArgs {
 
 export interface ISetAircrewSearchArgs {
     crewSearchInput?: string;
+    showAvailable?: boolean;
     qualFilter?: string[];
     rankFilter?: string[];
 }

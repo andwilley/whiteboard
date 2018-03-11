@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
 import { actions } from '../actions';
-import { IState } from '../types/State';
-import { IAircrewWithPucks, IFilters } from '../types/WhiteboardTypes';
+import { IEntity, IState, IAircrew, IFilters } from '../types/State';
+import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
 import CrewList from '../components/CrewList';
 const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
+type IAircrewEntity = IEntity<IAircrew>;
 
 const newPuck = {
   flight: 0,
@@ -13,7 +14,13 @@ const newPuck = {
   dayNote: 0,
 };
 
-const getDayPucks = (state: IState) => {
+const getDayPucks = (state: IState): IAircrewDayPucks => {
+  // slices of the state this needs for future optimization reference:
+  // state.days.byId[~currentDay]:
+  //    state.days.byId[~currentDay].flights
+  //    state.days.byId[~currentDay].notes
+  // state.flights.byId
+  // state.notes.byId
   let crewId: number, eventType: string;
   const seats = ['front', 'back'];
   const aircrewCurrentDayPucks = state.days.byId[state.crewListUI.currentDay].flights
@@ -65,26 +72,76 @@ const getDayPucks = (state: IState) => {
   return aircrewCurrentDayPucks;
 };
 
+const getFilteredAircrewIds = (aircrew: IAircrewEntity,
+                               filters: IFilters,
+                               aircrewDayPucks: IAircrewDayPucks): string[] => {
+  // slices of the state this needs for future optimization reference:
+  // state.aircrew
+  // state.crewListUI.filters
+  const filteredAircrewIds = aircrew.allIds.filter((aircrewId: string) => {
+    if (filters.qualFilter.length === 0 && filters.rankFilter.length === 0 && filters.crewSearchInput === '') {
+        return true;
+    }
+    if (filters.qualFilter.length > 0) {
+        let allQualsMatch = true;
+        filters.qualFilter.forEach((qual: string) => {
+            if (aircrew.byId[aircrewId].quals.indexOf(qual) === -1) {
+                allQualsMatch = false;
+            }
+        });
+        if (!allQualsMatch) {
+            return false;
+        }
+    }
+    if (filters.rankFilter.length > 0) {
+      let matchRank = false;
+      filters.rankFilter.forEach((rank: number) => {
+        if (aircrew.byId[aircrewId].rank === rank) {
+          matchRank = true;
+        }
+      });
+      if (!matchRank) {
+        return false;
+      }
+    }
+    const crewSearchInput = filters.crewSearchInput.toLowerCase();
+    if (crewSearchInput !== '') {
+      const callsign = aircrew.byId[aircrewId].callsign.toLowerCase();
+      const first = aircrew.byId[aircrewId].first.toLowerCase();
+      const last = aircrew.byId[aircrewId].last.toLowerCase();
+      const searchMatch = callsign.includes(crewSearchInput) ||
+                          first.includes(crewSearchInput) ||
+                          `${first} ${last}`.includes(crewSearchInput) ||
+                          `${last} ${first}`.includes(crewSearchInput) ||
+                          `${last}, ${first}`.includes(crewSearchInput);
+      if (!searchMatch) {
+        return false;
+      }
+    }
+    if (filters.showAvailable) {
+      if (Object.keys(aircrewDayPucks).indexOf(aircrewId) > -1) {
+        return false;
+      }
+    }
+    return true;
+  });
+  return filteredAircrewIds;
+};
+
 const getAircrewList = (state: IState): IAircrewWithPucks[] => {
+  // slices of the state this needs for future optimization reference:
+  // state.aircrew
+  // state.crewListUI.filters
+  // anything getDayPucks needs (see above)
   const aircrewDayPucks = getDayPucks(state);
-  return state.aircrew.allIds.map( (aircrewId: string): IAircrewWithPucks => {
+  const filteredAircrewIds = getFilteredAircrewIds(state.aircrew, state.crewListUI.filters, aircrewDayPucks);
+  return filteredAircrewIds.map( (aircrewId: string): IAircrewWithPucks => {
     const aircrewWithPucks: IAircrewWithPucks = Object.assign({}, state.aircrew.byId[aircrewId], {pucks: newPuck});
     aircrewWithPucks.pucks = aircrewDayPucks[aircrewId] ?
       Object.assign({}, aircrewDayPucks[aircrewId]) :
       newPuck;
     return aircrewWithPucks;
   });
-};
-
-const getAircrewSearchFilters = (state: IState): IFilters => {
-  return {
-    qualFilter: state.crewListUI.qualFilter,
-    rankFilter: state.crewListUI.rankFilter,
-  };
-};
-
-const getCrewSearchValue = (state: IState): string => {
-  return state.crewListUI.crewSearchInput.toLowerCase();
 };
 
 const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
@@ -94,10 +151,7 @@ const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
 const mapStateToProps = (state: IState) => {
   return {
     aircrewList: getAircrewList(state),
-    filters: getAircrewSearchFilters(state),
-    crewSearchValue: getCrewSearchValue(state),
     addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
-    // need something to validate unique callsigns from server async.
   };
 };
 
@@ -123,6 +177,7 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(setAircrewForm(blankAddUpdateAircrewForm));
       dispatch(addUpdateAircrewFormDisplay(false));
     },
+    // need something to validate unique callsigns from server async.
   };
 };
 

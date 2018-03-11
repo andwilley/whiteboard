@@ -136,21 +136,21 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
                 value={addUpdateAircrewFormValues.callsign}
                 onChange={onInputChange}
                 required={true}
-            />
+            /><br />
             <input
                 type="text"
                 placeholder="First"
                 name="first"
                 value={addUpdateAircrewFormValues.first}
                 onChange={onInputChange}
-            />
+            /><br />
             <input
                 type="text"
                 placeholder="Last"
                 name="last"
                 value={addUpdateAircrewFormValues.last}
                 onChange={onInputChange}
-            />
+            /><br />
             <input
                 type="text"
                 placeholder="Rank"
@@ -158,7 +158,7 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
                 style={{borderColor: rankIsValid ? '' : 'red' }}
                 value={intToRank(addUpdateAircrewFormValues.rank)}
                 onChange={onInputChange}
-            />
+            /><br />
             <select name="seat" value={addUpdateAircrewFormValues.seat} onChange={onInputChange}>
                 <option value="pilot">
                     Pilot
