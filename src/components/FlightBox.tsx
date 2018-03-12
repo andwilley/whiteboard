@@ -1,7 +1,8 @@
 import * as React from 'react';
+import Flight from './Flight';
 
 const FlightBox: React.SFC = () => (
-    <span>HI!</span>
+    <Flight />
 );
 
 export default FlightBox;

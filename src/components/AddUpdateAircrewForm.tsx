@@ -100,9 +100,9 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
         e.preventDefault();
         onAddUpdateAircrewSubmit({
             id: addUpdateAircrewFormValues.id,
-            callsign: addUpdateAircrewFormValues.callsign,
-            first: addUpdateAircrewFormValues.first,
-            last: addUpdateAircrewFormValues.last,
+            callsign: addUpdateAircrewFormValues.callsign.trim(),
+            first: addUpdateAircrewFormValues.first.trim(),
+            last: addUpdateAircrewFormValues.last.trim(),
             rank: parseRank(addUpdateAircrewFormValues.rank),
             seat: addUpdateAircrewFormValues.seat,
             quals: addUpdateAircrewFormValues.quals,
@@ -136,6 +136,7 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
                 value={addUpdateAircrewFormValues.callsign}
                 onChange={onInputChange}
                 required={true}
+                autoFocus={true}
             /><br />
             <input
                 type="text"
