@@ -79,7 +79,10 @@ const getFilteredAircrewIds = (aircrew: IAircrewEntity,
   // state.aircrew
   // state.crewListUI.filters
   const filteredAircrewIds = aircrew.allIds.filter((aircrewId: string) => {
-    if (filters.qualFilter.length === 0 && filters.rankFilter.length === 0 && filters.crewSearchInput === '') {
+    if (filters.qualFilter.length === 0 &&
+        filters.rankFilter.length === 0 &&
+        filters.crewSearchInput === '' &&
+        filters.showAvailable === false) {
         return true;
     }
     if (filters.qualFilter.length > 0) {
