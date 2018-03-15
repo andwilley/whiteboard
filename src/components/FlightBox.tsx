@@ -1,8 +1,14 @@
 import * as React from 'react';
 import Flight from './Flight';
+import AddButton from './AddButton';
 
 const FlightBox: React.SFC = () => (
-    <Flight />
+    <div>
+        <Flight />
+        <AddButton
+            onClick={() => alert('Add a Flight')}
+        />
+    </div>
 );
 
 export default FlightBox;

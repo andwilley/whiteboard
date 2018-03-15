@@ -2,13 +2,13 @@ import * as React from 'react';
 import Note from './Note';
 import AddButton from './AddButton';
 
-const DayNoteBox: React.SFC = () => (
+const FlightNoteBox: React.SFC = ({ codes }) => (
     <div>
         <Note />
         <AddButton
-            onClick={() => alert('Add Day Note')}
+            onClick={() => alert('Add Flight Note')}
         />
     </div>
 );
 
-export default DayNoteBox;
+export default FlightNoteBox;

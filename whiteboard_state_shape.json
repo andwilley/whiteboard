@@ -403,11 +403,11 @@ App
 						Brief
 						Takeoff
 						Land
-					AirspaceBox
-						AirspaceName
-						Start
-						End
-					AddButton(airspace)
+					//AirspaceBox (later)
+					//	AirspaceName
+					//	Start
+					//	End
+					//AddButton(airspace)
 				SortieBox
 					Sortie
 						CodeBox
@@ -416,14 +416,13 @@ App
 						CrewBox
 							Crew
 							Crew
-						Symbol
+						Symbols
 					AddButton(sortie)
 				FlightNoteBox
 					Note
 					AddButton(flightNote)
 			AddButton(flight)
 		DayNoteBox
-			NoteList
-				Note
-				AddButton(dayNote)
+			Note
+			AddButton(dayNote)
 }
