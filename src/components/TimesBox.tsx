@@ -5,7 +5,11 @@ import FlightTimesBox from './FlightTimesBox';
 
 const TimesBox: React.SFC = () => (
     <div>
-        <FlightTimesBox />
+        <FlightTimesBox
+            briefTime={'0900'}
+            takeoffTime={'1100'}
+            landTime={'1215'}
+        />
         {/*<AirspaceBox />
         <AddButton
             onClick={() => alert('Add Airspace')}

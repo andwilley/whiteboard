@@ -1,23 +1,34 @@
 import * as React from 'react';
+import Symbols from './Symbols';
 
 interface ICrewBoxProps {
-    crewPilot: string;
-    crewWso: string;
+    pilot: string;
+    pilotSymbols: string;
+    wso: string;
+    wsoSymbols: string;
 }
 
-const CrewBox: React.SFC<ICrewBoxProps> = ({ crewPilot, crewWso }) => (
+const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbols }) => (
     <div>
         <input
             type="text"
             placeholder="Pilot"
             name="crew"
-            value={crewPilot}
+            value={pilot}
+        />
+        <Symbols
+            symbols={pilotSymbols}
+            seat="pilot"
         />
         <input
             type="text"
             placeholder="WSO"
             name="crew"
-            value={crewWso}
+            value={wso}
+        />
+        <Symbols
+            symbols={wsoSymbols}
+            seat="wso"
         />
     </div>
 );

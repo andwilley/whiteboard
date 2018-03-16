@@ -4,7 +4,9 @@ import AddButton from './AddButton';
 
 const DayNoteBox: React.SFC = () => (
     <div>
-        <Note />
+        <Note
+            note={{id: 'a1', content: 'Day Note', aircrewRefIds: []}}
+        />
         <AddButton
             onClick={() => alert('Add Day Note')}
         />

@@ -396,10 +396,10 @@ App
 		FilterBox
 			Filter
 	Day
-		FlightBox
-			Flight
+		FlightBox - *container
+			Flight - *container
 				TimesBox
-					FlightTimesBox
+					FlightTimesBox - *container
 						Brief
 						Takeoff
 						Land
@@ -408,17 +408,18 @@ App
 					//	Start
 					//	End
 					//AddButton(airspace)
-				SortieBox
-					Sortie
+				SortieBox - *container
+					Sortie - *container
 						CodeBox
 							Codes
 							Loadout
 						CrewBox
 							Crew
+								Symbols
 							Crew
-						Symbols
+								Symbols
 					AddButton(sortie)
-				FlightNoteBox
+				FlightNoteBox - *container
 					Note
 					AddButton(flightNote)
 			AddButton(flight)
