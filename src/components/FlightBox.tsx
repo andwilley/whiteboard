@@ -2,13 +2,22 @@ import * as React from 'react';
 import Flight from './Flight';
 import AddButton from './AddButton';
 
-const FlightBox: React.SFC = () => (
-    <div>
-        <Flight />
-        <AddButton
-            onClick={() => alert('Add a Flight')}
-        />
-    </div>
-);
+interface IFlightBoxProps {
+    dayId: string;
+    flightIds: string[];
+    onAddFlightClick: (dayId: string, sim: boolean) => any;
+}
+
+const FlightBox: React.SFC<IFlightBoxProps> = ({ dayId, flightIds, onAddFlightClick }) => {
+    const flightComponents = flightIds.map(id => (<Flight key={id} flightId={id} />));
+    return (
+        <div>
+            {flightComponents}
+            <AddButton
+                onClick={() => onAddFlightClick(dayId, false)}
+            />
+        </div>
+    );
+};
 
 export default FlightBox;

@@ -5,9 +5,6 @@ import AddButton from './AddButton';
 const SortieBox: React.SFC = () => (
     <div>
         <Sortie />
-        <Sortie />
-        <Sortie />
-        <Sortie />
         <AddButton
             onClick={() => alert('Add Sortie')}
         />
