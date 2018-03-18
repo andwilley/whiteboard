@@ -92,6 +92,13 @@ export interface IAddUpdateAircrewFormValues {
     existingAircrewUnchanged: boolean;
 }
 
+export interface IErrors {
+    readonly id: string;
+    readonly type: string;
+    readonly level: string;
+    readonly message: string;
+}
+
 export interface IState {
     readonly aircrew: IEntity<IAircrew>;
     readonly days: IEntity<IDays>;
@@ -101,4 +108,5 @@ export interface IState {
     readonly airspace: IEntity<IAirspace>;
     readonly crewListUI: ICrewListUI;
     readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
+    readonly errors: IEntity<IErrors>;
 }
