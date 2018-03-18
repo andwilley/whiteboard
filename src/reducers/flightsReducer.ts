@@ -30,9 +30,6 @@ const flightsById = (state = {}, action: IAction) => {
             if (['brief', 'takeoff', 'land'].indexOf(action.payload.timeType) === -1) {
                 return state;
             }
-            if (!/^\d{0,4}$/.test(action.payload.time)) {
-                return state;
-            }
             return {
                 ...state,
                 [action.payload.flightId]: {

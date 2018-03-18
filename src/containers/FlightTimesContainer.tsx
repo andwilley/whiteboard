@@ -23,6 +23,9 @@ const mapStateToProps = (state: IState, ownProps: IFlightTimesContainerProps) =>
 const mapDispatchToProps = (dispatch: any, ownProps: IFlightTimesContainerProps) => {
     return {
         onInputChange: (timeType: string, time: string) => {
+            if (!/^\d{0,4}$/.test(time)) {
+                return;
+            }
             dispatch(updateFlightTime(ownProps.flightId, timeType, time));
         },
     };
