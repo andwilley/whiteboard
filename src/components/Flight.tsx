@@ -10,7 +10,9 @@ interface IFlightProps {
 const Flight: React.SFC<IFlightProps> = ({ flightId }) => (
     <div style={{border: '1px solid black', marginTop: '20px'}}>
         <span style={{position: 'relative', top: '-10px', left: '10px', background: 'white'}}>Flight</span>
-        <TimesBox />
+        <TimesBox
+            flightId={flightId}
+        />
         <SortieBox />
         <FlightNoteBox />
     </div>

@@ -205,13 +205,25 @@ export const actions = {
         };
     }),
     addFlight: createAction(ADD_FLIGHT, (dayId: string, sim: boolean = false) => {
+        /** action to add flight to state.
+         * in reducer:
+         * adds new flight entity to flights byId and allIds
+         * adds flightId to the days.byId[dayId].flights
+         * adds new sortie entity to sorties byId and allIds
+         * adds new sortieId to the new flight entity
+         * @param {string} dayId Id of the day to add the flight to
+         * @param {boolean} sim Is this going to be a sim, default false
+         * @returns {object} ADD_FLIGHT action object
+         */
         const flightId = cuid();
+        const sortieId = cuid();
         // testFlightId++;
         // const flightId = testFlightId;
         return {
             type: ADD_FLIGHT,
             payload: {
-                id: flightId,
+                flightId,
+                sortieId,
                 dayId,
                 sim,
             },
@@ -224,10 +236,10 @@ export const actions = {
             dayId,
         },
     })),
-    updateFlightTime: createAction(UPDATE_FLIGHT_TIME, (id: string, timeType: string, time: string) => ({
+    updateFlightTime: createAction(UPDATE_FLIGHT_TIME, (flightId: string, timeType: string, time: string) => ({
         type: UPDATE_FLIGHT_TIME,
         payload: {
-            id,
+            flightId,
             timeType,
             time,
         },
@@ -288,7 +300,7 @@ export const actions = {
         return {
             type: ADD_SORTIE,
             payload: {
-                id: sortieId,
+                sortieId,
                 flightId,
             },
         };

@@ -24,14 +24,16 @@ export interface IDays {
     readonly notes: string[];
 }
 
+export interface IFlightTimes {
+    readonly brief: string;
+    readonly takeoff: string;
+    readonly land: string;
+}
+
 export interface IFlights {
     readonly id: string;
     readonly sim: boolean;
-    readonly times: {
-        readonly brief: string;
-        readonly takeoff: string;
-        readonly land: string;
-    };
+    readonly times: IFlightTimes;
     readonly airspace: string[];
     readonly sorties: string[];
     readonly notes: string[];

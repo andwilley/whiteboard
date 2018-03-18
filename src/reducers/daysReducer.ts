@@ -23,14 +23,14 @@ const daysById = (state = {}, action: IAction) => {
                 },
             };
         case getType(actions.addFlight):
-            if (state[action.payload.dayId].flights.indexOf(action.payload.id) > -1) {
+            if (state[action.payload.dayId].flights.indexOf(action.payload.flightId) > -1) {
                 return state;
             }
             return {
                 ...state,
                 [action.payload.dayId]: {
                     ...state[action.payload.dayId],
-                    flights: state[action.payload.dayId].flights.concat(action.payload.id),
+                    flights: state[action.payload.dayId].flights.concat(action.payload.flightId),
                 },
             };
         case getType(actions.delFlight):

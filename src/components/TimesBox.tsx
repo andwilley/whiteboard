@@ -1,14 +1,16 @@
 import * as React from 'react';
-import FlightTimesBox from './FlightTimesBox';
+import FlightTimesContainer from '../containers/FlightTimesContainer';
 // import AirspaceBox from './AirspaceBox';
 // import AddButton from './AddButton';
 
-const TimesBox: React.SFC = () => (
+interface ITimesBoxProps {
+    flightId: string;
+}
+
+const TimesBox: React.SFC<ITimesBoxProps> = ({ flightId }) => (
     <div>
-        <FlightTimesBox
-            briefTime={'0900'}
-            takeoffTime={'1100'}
-            landTime={'1215'}
+        <FlightTimesContainer
+            flightId={flightId}
         />
         {/*<AirspaceBox />
         <AddButton

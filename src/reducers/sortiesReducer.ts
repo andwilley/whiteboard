@@ -5,11 +5,12 @@ import { actions, IAction } from '../actions';
 
 const sortiesById = (state = {}, action: IAction) => {
     switch (action.type) {
+        case getType(actions.addFlight):
         case getType(actions.addSortie):
             return {
                 ...state,
-                [action.payload.id]: {
-                    id: action.payload.id,
+                [action.payload.sortieId]: {
+                    id: action.payload.sortieId,
                     front: {
                         inputName: '',
                         crewId: null,
@@ -127,8 +128,9 @@ const sortiesById = (state = {}, action: IAction) => {
 
 const allSorties = (state = [], action: IAction) => {
     switch (action.type) {
+        case getType(actions.addFlight):
         case getType(actions.addSortie):
-            return state.concat(action.payload.id);
+            return state.concat(action.payload.sortieId);
         case getType(actions.delSortie):
             return state.filter(sortieId => sortieId !== action.payload.id);
         default:

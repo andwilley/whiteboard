@@ -397,17 +397,17 @@ App
 			Filter
 	Day
 		FlightBox - *container
-			Flight - *container
+			Flight
 				TimesBox
-					FlightTimesBox - *container
+					FlightTimes - *container
 						Brief
 						Takeoff
 						Land
-					//AirspaceBox (later)
+					//AirspaceBox (later) - *container
 					//	AirspaceName
 					//	Start
 					//	End
-					//AddButton(airspace)
+					//	AddButton(airspace)
 				SortieBox - *container
 					Sortie - *container
 						CodeBox

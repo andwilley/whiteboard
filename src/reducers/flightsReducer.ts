@@ -8,8 +8,8 @@ const flightsById = (state = {}, action: IAction) => {
         case getType(actions.addFlight):
             return {
                 ...state,
-                [action.payload.id]: {
-                    id: action.payload.id,
+                [action.payload.flightId]: {
+                    id: action.payload.flightId,
                     sim: action.payload.sim,
                     // flow: 'pit',
                     times: {
@@ -18,7 +18,7 @@ const flightsById = (state = {}, action: IAction) => {
                         land: '',
                     },
                     airspace: [],
-                    sorties: [],
+                    sorties: [action.payload.sortieId],
                     notes: [],
                 },
             };
@@ -30,12 +30,15 @@ const flightsById = (state = {}, action: IAction) => {
             if (['brief', 'takeoff', 'land'].indexOf(action.payload.timeType) === -1) {
                 return state;
             }
+            if (!/^\d{0,4}$/.test(action.payload.time)) {
+                return state;
+            }
             return {
                 ...state,
-                [action.payload.id]: {
-                    ...state[action.payload.id],
+                [action.payload.flightId]: {
+                    ...state[action.payload.flightId],
                     times: {
-                        ...state[action.payload.id].times,
+                        ...state[action.payload.flightId].times,
                         [action.payload.timeType]: action.payload.time,
                     },
                 },
@@ -120,10 +123,10 @@ const flightsById = (state = {}, action: IAction) => {
 const allFlights = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
-            if (state.indexOf(action.payload.id) > -1) {
+            if (state.indexOf(action.payload.flightId) > -1) {
                 return state;
             }
-            return state.concat(action.payload.id);
+            return state.concat(action.payload.flightId);
         case getType(actions.delFlight):
             return state.filter(id => id !== action.payload.id);
         default:
