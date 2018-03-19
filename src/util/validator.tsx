@@ -1,17 +1,30 @@
-export VAL_IS_24_HOUR_TIME = 'VAL_IS_24_HOUR_TIME';
+import * as cuid from 'cuid';
+import { errorLevels } from '../errors';
+import { errorTypes } from '../errors';
+import { errorMessages } from '../errors';
 
-const textValidator = (type: string, input: string) => {
-    /**
-     * @param {string} type Type of validation
-     * @param {string} input The input to validate
-     * @returns {boolean} True if valid, False if not. 
-     */
-    switch (type) {
-        case VAL_IS_24_HOUR_TIME:
-            return /^0[0-9][0-5][0-9]|1[0-9][0-5][0-9]|2[0-3][0-5][0-9]$/.test(input);
-        default:
-            return true;
-    }
+export const validatorFunctions = {
+    is24HourTime: (text, level = errorLevels.ERROR) => {
+        const valid = /^0[0-9][0-5][0-9]|1[0-9][0-5][0-9]|2[0-3][0-5][0-9]$/.test(text);
+        return valid ? 
+            null :
+            {
+                id: cuid(),
+                type: errorTypes.FORM_VAL_ERROR,
+                level,
+                message: 'Error Message',
+                display: true,
+            };
+    },
 };
 
-export default textValidator;
+const validator = (validatorFunctions, value) => {
+    /** 
+     * @param validatorFunctions array of validation functions from list above
+     * @param {string} value The string to be validated
+     * @returns {IErrors|null} If value validates, return null, if not, return the IErrors object
+     * should evaluate in order of level
+     */
+};
+
+export default validator;

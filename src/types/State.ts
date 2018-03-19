@@ -97,6 +97,7 @@ export interface IErrors {
     readonly type: string;
     readonly level: string;
     readonly message: string;
+    readonly display: boolean;
 }
 
 export interface IState {

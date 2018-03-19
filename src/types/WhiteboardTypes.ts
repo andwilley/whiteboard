@@ -14,3 +14,8 @@ export interface IAircrewWithPucks extends IAircrew {
 export interface IAircrewDayPucks {
     [id: string]: IPucks;
 }
+
+export interface IValidator {
+    level: string;
+    message: string;
+}
