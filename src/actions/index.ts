@@ -25,6 +25,8 @@ export const DEL_CREW_REF_FROM_NOTE = 'DEL_CREW_REF_FROM_NOTE';
 export const ADD_SORTIE = 'ADD_SORTIE';
 export const DEL_SORTIE = 'DEL_SORTIE';
 export const UPDATE_PUCK_NAME = 'UPDATE_PUCK_NAME';
+export const ADD_CREW_REF_TO_SEAT = 'ADD_CREW_REF_TO_SEAT';
+export const DEL_CREW_REF_FROM_SEAT = 'DEL_CREW_REF_FROM_SEAT';
 export const UPDATE_PUCK_CODE = 'UPDATE_PUCK_CODE';
 export const UPDATE_PUCK_SYMBOL = 'UPDATE_PUCK_SYMBOL';
 export const ADD_AIRSPACE = 'ADD_AIRSPACE';
@@ -318,6 +320,21 @@ export const actions = {
             sortieId: args.sortieId,
             crewPosition: args.crewPosition,
             name: args.name,
+        },
+    })),
+    addCrewRefToSeat: createAction(ADD_CREW_REF_TO_SEAT, (sortieId: string, crewPosition: string, aircrewId: string) => ({
+        type: ADD_CREW_REF_TO_SEAT,
+        payload: {
+            sortieId,
+            crewPosition,
+            aircrewId,
+        },
+    })),
+    delCrewRefFromSeat: createAction(DEL_CREW_REF_FROM_SEAT, (sortieId: string, crewPosition: string) => ({
+        type: DEL_CREW_REF_FROM_SEAT,
+        payload: {
+            sortieId,
+            crewPosition,
         },
     })),
     updatePuckCode: createAction(UPDATE_PUCK_CODE, (args: IUpdatePuckCodeArgs) => {

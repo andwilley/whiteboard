@@ -32,13 +32,12 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
     // }
     return (
         <form>
-            <input
-                type="text"
+            <FlexInputContainer
                 placeholder="Brief Time"
                 name="flightTimes"
                 value={times.brief}
-                style={{borderColor: timeIsValid.brief ? '' : 'orange'}}
                 onChange={(e) => onInputChange('brief', e.target.value)}
+                validators={['is24HourTime']}
             />
             <input
                 type="text"

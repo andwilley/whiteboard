@@ -20,7 +20,7 @@ export const validatorFunctions = {
 
 const validator = (validatorFunctions, value) => {
     /** 
-     * @param validatorFunctions array of validation functions from list above
+     * @param {string[]}validatorFunctions array of validation strings corresponding to list above
      * @param {string} value The string to be validated
      * @returns {IErrors|null} If value validates, return null, if not, return the IErrors object
      * should evaluate in order of level

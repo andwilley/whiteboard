@@ -13,13 +13,13 @@ const sortiesById = (state = {}, action: IAction) => {
                     id: action.payload.sortieId,
                     front: {
                         inputName: '',
-                        crewId: null,
+                        aircrewRefId: null,
                         codes: [],
                         symbols: [],
                     },
                     back: {
                         inputName: '',
-                        crewId: null,
+                        aircrewRefId: null,
                         codes: [],
                         symbols: [],
                     },
@@ -76,10 +76,6 @@ const sortiesById = (state = {}, action: IAction) => {
                 },
             };
         case getType(actions.updatePuckName):
-            // match name to list of crew
-            // if its a match, set crewId to aircrew id
-            // if not:
-            const crewId = null;
             return {
                 ...state,
                 [action.payload.sortieId]: {
@@ -87,7 +83,28 @@ const sortiesById = (state = {}, action: IAction) => {
                     [action.payload.crewPosition]: {
                         ...state[action.payload.sortieId][action.payload.crewPosition],
                         inputName: action.payload.name,
-                        crewId, // *******************TODO ***
+                    },
+                },
+            };
+        case getType(actions.addCrewRefToSeat):
+            return {
+                ...state,
+                [action.payload.sortieId]: {
+                    ...state[action.payload.sortieId],
+                    [action.payload.crewPosition]: {
+                        ...state[action.payload.sortieId][action.payload.crewPosition],
+                        aircrewRefId: action.payload.aircrewId,
+                    },
+                },
+            };
+        case getType(actions.delCrewRefFromSeat):
+            return {
+                ...state,
+                [action.payload.sortieId]: {
+                    ...state[action.payload.sortieId],
+                    [action.payload.crewPosition]: {
+                        ...state[action.payload.sortieId][action.payload.crewPosition],
+                        aircrewRefId: null,
                     },
                 },
             };

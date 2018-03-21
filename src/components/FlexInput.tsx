@@ -6,9 +6,8 @@ interface IFlexInputProps {
     placeHolder: string;
     name: string;
     value: string;
-    validators: ((input: string) => IErrors)[];
-    errors: IErrors;
-    onChange: () => any;
+    onChange: (e: any) => any;
+    errors?: IErrors[];
 }
 
 const FlexInput: React.SFC<IFlexInputProps> = ({ 
@@ -16,8 +15,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     name,
     value,
     onChange,
-    validators = [],
-    errors = []
+    errors = [],
 }) => {
     const valResults = validator(validators, value);
     const formErrors = [...valResults, ...errors].filter(error => error !== null);
@@ -38,7 +36,6 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
                 placeholder={placeHolder}
                 name={name}
                 value={value}
-                style={style}
                 onChange={onChange}
             />
             {errorComponents}
