@@ -98,6 +98,7 @@ export interface IErrors {
     readonly level: string;
     readonly message: string;
     readonly display: boolean;
+    readonly active: boolean;
 }
 
 export interface IState {
