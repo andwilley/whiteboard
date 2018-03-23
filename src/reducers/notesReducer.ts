@@ -19,24 +19,12 @@ const notesById = (state = {}, action: IAction) => {
             const rest = Object.assign({}, state);
             delete rest[action.payload.id];
             return rest;
-        case getType(actions.addCrewRefToNote):
-            if (state[action.payload.noteId].aircrewRefIds.indexOf(action.payload.aircrewId) > -1) {
-                return state;
-            }
+        case getType(actions.updateNoteCrewRefs):
             return {
                 ...state,
                 [action.payload.noteId]: {
                     ...state[action.payload.noteId],
-                    aircrewRefIds: state[action.payload.noteId].aircrewRefIds.concat(action.payload.aircrewId),
-                },
-            };
-        case getType(actions.delCrewRefFromNote):
-            return {
-                ...state,
-                [action.payload.noteId]: {
-                    ...state[action.payload.noteId],
-                    aircrewRefIds: state[action.payload.noteId].aircrewRefIds
-                        .filter((id: number) => id !== action.payload.aircrewId),
+                    aircrewRefIds: action.payload.aircrewIds,
                 },
             };
         case getType(actions.delAircrew):

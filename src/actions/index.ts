@@ -20,13 +20,11 @@ export const UPDATE_FLIGHT_TIME = 'UPDATE_FLIGHT_TIME';
 export const TOGGLE_FLIGHT_TYPE = 'TOGGLE_FLIGHT_TYPE';
 export const ADD_UPDATE_NOTE = 'ADD_UPDATE_NOTE';
 export const DEL_NOTE = 'DEL_NOTE';
-export const ADD_CREW_REF_TO_NOTE = 'ADD_CREW_REF_TO_NOTE';
-export const DEL_CREW_REF_FROM_NOTE = 'DEL_CREW_REF_FROM_NOTE';
+export const UPDATE_NOTE_CREW_REFS = 'UPDATE_NOTE_CREW_REFS';
 export const ADD_SORTIE = 'ADD_SORTIE';
 export const DEL_SORTIE = 'DEL_SORTIE';
 export const UPDATE_PUCK_NAME = 'UPDATE_PUCK_NAME';
-export const ADD_CREW_REF_TO_SEAT = 'ADD_CREW_REF_TO_SEAT';
-export const DEL_CREW_REF_FROM_SEAT = 'DEL_CREW_REF_FROM_SEAT';
+export const UPDATE_SEAT_CREW_REFS = 'UPDATE_SEAT_CREW_REFS';
 export const UPDATE_PUCK_CODE = 'UPDATE_PUCK_CODE';
 export const UPDATE_PUCK_SYMBOL = 'UPDATE_PUCK_SYMBOL';
 export const ADD_AIRSPACE = 'ADD_AIRSPACE';
@@ -281,18 +279,11 @@ export const actions = {
             entityId: args.entityId,
         },
     })),
-    addCrewRefToNote: createAction(ADD_CREW_REF_TO_NOTE, (noteId: string, aircrewId: string) => ({
-        type: ADD_CREW_REF_TO_NOTE,
+    updateNoteCrewRefs: createAction(UPDATE_NOTE_CREW_REFS, (noteId: string, aircrewIds: string[]) => ({
+        type: UPDATE_NOTE_CREW_REFS,
         payload: {
             noteId,
-            aircrewId,
-        },
-    })),
-    delCrewRefFromNote: createAction(DEL_CREW_REF_FROM_NOTE, (noteId: string, aircrewId: string) => ({
-        type: DEL_CREW_REF_FROM_NOTE,
-        payload: {
-            noteId,
-            aircrewId,
+            aircrewIds,
         },
     })),
     addSortie: createAction(ADD_SORTIE, (flightId: string) => {
@@ -322,19 +313,12 @@ export const actions = {
             name: args.name,
         },
     })),
-    addCrewRefToSeat: createAction(ADD_CREW_REF_TO_SEAT, (sortieId: string, crewPosition: string, aircrewId: string) => ({
-        type: ADD_CREW_REF_TO_SEAT,
+    updateSeatCrewRefs: createAction(UPDATE_SEAT_CREW_REFS, (sortieId: string, crewPosition: string, aircrewIds: string[]) => ({
+        type: UPDATE_SEAT_CREW_REFS,
         payload: {
             sortieId,
             crewPosition,
-            aircrewId,
-        },
-    })),
-    delCrewRefFromSeat: createAction(DEL_CREW_REF_FROM_SEAT, (sortieId: string, crewPosition: string) => ({
-        type: DEL_CREW_REF_FROM_SEAT,
-        payload: {
-            sortieId,
-            crewPosition,
+            aircrewIds,
         },
     })),
     updatePuckCode: createAction(UPDATE_PUCK_CODE, (args: IUpdatePuckCodeArgs) => {

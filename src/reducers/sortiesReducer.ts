@@ -86,25 +86,14 @@ const sortiesById = (state = {}, action: IAction) => {
                     },
                 },
             };
-        case getType(actions.addCrewRefToSeat):
+        case getType(actions.updateSeatCrewRefs):
             return {
                 ...state,
                 [action.payload.sortieId]: {
                     ...state[action.payload.sortieId],
                     [action.payload.crewPosition]: {
                         ...state[action.payload.sortieId][action.payload.crewPosition],
-                        aircrewRefId: action.payload.aircrewId,
-                    },
-                },
-            };
-        case getType(actions.delCrewRefFromSeat):
-            return {
-                ...state,
-                [action.payload.sortieId]: {
-                    ...state[action.payload.sortieId],
-                    [action.payload.crewPosition]: {
-                        ...state[action.payload.sortieId][action.payload.crewPosition],
-                        aircrewRefId: null,
+                        aircrewRefIds: action.payload.aircrewIds,
                     },
                 },
             };

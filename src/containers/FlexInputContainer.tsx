@@ -6,11 +6,11 @@ import FlexInput from '../components/FlexInput';
 import validator from '../util/validator';
 type IAircrewEntity = IEntity<IAircrew>;
 
-const nameLocation = {
+export const nameLocation = {
     FRONT_SEAT: 'FRONT_SEAT',
     BACK_SEAT: 'BACK_SEAT',
     NOTE: 'NOTE',
-}
+};
 
 /**
  * This component is responsible for displaying all the input elements, their errors from validation and does the
@@ -18,7 +18,8 @@ const nameLocation = {
  * and passes most of them right on to the presentational component FlexInput. The heavy lifting of this component is
  * recognizing aircrew names in the input value, dispatching an action to add the aircrew Id to the correct part of
  * the state, dispatching the action passed to it by the parent component to update the value of the field, getting
- * the value of the field and any referenced aircrew Ids saved in the state to pass that info on to the presentational
+ * the value of the field and any referenced aircrew Ids saved in the state, checking if the refIds for this input
+ * are in conflict with other refs to that same aircrewID, and to pass that info on to the presentational
  * component to dictate its display.
  */
 
@@ -85,34 +86,62 @@ const getActiveAircrewRefIds = (state) => {
      * @param {IState} state The application state (store.getState())
      * @returns {object} keyed by aircrewId with values set to an array of the timespans associated with each ref
      * This checks all the places aircrew Ids can be referenced in the current day, aggregates them into an object and 
-     * includes the times they are scheduled for, so we can check for conflicts.
+     * includes the times they are scheduled for, so we can check for conflicts in another function.
      * Looks for names in:
-     * state.sorites.byId[x].front/back
-     * state.notes.byId
+     * state.sorites.byId[...allIds].front/back
+     * state.notes.byId[.allIds]
      */
     
 };
 
-const getOnChangeWithNameMatch = (aircrewList: IAircrew[], actions: any, ownProps: IFlexInputContainerProps) => {
+const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
+    /**
+     * @param {IAircrew[]} aircrewList Array containing full list of aircrew objects.
+     * @param {string} inputValue The actual value of the input field
+     * @returns {IAircrew[]} Array of aircrew objects with name fields tha match the input
+     * 
+     * Finds the aircrew that are referenced in this input.
+     * 
+     * Should I use first or even last name? First is not likely to be unique. Maybe if I had a way to suggest name
+     * matches instead of assume a match. Also, first and last can be ''. I'd have to check for that first. I think
+     * includes would return true 
+     * 
+     * This is its own function because I think this will become more complex later.
+     */
+    return aircrewList.filter(aircrew => inputValue.includes(aircrew.callsign));
+};
+
+const getOnChangeWithNameMatch = (aircrewList: IAircrew[], dispatch: any, ownProps: IFlexInputContainerProps) => {
     /** 
      * @param {function} dispatch
      * @param {IFlexInputContainerProps} ownProps Props passed to this container
      * @returns {function} If addNameIdTo is specified, returns updated onChange function. It wraps the onChange
      * function passed and:
      * compares the value being updated with all the aircrew names
-     * and dispatches the Id of matched aircrew to the specified state slice if theres a match.
+     * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
      */
     if (!addNameIdTo) {
         return ownProps.onChange;
     }
+    const matchedAircrewIds = nameMatch(aircrewList, ownProps.value).map(aircrew => aircrew.id);
     switch (addNameIdTo.nameLocation) {
         case nameLocation.FRONT_SEAT:
             return (e) => {
-                
+                // have to do the nameMatch here. Otherwise I'm using old data, not the newest change.
+                dispatch(actions.updateSeatCrewRefs(ownProps.addNameIdTo.entityId, 'front', matchedAircrewIds));
+                ownProps.onChange(e);
             };
         case nameLocation.BACK_SEAT:
+            return (e) => {
+                dispatch(actions.updateSeatCrewRefs(ownProps.addNameIdTo.entityId, 'back', matchedAircrewIds));
+                ownProps.onChange(e);
+            };
         case nameLocation.NOTE:
+            return (e) => {
+                dispatch(actions.(ownProps.addNameIdTo.entityId, matchedAircrewIds));
+                ownProps.onChange(e);
+            };
         default:
             return ownProps.onChange;
     }
@@ -133,13 +162,13 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
      * other aircrew (the state I need) to see if there are matches and dispatching to update the state if there are.
      */
     return Object.assign({}, ownProps, {
-        onChange: getOnChangeWithNameMatch(stateProps.aircrewList, dispatchProps, ownProps),
+        onChange: getOnChangeWithNameMatch(stateProps.aircrewList, dispatchProps.dispatch, ownProps),
     });
 };
 
 const FlexInputContainer = connect(
     mapStateToProps,
-    actions,
+    ((dispatch) => {dispatch}),
     mergeProps
 )(FlexInput);
 

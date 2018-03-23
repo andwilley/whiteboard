@@ -47,7 +47,7 @@ export interface INotes {
 
 export interface ISeat {
     readonly inputName: string;
-    readonly aircrewRefId: string;
+    readonly aircrewRefIds: string[];
     readonly codes: string[];
     readonly symbols: string[];
 }
