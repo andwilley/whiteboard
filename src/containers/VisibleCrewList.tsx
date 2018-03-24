@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { blankAddUpdateAircrewForm } from '../whiteboard-constants';
+import { blankAddUpdateAircrewForm, seats } from '../whiteboard-constants';
 import { actions } from '../actions';
 import { IEntity, IState, IAircrew, IFilters } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
@@ -22,7 +22,6 @@ const getDayPucks = (state: IState): IAircrewDayPucks => {
   // state.flights.byId
   // state.notes.byId
   let crewId: number, eventType: string;
-  const seats = ['front', 'back'];
   const aircrewCurrentDayPucks = state.days.byId[state.crewListUI.currentDay].flights
     .reduce((flightPucks: any, flightId: string) => {
       eventType = state.flights.byId[flightId].sim ? 'sim' : 'flight';

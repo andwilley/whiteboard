@@ -12,3 +12,5 @@ export const blankAddUpdateAircrewForm = {
     existingAircrewUnchanged: false,
     display: false,
 };
+
+export const seats = ['front', 'back'];

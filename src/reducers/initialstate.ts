@@ -143,13 +143,13 @@ export const INITIAL_STATE = {
                 id: 'a',
                 front: {
                     inputName: '',
-                    crewId: 'a',
+                    aircrewRefIds: ['a'],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    crewId: 'b',
+                    aircrewRefIds: ['b'],
                     codes: [],
                     symbols: [],
                 },
@@ -160,13 +160,13 @@ export const INITIAL_STATE = {
                 id: 'b',
                 front: {
                     inputName: '',
-                    crewId: 'a',
+                    aircrewRefIds: ['a'],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    crewId: 'b',
+                    aircrewRefIds: ['b'],
                     codes: [],
                     symbols: [],
                 },
@@ -177,13 +177,13 @@ export const INITIAL_STATE = {
                 id: 'c',
                 front: {
                     inputName: '',
-                    crewId: 'c',
+                    aircrewRefIds: ['c'],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    crewId: 'a',
+                    aircrewRefIds: ['a'],
                     codes: [],
                     symbols: [],
                 },
@@ -194,13 +194,13 @@ export const INITIAL_STATE = {
                 id: 'd',
                 front: {
                     inputName: '',
-                    crewId: 'c',
+                    aircrewRefIds: ['c'],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    crewId: 'a',
+                    aircrewRefIds: ['a'],
                     codes: [],
                     symbols: [],
                 },
