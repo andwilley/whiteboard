@@ -101,6 +101,13 @@ export interface IErrors {
     readonly active: boolean;
 }
 
+export interface settings {
+    minutesBeforeBrief: number;
+    minutesAfterLand: number;
+    minutesBriefToTakeoff: number;
+    minutesNoteDuration: number;
+}
+
 export interface IState {
     readonly aircrew: IEntity<IAircrew>;
     readonly days: IEntity<IDays>;

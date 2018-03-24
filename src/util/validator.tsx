@@ -3,9 +3,12 @@ import { errorLevels } from '../errors';
 import { errorTypes } from '../errors';
 import { errorMessages } from '../errors';
 
+export const R_24HourTime = /^0[0-9][0-5][0-9]|1[0-9][0-5][0-9]|2[0-3][0-5][0-9]$/;
+export const R_startsWithTimeBlock = /^(0[0-9][0-5][0-9]|1[0-9][0-5][0-9]|2[0-3][0-5][0-9])[ -]?(0[0-9][0-5][0-9]|1[0-9][0-5][0-9]|2[0-3][0-5][0-9])?.*/
+
 export const validatorFunctions = {
     is24HourTime: (text, level = errorLevels.ERROR) => {
-        const valid = /^0[0-9][0-5][0-9]|1[0-9][0-5][0-9]|2[0-3][0-5][0-9]$/.test(text);
+        const valid = R_24HourTime.test(text);
         return valid ? 
             null :
             {

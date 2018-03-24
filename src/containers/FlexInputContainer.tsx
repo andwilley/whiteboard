@@ -4,7 +4,7 @@ import { seats } from '../whiteboard-constants'
 import { IState, IFlightTimes, IAircrew, IEntity } from '../types/State';
 import { IAction } from '../actions';
 import FlexInput from '../components/FlexInput';
-import validator from '../util/validator';
+import validator, { R_24HourTime, R_startsWithTimeBlock } from '../util/validator';
 type IAircrewEntity = IEntity<IAircrew>;
 
 export const nameLocation = {
@@ -82,6 +82,52 @@ const getErrors = () => {
      
 };
 
+const getSchedFromFlightTimes = (activeAircrewRefs, state, flightId, aircrewId) => {
+    /**
+     * Assumes worst case for flights unless we can deduce it from the settings.
+     * Crew in the seat for a sortie are assumed to be busy from brief to land with an offset on
+     * either end (default 60 min) to account for prep and debrief.
+     * If no brief time is given, its assumed to be the standard time from brief to takeoff (default
+     * is 120 minutes) plus the offset. If no takeoff time is given, assume flight starts at 0000.
+     * If no land time is given, assume flight lands at 2359. (may be smart to use a standard flight
+     * duration for this, so we can go past midnight if thats when the flight takes off)
+     */
+    let startTimeHr, stateTimeMn, endTimeHr, endTimeMn;
+    let startOffset = state.settings.minutesBeforeBrief*60000;
+    let endOffset = state.settings.minutesAfterLand*60000;
+    if (R_24HourTime.test(state.flights.byId[flightId].times.brief)) {
+        startTimeHr = state.flights.byId[flightId].times.brief.slice(0,2);
+        startTimeMn = state.flights.byId[flightId].times.brief.slice(2,4);
+    } else if (R_24HourTime.test(state.flights.byId[flightId].times.takeoff)) {
+        startTimeHr = state.flights.byId[flightId].times.takeoff.slice(0,2);
+        startTimeMn = state.flights.byId[flightId].times.takeoff.slice(2,4);
+        startOffset += state.settings.minutesBriefToTakeoff*60000;
+    } else {
+        startTimeHr = '00';
+        startTimeMn = '00';
+        startOffset = 0;
+    }
+    if (R_24HourTime.test(state.flights.byId[flightId].times.land)) {
+        const endTimeHr = state.flights.byId[flightId].times.land.slice(0,2);
+        const endTimeMn = state.flights.byId[flightId].times.land.slice(2,4);
+    } else {
+        startTimeHr = '23';
+        startTimeMn = '59';
+        endOffset = 0;
+    }
+    const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000Z`);
+    const endDate = new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000Z`);
+    const schedBlock = {
+        start: new Date(startDate.getTime() - startOffset),
+        end: new Date(endDate.getTime() + endOffset),
+    };
+    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+    return activeAircrewRefs;
+}
+                        
+                        
+
 const getActiveAircrewRefIds = (state) => {
     /**
      * @param {IState} state The application state (store.getState())
@@ -101,25 +147,47 @@ const getActiveAircrewRefIds = (state) => {
         state.flights.byId[flightId].sorties.forEach(sortieId => {
             seats.forEach(seat => {
                 state.sorties.byId[sortieId][seat].aircrewRefIds.forEach(aircrewId => {
-                    const startTimeHr = state.flights.byId[flightId].times.brief.slice(0,2);
-                    const startTimeMn = state.flights.byId[flightId].times.brief.slice(2,4);
-                    const endTimeHr = state.flights.byId[flightId].times.land.slice(0,2);
-                    const endTimeMn = state.flights.byId[flightId].times.land.slice(2,4);
-                    const schedBlock = {
-                        start: new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000Z`),
-                        end: new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000Z`),
-                    };
-                    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-                        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+                    activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
                 });
             });
         });
         state.flights.byId[flightId].notes.forEach(noteId => {
-            state.notes.byId[noteId].content // need to parse this for dates
-                                             // check for times at beginning. time, time-time, time time
-                                             // if one time, assume 1 hour after (use imported var for settings later)
-                                             // if two times, add actual sched block obj to that aircrewID
-                                             // if no times, assume all day.
+            state.notes.byId[noteId].aircrewRefIds.forEach(aircrewId => {
+                /**
+                 * if times were specified, uses those. if start time but no end time, uses land time.
+                 * *** this doesn't check if land time comes after start time!!!!!!!!!
+                 * If no land time, uses stardard note duration (default 60 min).
+                 * If times aren't specified, uses flight times in the same way as above.
+                 */
+                const noteTimes = R_startsWithTimeBlock.exec(state.notes.byId[noteId].content);
+                let startTimeHr, stateTimeMn, endTimeHr, endTimeMn;
+                let endOffset = 0;
+                if (noteTimes) {
+                    startTimeHr = noteTimes[1].slice(0,2);
+                    startTimeMn = noteTimes[1].slice(2,4);
+                    if (noteTimes[2]) {
+                        endTimeHr = noteTimes[2].slice(0,2);
+                        endTimeMn = noteTimes[2].slice(2,4);
+                    } else if (R_24HourTime.test(state.flights.byId[flightId].times.land)) {
+                        endTimeHr = state.flights.byId[flightId].times.land.slice(0,2);
+                        endTimeMn = state.flights.byId[flightId].times.land.slice(2,4);
+                    } else {
+                        endOffset = state.settings.minutesNoteDuration*60000;
+                    }
+                    const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000Z`);
+                    const endDate = endOffset === 0 ?
+                        new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000Z`) :
+                        new Date(startDate.getTime + state.settings.minutesNoteDuration);
+                    const schedBlock = {
+                        start: startDate,
+                        end: endDate,
+                    };
+                    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+                        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+                } else {
+                    activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
+                }
+            });
         });
     });
 };

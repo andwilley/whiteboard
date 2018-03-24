@@ -224,4 +224,9 @@ export const INITIAL_STATE = {
         quals: [],
         existingAircrewUnchanged: false,
     },
+    settings: {
+        minutesAfterLand: 60,
+        minutesBeforeBrief: 60,
+        minutesBriefToTakeoff: 120,
+    },
 };
