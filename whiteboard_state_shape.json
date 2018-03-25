@@ -385,6 +385,7 @@ App
 			ProfileButton
 			HelpButton
 			SettingsButton
+		Errors(app) - *container
 	CrewlistBox
 		SearchBox
 			Search
@@ -393,8 +394,7 @@ App
 		CrewList
 			Aircrew
 			AddButton(aircrew)
-		FilterBox
-			Filter
+		Errors(crewList) - *container
 	Day
 		FlightBox - *container
 			Flight
@@ -419,11 +419,14 @@ App
 							Crew
 								Symbols
 					AddButton(sortie)
+					Errors(sortie) - *container
 				FlightNoteBox - *container
 					Note
 					AddButton(flightNote)
+				Errors(flight) - *container
 			AddButton(flight)
 		DayNoteBox
 			Note
 			AddButton(dayNote)
+		Errors(day) - *container
 }
