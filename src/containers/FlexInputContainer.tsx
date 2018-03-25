@@ -1,7 +1,8 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { seats } from '../whiteboard-constants'
-import { IState, IFlightTimes, IAircrew, IEntity } from '../types/State';
+import { seats } from '../whiteboard-constants';
+import { errorLevels, errorTypes, errorLocs } from '../errors';
+import { IState, IFlightTimes, IAircrew, IEntity, IErrors } from '../types/State';
 import { IAction } from '../actions';
 import FlexInput from '../components/FlexInput';
 import validator, { R_24HourTime, R_startsWithTimeBlock } from '../util/validator';
@@ -74,7 +75,7 @@ const getAircrewRefList = (state: IState, addNameIdTo): IAircrew[] => {
     }
 };
 
-const getErrors = (state: IState, validators: string[]) => {
+const getErrors = (state: IState, ownProps: IFlexInputContainerProps, aircrewRefList: IAircrew[]): IErrors[] => {
     /**
      * @param
      * @param
@@ -86,7 +87,45 @@ const getErrors = (state: IState, validators: string[]) => {
      * 
      * So it runs the val and runs the logic that checks for scheds conflicts, then aggregates the errors.
      */
-     activeAircrewRefs = getActiveAircrewRefs(state);
+    let errors = [];
+    if (ownProps.addNameIdTo) {
+        /**
+         * Check for scheduling conflicts
+         */
+        const activeAircrewRefs = getActiveAircrewRefs(state);
+        aircrewRefList.forEach(aircrew => {
+            if (activeAircrewRefs[aircrew.id]) {
+                activeAircrewRefs[aircrew.id].sort((a, b) => {
+                    if (a.start < b.start) return -1;
+                    if (a.start > b.start) return 1;
+                    return 0;
+                });
+                activeAircrewRefs[aircrew.id].reduce((lastTime, schedBlock) => {
+                    const actFirst = schedBlock.start < schedBlock.end ? schedBlock.start : schedBlock.end;
+                    const actLast = schedBlock.start < schedBlock.end ? schedBlock.end : schedBlock.start;
+                    if (actFirst < lastTime) {
+                        errors.push({
+                            id: cuid(),
+                            type: errorTypes.SCHEDULE_CONFLICT,
+                            location: errorLocs.FLIGHT,
+                            level: errorLevels.ERROR,
+                            message: `${state.aircrew.byId[aircrew.id].callsign} has an event ending at 
+                                ${lastTime.getTime()} and another starting at ${schedBlock.start.getTime()}.`,
+                            display: true,
+                            active: true,
+                        });
+                    }
+                    lastTime = actLast;
+                }, new Date(0));
+            }
+        });
+    }
+    if (ownProps.validators.length > 0) {
+        /**
+         * Check the input against the provided validation functions
+         */
+    }
+    return errors;
 };
 
 const getSchedFromFlightTimes = (
@@ -220,18 +259,21 @@ const getActiveAircrewRefs = (state: IState): ISchedBlock => {
         state.flights.byId[flightId].sorties.forEach(sortieId => {
             seats.forEach(seat => {
                 state.sorties.byId[sortieId][seat].aircrewRefIds.forEach(aircrewId => {
+                    /** Get all the referenced aircrew from sorties in the current day */
                     activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
                 });
             });
         });
         state.flights.byId[flightId].notes.forEach(noteId => {
             state.notes.byId[noteId].aircrewRefIds.forEach(aircrewId => {
+                /** Get all the referenced aircrew from flight notes in the current day */
                 activeAircrewRefs = getSchedFromNotes(activeAircrewRefs, state, noteId, aircrewId, true, flightId);
             });
         });
     });
     state.days.byId[state.crewListUI.currentDay].notes.forEach(noteId => {
         state.notes.byId[noteId].aircrewRefIds.forEach(aircrewId => {
+            /** Get all the referenced aircrew from day notes in the current day */
             activeAircrewRefs = getSchedFromNotes(activeAircrewRefs, state, noteId, aircrewId);
         });
     });
@@ -293,10 +335,11 @@ const getOnChangeWithNameMatch = (aircrewList: IAircrew[], dispatch: any, ownPro
 };
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
+    const aircrewRefList = getAircrewRefList(state, ownProps.addNameIdTo);
     return {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
-        aircrewRefList: getAircrewRefList(state, ownProps.addNameIdTo),
-        errors: getErrors(state, ownProps.validators), // check for sched conflicts here (possibly rename this)
+        aircrewRefList,
+        errors: getErrors(state, ownProps, aircrewRefList), // check for sched conflictsd and validate here (possibly rename this)
     };
 };
 
@@ -307,7 +350,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
      * other aircrew (the state I need) to see if there are matches and dispatching to update the state with the
      * referenced aircrewIds if there are.
      * 
-     * @property onChange is the wrapped version of the one passed to this container.
+     * @property onChange The wrapped version overwrites the one passed to this container.
      * @property aircrewRefList is the list of aircrew objects whose Ids are refed in this component (in the future,
      * this will affect display at the presentational component level).
      */

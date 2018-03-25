@@ -214,6 +214,11 @@ export const INITIAL_STATE = {
         byId: {},
         allIds: [],
     },
+    errors: {
+        byId: {},
+        activeIds: [],
+        inactiveIds: [],
+    },
     addUpdateAircrewFormValues: {
         id: '',
         callsign: '',

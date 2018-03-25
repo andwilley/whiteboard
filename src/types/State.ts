@@ -92,13 +92,19 @@ export interface IAddUpdateAircrewFormValues {
     existingAircrewUnchanged: boolean;
 }
 
+export interface IMeta {
+    aircrewId?: string;
+}
+
 export interface IErrors {
     readonly id: string;
     readonly type: string;
+    readonly location: string;
     readonly level: string;
     readonly message: string;
     readonly display: boolean;
     readonly active: boolean;
+    readonly meta?: IErrorMeta;
 }
 
 export interface settings {
@@ -117,5 +123,9 @@ export interface IState {
     readonly airspace: IEntity<IAirspace>;
     readonly crewListUI: ICrewListUI;
     readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
-    readonly errors: IEntity<IErrors>;
+    readonly errors: {
+        readonly byId: { [id: string]: IErrors };
+        readonly activeIds: string[];
+        readonly inactiveIds: string[];
+    };
 }

@@ -9,9 +9,17 @@ export const errorLevels = {
 // error types
 export const errorTypes = {
     FORM_VAL_ERROR: 'FORM_VAL_ERROR',
+    SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT',
 };
 
 // error messages
 export const errorMessages = {
     ERR_NO_RESULTS_FOUND: 'No results match your search.',
 };
+
+export cont errorLocs = {
+    FLIGHT: 'FLIGHT',
+    DAY: 'DAY',
+    CREWLIST: 'CREWLIST',
+    APP: 'APP',
+}
