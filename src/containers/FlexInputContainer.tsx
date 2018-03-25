@@ -33,6 +33,13 @@ interface IFlexInputContainerProps {
     addNameIdTo?: {nameLocation: string, entityId: string};
 }
 
+interface ISchedBlock {
+    [id: string]: {
+        start: Date;
+        end: Date;
+    }[];
+}
+
 const getAircrewList = (aircrew: IAircrewEntity): IAircrew[] => {
     return aircrew.allIds.map(id => aircrew.byId[id])
 };
@@ -67,7 +74,7 @@ const getAircrewRefList = (state: IState, addNameIdTo): IAircrew[] => {
     }
 };
 
-const getErrors = () => {
+const getErrors = (state: IState, validators: string[]) => {
     /**
      * @param
      * @param
@@ -79,10 +86,15 @@ const getErrors = () => {
      * 
      * So it runs the val and runs the logic that checks for scheds conflicts, then aggregates the errors.
      */
-     
+     activeAircrewRefs = getActiveAircrewRefs(state);
 };
 
-const getSchedFromFlightTimes = (activeAircrewRefs, state, flightId, aircrewId) => {
+const getSchedFromFlightTimes = (
+    activeAircrewRefs: ISchedBlock,
+    state: IState,
+    flightId: string,
+    aircrewId: string
+): ISchedBlock => {
     /**
      * Assumes worst case for flights unless we can deduce it from the settings.
      * Crew in the seat for a sortie are assumed to be busy from brief to land with an offset on
@@ -115,8 +127,8 @@ const getSchedFromFlightTimes = (activeAircrewRefs, state, flightId, aircrewId) 
         startTimeMn = '59';
         endOffset = 0;
     }
-    const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000Z`);
-    const endDate = new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000Z`);
+    const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000`);
+    const endDate = new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000`);
     const schedBlock = {
         start: new Date(startDate.getTime() - startOffset),
         end: new Date(endDate.getTime() + endOffset),
@@ -124,11 +136,72 @@ const getSchedFromFlightTimes = (activeAircrewRefs, state, flightId, aircrewId) 
     activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
         [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
     return activeAircrewRefs;
-}
-                        
-                        
+};
 
-const getActiveAircrewRefIds = (state) => {
+const getSchedFromNotes = (
+    activeAircrewRefs: ISchedBlock,
+    state: IState,
+    noteId: string,
+    aircrewId: string,
+    flightNote: boolean = false,
+    flightId: string = ''
+): ISchedBlock => {
+    /**
+     * Gets referenced aircrew start and end times from notes.
+     * @param {ISchedBlock} activeAircrewRefs The working dict of refed aircrew and their scheduled times.
+     * @param {IState} state The app state.
+     * @param {string} noteId
+     * @param {string} aircrewId
+     * @param {?boolean} flightNote True if this is a flight note. Default: false.
+     * @param {?string} flightId Needed if this is a flight note. Default: ''
+     * @returns {ISchedBlock}
+     * if times were specified, uses those. if start time but no end time, uses land time.
+     * *** this doesn't check if land time comes after start time!!!!!!!!!
+     * If no land time, uses stardard note duration (default 60 min).
+     * If times aren't specified, uses flight times in the same way as above.
+     * If flightNote is false, skips using flight times, defaults to length.
+     */
+    const noteTimes = R_startsWithTimeBlock.exec(state.notes.byId[noteId].content);
+    let startTimeHr, stateTimeMn, endTimeHr, endTimeMn;
+    let endOffset = 0;
+    if (noteTimes) {
+        startTimeHr = noteTimes[1].slice(0,2);
+        startTimeMn = noteTimes[1].slice(2,4);
+        if (noteTimes[2]) {
+            endTimeHr = noteTimes[2].slice(0,2);
+            endTimeMn = noteTimes[2].slice(2,4);
+        } else if (flightNote && R_24HourTime.test(state.flights.byId[flightId].times.land)) {
+            endTimeHr = state.flights.byId[flightId].times.land.slice(0,2);
+            endTimeMn = state.flights.byId[flightId].times.land.slice(2,4);
+        } else {
+            endOffset = state.settings.minutesNoteDuration*60000;
+        }
+        const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000`);
+        const endDate = endOffset === 0 ?
+            new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000`) :
+            new Date(startDate.getTime + state.settings.minutesNoteDuration);
+        const schedBlock = {
+            start: startDate,
+            end: endDate,
+        };
+        activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+            [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+    } else {
+        if (flightNote) {
+            activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
+        } else {
+            const schedBlock = {
+                start: new Date(`${state.crewListUI.currentDay}T00:00:00.000`),
+                end: new Date(`${state.crewListUI.currentDay}T23:59:00.000`),
+            };
+            activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+                [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+        }
+    }
+    return activeAircrewRefs;
+};
+
+const getActiveAircrewRefs = (state: IState): ISchedBlock => {
     /**
      * @param {IState} state The application state (store.getState())
      * @returns {object} keyed by aircrewId with values set to an array of the timespans associated with each ref
@@ -153,43 +226,16 @@ const getActiveAircrewRefIds = (state) => {
         });
         state.flights.byId[flightId].notes.forEach(noteId => {
             state.notes.byId[noteId].aircrewRefIds.forEach(aircrewId => {
-                /**
-                 * if times were specified, uses those. if start time but no end time, uses land time.
-                 * *** this doesn't check if land time comes after start time!!!!!!!!!
-                 * If no land time, uses stardard note duration (default 60 min).
-                 * If times aren't specified, uses flight times in the same way as above.
-                 */
-                const noteTimes = R_startsWithTimeBlock.exec(state.notes.byId[noteId].content);
-                let startTimeHr, stateTimeMn, endTimeHr, endTimeMn;
-                let endOffset = 0;
-                if (noteTimes) {
-                    startTimeHr = noteTimes[1].slice(0,2);
-                    startTimeMn = noteTimes[1].slice(2,4);
-                    if (noteTimes[2]) {
-                        endTimeHr = noteTimes[2].slice(0,2);
-                        endTimeMn = noteTimes[2].slice(2,4);
-                    } else if (R_24HourTime.test(state.flights.byId[flightId].times.land)) {
-                        endTimeHr = state.flights.byId[flightId].times.land.slice(0,2);
-                        endTimeMn = state.flights.byId[flightId].times.land.slice(2,4);
-                    } else {
-                        endOffset = state.settings.minutesNoteDuration*60000;
-                    }
-                    const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000Z`);
-                    const endDate = endOffset === 0 ?
-                        new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000Z`) :
-                        new Date(startDate.getTime + state.settings.minutesNoteDuration);
-                    const schedBlock = {
-                        start: startDate,
-                        end: endDate,
-                    };
-                    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-                        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-                } else {
-                    activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
-                }
+                activeAircrewRefs = getSchedFromNotes(activeAircrewRefs, state, noteId, aircrewId, true, flightId);
             });
         });
     });
+    state.days.byId[state.crewListUI.currentDay].notes.forEach(noteId => {
+        state.notes.byId[noteId].aircrewRefIds.forEach(aircrewId => {
+            activeAircrewRefs = getSchedFromNotes(activeAircrewRefs, state, noteId, aircrewId);
+        });
+    });
+    return activeAircrewRefs;
 };
 
 const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
@@ -249,16 +295,21 @@ const getOnChangeWithNameMatch = (aircrewList: IAircrew[], dispatch: any, ownPro
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
     return {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
-        aircrewRefList: getAircrewRefIds(state, ownProps.addNameIdTo),
-        errors: getErrors(state), // check for sched conflicts here (possibly rename this)
+        aircrewRefList: getAircrewRefList(state, ownProps.addNameIdTo),
+        errors: getErrors(state, ownProps.validators), // check for sched conflicts here (possibly rename this)
     };
 };
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
     /**
      * Necessary because I need a slice of the state in the dispatch I'm wrapping here. Specifically, depending on
-     * ownProps.addNameToId, I'm comparing the input value (about to be dispatched by ownProps.onChange) to all the
-     * other aircrew (the state I need) to see if there are matches and dispatching to update the state if there are.
+     * ownProps.addNameIdTo, I'm comparing the input value (about to be dispatched by ownProps.onChange) to all the
+     * other aircrew (the state I need) to see if there are matches and dispatching to update the state with the
+     * referenced aircrewIds if there are.
+     * 
+     * @property onChange is the wrapped version of the one passed to this container.
+     * @property aircrewRefList is the list of aircrew objects whose Ids are refed in this component (in the future,
+     * this will affect display at the presentational component level).
      */
     return Object.assign({}, ownProps, {
         onChange: getOnChangeWithNameMatch(stateProps.aircrewList, dispatchProps.dispatch, ownProps),
