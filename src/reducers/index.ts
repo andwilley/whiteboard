@@ -9,6 +9,8 @@ import flightsReducer from './flightsReducer';
 import notesReducer from './notesReducer';
 import sortiesReducer from './sortiesReducer';
 import airspaceReducer from './airspaceReducer';
+import settingsReducer from './settingsReducer';
+import errorReducer from './errorReducer';
 
 export const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
@@ -19,4 +21,6 @@ export const whiteboardApp = combineReducers<IState>({
     airspace: airspaceReducer,
     crewListUI: crewListUIReducer,
     addUpdateAircrewFormValues: addUpdateAircrewFormValuesReducer,
+    settings: settingsReducer,
+    errors: errorReducer,
 });

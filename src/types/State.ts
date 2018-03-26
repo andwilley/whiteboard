@@ -3,6 +3,12 @@ export interface IEntity<E> {
     readonly allIds: string[];
 }
 
+export interface IEntityWithActive<E> {
+    readonly byId: { [id: string]: E };
+    readonly activeIds: string[];
+    readonly allIds: string[];
+}
+
 export interface IAircrew {
     readonly id: string;
     readonly callsign: string;
@@ -92,22 +98,27 @@ export interface IAddUpdateAircrewFormValues {
     existingAircrewUnchanged: boolean;
 }
 
-export interface IMeta {
-    aircrewId?: string;
+export interface IErrorMeta {
+    readonly aircrewId?: string;
+    readonly dayId?: string;
+    readonly timeHidden?: Date;
+    readonly timeInactive?: Date;
 }
 
 export interface IErrors {
     readonly id: string;
+    readonly time: Date;
     readonly type: string;
     readonly location: string;
+    readonly locationId: string;
     readonly level: string;
     readonly message: string;
     readonly display: boolean;
     readonly active: boolean;
-    readonly meta?: IErrorMeta;
+    readonly meta: IErrorMeta;
 }
 
-export interface settings {
+export interface ISettings {
     minutesBeforeBrief: number;
     minutesAfterLand: number;
     minutesBriefToTakeoff: number;
@@ -123,9 +134,6 @@ export interface IState {
     readonly airspace: IEntity<IAirspace>;
     readonly crewListUI: ICrewListUI;
     readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
-    readonly errors: {
-        readonly byId: { [id: string]: IErrors };
-        readonly activeIds: string[];
-        readonly inactiveIds: string[];
-    };
+    readonly settings: ISettings;
+    readonly errors: IEntityWithActive<IErrors>;
 }

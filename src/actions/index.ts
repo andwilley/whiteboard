@@ -1,4 +1,5 @@
 import * as cuid from 'cuid';
+import { IErrorMeta } from '../types/State';
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 
@@ -31,6 +32,10 @@ export const ADD_AIRSPACE = 'ADD_AIRSPACE';
 export const DEL_AIRSPACE = 'DEL_AIRSPACE';
 export const UPDATE_AIRSPACE = 'UPDATE_AIRSPACE';
 export const UPDATE_LOADOUT = 'UPDATE_LOADOUT';
+export const ADD_ERROR = 'ADD_ERROR';
+export const TOGGLE_SHOW_ERROR = 'TOGGLE_SHOW_ERROR';
+export const CLEAR_ERROR = 'CLEAR_ERROR';
+export const DEL_ERROR = 'DEL_ERROR';
 
 // const makeActionCreator = (type, ...payloadNames) => {
 //     return (...payloadValues) => {
@@ -106,6 +111,15 @@ export interface IUpdateAirspace {
     id: string;
     field: string;
     input: string;
+}
+
+interface IAddErrorArgs {
+    type: string;
+    location: string;
+    locationId: string;
+    level: string;
+    message: string;
+    meta: IErrorMeta;
 }
 
 // let crewId = 0;
@@ -423,6 +437,42 @@ export const actions = {
         payload: {
             sortieId,
             input,
+        },
+    })),
+    addError: createAction(ADD_ERROR, (args: IAddErrorArgs) => {
+        const errorId = cuid();
+        return {
+            type: ADD_ERROR,
+            payload: {
+                errorId,
+                time: Date(),
+                type: args.type,
+                location: args.location,
+                locationId: args.locationId,
+                level: args.level,
+                message: args.message,
+            },
+            meta: {
+                ...args.meta,
+            },
+        };
+    }),
+    toggleShowError: createAction(TOGGLE_SHOW_ERROR, (errorId: string) => ({
+        type: TOGGLE_SHOW_ERROR,
+        payload: {
+            errorId,
+        },
+    })),
+    clearError: createAction(CLEAR_ERROR, (errorId: string) => ({
+        type: CLEAR_ERROR,
+        payload: {
+            errorId,
+        },
+    })),
+    delError: createAction(DEL_ERROR, (errorId: string) => ({
+        type: DEL_ERROR,
+        payload: {
+            errorId,
         },
     })),
 };

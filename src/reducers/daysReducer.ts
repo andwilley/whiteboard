@@ -74,6 +74,9 @@ const daysById = (state = {}, action: IAction) => {
 const allDays = (state = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addDay):
+            if (state.indexOf(action.payload.id) > -1) {
+                return state;
+            }
             return state.concat(action.payload.id);
         default:
             return state;

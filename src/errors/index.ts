@@ -19,7 +19,9 @@ export const errorMessages = {
 
 export cont errorLocs = {
     FLIGHT: 'FLIGHT',
+    FLIGHT_NOTE: 'FLIGHT_NOTE',
     DAY: 'DAY',
+    DAY_NOTE: 'DAY_NOTE',
     CREWLIST: 'CREWLIST',
     APP: 'APP',
 }
