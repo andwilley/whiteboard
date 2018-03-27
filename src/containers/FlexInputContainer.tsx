@@ -110,7 +110,6 @@ const getSchedErrors = (state: IState, aircrewRefIds: string[]): IAddErrorArgs[]
      * 
      * So it runs the val and runs the logic that checks for scheds conflicts, then aggregates the errors.
      */
-    let errors = [];
     const activeAircrewRefs = getActiveAircrewRefs(state);
     aircrewRefIds.forEach(aircrewId => {
         if (activeAircrewRefs[aircrewId]) {
@@ -119,28 +118,37 @@ const getSchedErrors = (state: IState, aircrewRefIds: string[]): IAddErrorArgs[]
                 if (a.start > b.start) return 1;
                 return 0;
             });
-            activeAircrewRefs[aircrewId].reduce((lastTime, schedBlock) => {
-                const actFirst = schedBlock.start < schedBlock.end ? schedBlock.start : schedBlock.end;
-                const actLast = schedBlock.start < schedBlock.end ? schedBlock.end : schedBlock.start;
-                if (actFirst < lastTime) {
-                    errors.push({
-                        type: errorTypes.SCHEDULE_CONFLICT,
-                        location: schedBlock.location,
-                        locationId: schedBlock.locationId,
-                        level: errorLevels.ERROR,
-                        message: `${state.aircrew.byId[aircrewId].callsign} has an event ending at 
-                            ${lastTime.getTime()} and another starting at ${schedBlock.start.getTime()}.`,
-                        meta: {
-                            aircrewId,
-                            dayId: state.crewListUI.currentDay,
-                        },
+            const emptyBlock = {
+                start: new Date(0),
+                end: new Date(0),
+                location: '',
+                locationId: '',
+            };
+            const accErrors = activeAircrewRefs[aircrewId].reduce((acc, schedBlock) => {
+                const actualFirst = schedBlock.start < schedBlock.end ? schedBlock.start : schedBlock.end;
+                const actualLast = schedBlock.start < schedBlock.end ? schedBlock.end : schedBlock.start;
+                if (actualFirst < acc.lastTime) {
+                    /** create an error for both locations */
+                    [acc.lastBlock, schedBlock].forEach(block => {
+                        errors.push({
+                            dayId: state.days.byId[state.crewListUI.currentDay],
+                            type: errorTypes.SCHEDULE_CONFLICT,
+                            location: block.location,
+                            locationId: block.locationId,
+                            level: errorLevels.ERROR,
+                            message: `${state.aircrew.byId[aircrewId].callsign} has a schedule conflict.`,
+                            meta: {
+                                aircrewId,
+                            },
+                        });
                     });
                 }
-                lastTime = actLast;
-            }, new Date(0));
+                acc.lastBlock = schedBlock;
+                acc.lastTime = actuallast;
+            }, {lastBlock: emptyBlock, errors: [], lastTime: new Date(0));
         }
     });
-    return errors;
+    return accErrors ? accErrors.errors : [];
 };
 
 const getSchedFromFlightTimes = (
@@ -328,18 +336,19 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
     return aircrewList.filter(aircrew => inputValue.includes(aircrew.callsign));
 };
 
-const getOnChangeWithNameMatch = (
+const getOnChangeWithNameMatch = ({
     state: IState,
     aircrewList: IAircrew[],
     aircrewRefList: IAircrew[],
     dispatch: any,
     ownProps: IFlexInputContainerProps
-): ((e: any) => any) => {
+    oldErrors: IErrors[],
+}): ((e: any) => any) => {
     /** 
      * @param {function} dispatch
      * @param {IFlexInputContainerProps} ownProps Props passed to this container
-     * @returns {function} If addNameIdTo is specified, returns updated onChange function. It wraps the onChange
-     * function passed and:
+     * @returns {function} If addNameIdTo is specified, returns updated onChange function.
+     * It wraps the onChange function passed and:
      * compares the value being updated with all the aircrew names
      * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
@@ -368,6 +377,11 @@ const getOnChangeWithNameMatch = (
     return (e) => {
         const matchedAircrewIds = nameMatch(aircrewList, e.target.value).map(aircrew => aircrew.id);
         locationSpecificDispatch(matchedAircrewIds);
+        /** the input changed, clear the old errors */
+        oldErrors.forEach(error => {
+            if (error.type === errorTypes.SCHEDULE_CONFLICT)
+                dispatch(clearError(error.id, state.crewListUI.currentDay));
+        });
         const errors = matchedAircrewIds.length > 0 ? getSchedErrors(state, matchedAircrewIds) : [];
         errors.forEach(error => {
             dispatch(actions.addError(error));
@@ -384,6 +398,7 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
     return {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
         aircrewRefList,
+        state,
         errors: getErrors(state.errors, aircrewRefList.map(aircrew => aircrew.id)), // and combine them all here
     };
 };
@@ -398,9 +413,18 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
      * @property onChange The wrapped version overwrites the one passed to this container.
      * @property aircrewRefList is the list of aircrew objects whose Ids are refed in this component (in the future,
      * this will affect display at the presentational component level).
+     * 
+     * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
     return Object.assign({}, ownProps, {
-        onChange: getOnChangeWithNameMatch(stateProps.aircrewList, dispatchProps.dispatch, ownProps),
+        onChange: getOnChangeWithNameMatch({
+            state: stateProps.state,
+            aircrewList: stateProps.aircrewList,
+            aircrewRefList: stateProps.aircrewRefList
+            dispatch: dispatchProps.dispatch,
+            ownProps: ownProps,
+            oldErrors: stateProps.errors,
+        }),
         aircrewRefList: stateProps.aircrewRefList,
     });
 };

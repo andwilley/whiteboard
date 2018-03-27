@@ -27,6 +27,12 @@ const errorsById = (state = {}, action: IAction) => {
                 [action.payload.errorId]: {
                     ...state[action.payload.errorId],
                     display: !state[action.payload.errorId].display,
+                    meta: {
+                        ...state[action.payload.errorId].meta,
+                        timeHiddenToggled: state[action.payload.errorId].meta.timeHiddenToggled ?
+                            state[action.payload.errorId].meta.concat(action.meta.timeHiddenToggled) :
+                            [action.meta.timeHiddenToggled],
+                    },
                 }
             };
         case getType(actions.clearError):
@@ -35,6 +41,10 @@ const errorsById = (state = {}, action: IAction) => {
                 [action.payload.errorId]: {
                     ...state[action.payload.errorId],
                     active: false,
+                    meta: {
+                        ...state[action.payload.errorId].meta,
+                        timeInactive: action.meta.timeInactive,
+                    },
                 }
             };
         case getType(actions.delError):

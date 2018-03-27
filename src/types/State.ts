@@ -28,6 +28,7 @@ export interface IDays {
     readonly id: string;
     readonly flights: string[];
     readonly notes: string[];
+    readonly errors: string[];
 }
 
 export interface IFlightTimes {
@@ -100,14 +101,14 @@ export interface IAddUpdateAircrewFormValues {
 
 export interface IErrorMeta {
     readonly aircrewId?: string;
-    readonly dayId?: string;
-    readonly timeHidden?: Date;
+    readonly timeHiddenToggled?: Date[];
     readonly timeInactive?: Date;
 }
 
 export interface IErrors {
     readonly id: string;
     readonly time: Date;
+    readonly dayId: string;
     readonly type: string;
     readonly location: string;
     readonly locationId: string;

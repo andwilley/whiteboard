@@ -76,6 +76,7 @@ export const INITIAL_STATE = {
                 // 	set: 2031,
                 // },
                 notes: ['b'],
+                errors: [],
             },
         },
         allIds: ['2018-01-24'],

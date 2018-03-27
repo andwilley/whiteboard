@@ -114,6 +114,7 @@ export interface IUpdateAirspace {
 }
 
 interface IAddErrorArgs {
+    dayId: string;
     type: string;
     location: string;
     locationId: string;
@@ -445,8 +446,9 @@ export const actions = {
             type: ADD_ERROR,
             payload: {
                 errorId,
-                time: Date(),
+                time: new Date(),
                 type: args.type,
+                dayId: args.dayId,
                 location: args.location,
                 locationId: args.locationId,
                 level: args.level,
@@ -462,17 +464,25 @@ export const actions = {
         payload: {
             errorId,
         },
+        meta: {
+            timeHiddenToggled: new Date();
+        },
     })),
-    clearError: createAction(CLEAR_ERROR, (errorId: string) => ({
+    clearError: createAction(CLEAR_ERROR, (errorId: string, dayId: string) => ({
         type: CLEAR_ERROR,
         payload: {
             errorId,
+            dayId,
         },
+        meta: {
+            timeInactive: new Date();
+        }
     })),
-    delError: createAction(DEL_ERROR, (errorId: string) => ({
+    delError: createAction(DEL_ERROR, (errorId: string, dayId: string) => ({
         type: DEL_ERROR,
         payload: {
             errorId,
+            dayId,
         },
     })),
 };

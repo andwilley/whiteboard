@@ -20,6 +20,7 @@ const daysById = (state = {}, action: IAction) => {
                     // },
                     flights: [],
                     notes: [],
+                    errors: [],
                 },
             };
         case getType(actions.addFlight):
@@ -63,7 +64,28 @@ const daysById = (state = {}, action: IAction) => {
                 [action.payload.entityId]: {
                     ...state[action.payload.entityId],
                     notes: state[action.payload.entityId].notes
-                        .filter((noteId: number) => noteId !== action.payload.id),
+                        .filter((noteId: string) => noteId !== action.payload.id),
+                },
+            };
+        case getType(actions.addError):
+            if (state[action.payload.dayId].errors.indexOf(action.payload.errorId) > -1) {
+                return state;
+            }
+            return {
+                ...state,
+                [action.payload.dayId]: {
+                    ...state[action.payload.dayId],
+                    errors: state[action.payload.dayId].errors.concat(action.payload.errorId),
+                },
+            };
+        case getType(actions.delError):
+        case getType(actions.clearError):
+            return {
+                ...state,
+                [action.payload.dayId]: {
+                    ...state[action.payload.dayId],
+                    errors: state[action.payload.dayId].errors
+                        .filter((errorId: string) => errorId !== action.payload.errorId),
                 },
             };
         default:
