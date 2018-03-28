@@ -326,6 +326,10 @@ export const actions = {
         },
     })),
     updatePuckName: createAction(UPDATE_PUCK_NAME, (args: IUpdatePuckNameArgs) => ({
+        /**
+         * updates the inputName field in the sortie
+         * crewPosition options: 'front' or 'back'
+         */
         type: UPDATE_PUCK_NAME,
         payload: {
             sortieId: args.sortieId,

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LoadoutBox from './LoadoutBox';
 import { ISorties } from '../types/State';
-import CrewBox from './CrewBox';
+import CrewBoxContainer from '../containers/CrewBoxContainer';
 
 interface ISortieProps {
     sortie: ISorties;
@@ -14,13 +14,8 @@ const Sortie: React.SFC<ISortieProps> = ({ sortie }) => (
             codes={'FFAM101'}
             loadout={'ABLR'}
         />
-        <CrewBox
-            pilot={sortie.front.inputName}
-            pilotCodes={sortie.front.codes.toString()}
-            pilotSymbols={sortie.front.symbols.toString()}
-            wso={sortie.back.inputName}
-            wsoCodes={sortie.back.codes.toString()}
-            wsoSymbols={sortie.back.symbols.toString()}
+        <CrewBoxContainer
+            sortieId={sortie.id}
         />
     </div>
 );

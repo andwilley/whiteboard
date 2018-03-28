@@ -1,51 +1,58 @@
 import * as React from 'react';
+import FlexInputContainer, { nameLocation } from '../containers/FlexInputContainer';
 
 interface ICrewBoxProps {
-    pilot: string;
-    pilotCodes: string;
-    pilotSymbols: string;
-    wso: string;
-    wsoCodes: string;
-    wsoSymbols: string;
+    sortieStrings: {
+        sortieId: string;
+        pilot: string;
+        pilotCodes: string;
+        pilotSymbols: string;
+        wso: string;
+        wsoCodes: string;
+        wsoSymbols: string;
+    };
+    onInputChange: (e: any) => void;
 }
 
-const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbols, pilotCodes, wsoCodes }) => (
+const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, onInputChange }) => (
     <div>
-        <input
-            type="text"
-            placeholder="Pilot"
-            name="crew"
-            value={pilot}
+        <FlexInputContainer
+            placeHolder="Pilot"
+            name="pilot"
+            value={sortieStrings.pilot}
+            onChange={onInputChange}
+            addNameIdTo={{nameLocation: nameLocation.FRONT_SEAT, entityId: sortieStrings.sortieId}}
         />
-        <input
-            type="text"
-            placeholder="Pilot Codes"
-            name="crew"
-            value={pilotCodes}
+        <FlexInputContainer
+            placeHolder="Pilot Codes"
+            name="pilotCodes"
+            value={sortieStrings.pilotCodes}
+            onChange={onInputChange}
         />
-        <input
-            type="text"
-            placeholder="Pilot Symbols"
-            name="crew"
-            value={pilotSymbols}
+        <FlexInputContainer
+            placeHolder="Pilot Symbols"
+            name="pilotSymbols"
+            value={sortieStrings.pilotSymbols}
+            onChange={onInputChange}
         />
-        <input
-            type="text"
-            placeholder="WSO"
-            name="crew"
-            value={wso}
+        <FlexInputContainer
+            placeHolder="WSO"
+            name="wso"
+            value={sortieStrings.wso}
+            onChange={onInputChange}
+            addNameIdTo={{nameLocation: nameLocation.BACK_SEAT, entityId: sortieStrings.sortieId}}
         />
-        <input
-            type="text"
-            placeholder="WSO Codes"
-            name="crew"
-            value={wsoCodes}
+        <FlexInputContainer
+            placeHolder="WSO Codes"
+            name="wsoCodes"
+            value={sortieStrings.wsoCodes}
+            onChange={onInputChange}
         />
-        <input
-            type="text"
-            placeholder="WSO Symbols"
-            name="crew"
-            value={wsoSymbols}
+        <FlexInputContainer
+            placeHolder="WSO Symbols"
+            name="wsoSymbols"
+            value={sortieStrings.wsoSymbols}
+            onChange={onInputChange}
         />
     </div>
 );

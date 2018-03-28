@@ -375,7 +375,7 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
      *
      * This is its own function because I think this will become more complex later.
      */
-    return aircrewList.filter(aircrew => inputValue.includes(aircrew.callsign));
+    return aircrewList.filter(aircrew => inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()));
 };
 
 interface IGetOnChangeWithNameMatchArgs {
