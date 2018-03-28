@@ -100,7 +100,7 @@ export interface IAddUpdateAircrewFormValues {
 }
 
 export interface IErrorMeta {
-    readonly aircrewId?: string;
+    readonly aircrewId: string;
     readonly timeHiddenToggled?: Date[];
     readonly timeInactive?: Date;
 }

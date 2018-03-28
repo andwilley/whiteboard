@@ -17,7 +17,7 @@ export const errorMessages = {
     ERR_NO_RESULTS_FOUND: 'No results match your search.',
 };
 
-export cont errorLocs = {
+export const errorLocs = {
     FLIGHT: 'FLIGHT',
     FLIGHT_NOTE: 'FLIGHT_NOTE',
     SORTIE: 'SORTIE',
@@ -26,4 +26,4 @@ export cont errorLocs = {
     DAY_NOTE: 'DAY_NOTE',
     CREWLIST: 'CREWLIST',
     APP: 'APP',
-}
+};

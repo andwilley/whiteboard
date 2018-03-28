@@ -33,7 +33,7 @@ const errorsById = (state = {}, action: IAction) => {
                             state[action.payload.errorId].meta.concat(action.meta.timeHiddenToggled) :
                             [action.meta.timeHiddenToggled],
                     },
-                }
+                },
             };
         case getType(actions.clearError):
             return {
@@ -45,7 +45,7 @@ const errorsById = (state = {}, action: IAction) => {
                         ...state[action.payload.errorId].meta,
                         timeInactive: action.meta.timeInactive,
                     },
-                }
+                },
             };
         case getType(actions.delError):
             const rest = Object.assign({}, state);
@@ -56,7 +56,7 @@ const errorsById = (state = {}, action: IAction) => {
     }
 };
 
-const activeErrors = (state = [], action: IAction) => {
+const activeErrors = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addError):
             if (state.indexOf(action.payload.errorId) > -1) {
@@ -71,14 +71,14 @@ const activeErrors = (state = [], action: IAction) => {
     }
 };
 
-const allErrors = (state = [], action: IAction) => {
+const allErrors = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addError):
             if (state.indexOf(action.payload.errorId) > -1) {
                 return state;
             }
             return state.concat(action.payload.errorId);
-        case getType(action.delError):
+        case getType(actions.delError):
             return state.filter(id => id !== action.payload.errorId);
         default:
             return state;

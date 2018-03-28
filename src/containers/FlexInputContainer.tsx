@@ -2,12 +2,11 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { seats } from '../whiteboard-constants';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
-import { IState, IFlightTimes, IAircrew, IEntity, IEntityWithActive, IErrors } from '../types/State';
-import { IAction, IAddErrorArgs } from '../actions';
+import { IState, IAircrew, IEntity, IErrors, IDays } from '../types/State';
+import { IAddErrorArgs } from '../actions';
 import FlexInput from '../components/FlexInput';
-import validator, { R_24HourTime, R_startsWithTimeBlock } from '../util/validator';
+import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/validator';
 type IAircrewEntity = IEntity<IAircrew>;
-type IErrorEntityWithActive = IEntityWithActive<IErrors>;
 
 export const nameLocation = {
     FRONT_SEAT: 'FRONT_SEAT',
@@ -32,41 +31,45 @@ interface IFlexInputContainerProps {
     value: string;
     onChange: (e: any) => any;
     validators?: string[];
-    addNameIdTo?: {nameLocation: string, entityId: string};
+    addNameIdTo?: {nameLocation: string; entityId: string};
 }
 
 interface ISchedBlock {
-    [id: string]: {
-        start: Date;
-        end: Date;
-        location: string;
-        locationId: string;
-    }[];
+    start: Date;
+    end: Date;
+    location: string;
+    locationId: string;
+}
+
+interface ISchedObject {
+    [id: string]: ISchedBlock[];
 }
 
 const getAircrewList = (aircrew: IAircrewEntity): IAircrew[] => {
-    return aircrew.allIds.map(id => aircrew.byId[id])
+    return aircrew.allIds.map(id => aircrew.byId[id]);
 };
 
-const getAircrewRefList = (state: IState, addNameIdTo: {nameLocation: string, entityId: string}): IAircrew[] => {
+const getAircrewRefList = (state: IState,
+                           addNameIdTo: {nameLocation: string; entityId: string} | undefined
+): IAircrew[] => {
     /**
      * @param {IState} state The application state
      * @param {nameLocation: string, entityId: string} addNameIdTo Object passed the container component with info
      * about applicable state slice.
      * @returns {IAircrew[]} Array of aircrew objects or empty array.
-     * 
+     *
      * This returns the aircrew that are referenced in the value of the input field for the presentational component to
      * display as required.
-     * 
+     *
      * State it needs:
      * state.aircrew.byId
      * state.sorties.byId
      * state.notes.byId
      */
-     if (!addNameIdTo) {
-         return [];
-     }
-    switch(addNameIdTo.nameLocation) {
+    if (!addNameIdTo) {
+        return [];
+    }
+    switch (addNameIdTo.nameLocation) {
         case nameLocation.FRONT_SEAT:
             return state.sorties.byId[addNameIdTo.entityId].front.aircrewRefIds.map(id => state.aircrew.byId[id]);
         case nameLocation.BACK_SEAT:
@@ -78,60 +81,81 @@ const getAircrewRefList = (state: IState, addNameIdTo: {nameLocation: string, en
     }
 };
 
-const getErrors = (errors: IErrorEntityWithActive, aircrewRefIds: string[]): IErrors[] => {
+const getDayErrors = (errorsById: { [id: string]: IErrors }, currentDay: IDays): IErrors[] => {
+    /**
+     * days.byId[currentDay].errors
+     * state.errors.byId
+     */
+    const dayErrors = currentDay.errors.map(errorId => {
+        return errorsById[errorId];
+    });
+    return dayErrors;
+};
+
+const getSchedErrors = (dayErrors: IErrors[], aircrewRefIds: string[]): IErrors[] => {
     /**
      * @param
      * @param
      * @returns {IErrors[]} an array of errors that apply to this input.
      * Finds the active errors with any of aircrewRefIds in the meta.
-     * Also runs the val
+     * Also runs the val??? Might screw with memoization.
      */
-    schedErrors = aircrewRefIds.length > 0 ? errors.activeIds.filter(errorId => {
-        return aircrewRefIds.indexOf(errors.byId[errorId].meta.aircrewId) > -1;
-    }).map(errorId => errors.byId[errorId]) : [];
+    const schedErrors = aircrewRefIds.length > 0 ? dayErrors.filter(error => {
+        return (error.type === errorTypes.SCHEDULE_CONFLICT &&
+                aircrewRefIds.indexOf(error.meta.aircrewId) > -1);
+    }) : [];
     return schedErrors;
-}
-
-const getValidationErrors = () {
-    if (ownProps.validators.length > 0) {
-        /**
-         * Check the input against the provided validation functions
-         */
-    }
 };
 
-const getSchedErrors = (state: IState, aircrewRefIds: string[]): IAddErrorArgs[] => {
+// const getValidationErrors = () => {
+//     if (ownProps.validators.length > 0) {
+//         /**
+//          * Check the input against the provided validation functions
+//          */
+//     }
+// };
+
+interface IFindSchedErrorsReducePreviousValue {
+    lastBlock: ISchedBlock;
+    lastTime: Date;
+}
+
+const findSchedErrors = (state: IState, aircrewRefIds: string[]): IAddErrorArgs[] => {
     /**
      * @param
      * @param
      * @returns {IAddErrorArgs[]} Array of IErrors objects sorted by error level.
-     * 
+     *
+     *
+     *
      * Creates the errors generated by any scheduling conflicts
-     * 
-     * So it runs the val and runs the logic that checks for scheds conflicts, then aggregates the errors.
+     *
+     * So it runs the logic that checks for scheds conflicts, then aggregates the errors.
      */
     const activeAircrewRefs = getActiveAircrewRefs(state);
+    const emptyBlock = {
+        start: new Date(0),
+        end: new Date(0),
+        location: '',
+        locationId: '',
+    };
+    const errors: IAddErrorArgs[] = [];
     aircrewRefIds.forEach(aircrewId => {
         if (activeAircrewRefs[aircrewId]) {
-            activeAircrewRefs[aircrewId].sort((a, b) => {
-                if (a.start < b.start) return -1;
-                if (a.start > b.start) return 1;
+            activeAircrewRefs[aircrewId].sort((a: ISchedBlock, b: ISchedBlock) => {
+                if (a.start < b.start) { return -1; }
+                if (a.start > b.start) { return 1; }
                 return 0;
             });
-            const emptyBlock = {
-                start: new Date(0),
-                end: new Date(0),
-                location: '',
-                locationId: '',
-            };
-            const accErrors = activeAircrewRefs[aircrewId].reduce((acc, schedBlock) => {
-                const actualFirst = schedBlock.start < schedBlock.end ? schedBlock.start : schedBlock.end;
-                const actualLast = schedBlock.start < schedBlock.end ? schedBlock.end : schedBlock.start;
+            activeAircrewRefs[aircrewId]
+              .reduce((acc: IFindSchedErrorsReducePreviousValue, schedBlock: ISchedBlock) => {
+                const actualFirst = (schedBlock.start < schedBlock.end) ? schedBlock.start : schedBlock.end;
+                const actualLast = (schedBlock.start < schedBlock.end) ? schedBlock.end : schedBlock.start;
                 if (actualFirst < acc.lastTime) {
                     /** create an error for both locations */
                     [acc.lastBlock, schedBlock].forEach(block => {
                         errors.push({
-                            dayId: state.days.byId[state.crewListUI.currentDay],
+                            dayId: state.crewListUI.currentDay,
                             type: errorTypes.SCHEDULE_CONFLICT,
                             location: block.location,
                             locationId: block.locationId,
@@ -144,19 +168,20 @@ const getSchedErrors = (state: IState, aircrewRefIds: string[]): IAddErrorArgs[]
                     });
                 }
                 acc.lastBlock = schedBlock;
-                acc.lastTime = actuallast;
-            }, {lastBlock: emptyBlock, errors: [], lastTime: new Date(0));
+                acc.lastTime = actualLast;
+                return acc;
+            }, {lastBlock: emptyBlock, lastTime: new Date(0)});
         }
     });
-    return accErrors ? accErrors.errors : [];
+    return errors;
 };
 
 const getSchedFromFlightTimes = (
-    activeAircrewRefs: ISchedBlock,
+    activeAircrewRefs: ISchedObject,
     state: IState,
     flightId: string,
     aircrewId: string
-): ISchedBlock => {
+): ISchedObject => {
     /**
      * Assumes worst case for flights unless we can deduce it from the settings.
      * Crew in the seat for a sortie are assumed to be busy from brief to land with an offset on
@@ -165,25 +190,30 @@ const getSchedFromFlightTimes = (
      * is 120 minutes) plus the offset. If no takeoff time is given, assume flight starts at 0000.
      * If no land time is given, assume flight lands at 2359. (may be smart to use a standard flight
      * duration for this, so we can go past midnight if thats when the flight takes off)
+     *
+     * NEEDS:
+     * state.settings
+     * state.flights
+     * state.crewListUI.currentDay
      */
-    let startTimeHr, stateTimeMn, endTimeHr, endTimeMn;
-    let startOffset = state.settings.minutesBeforeBrief*60000;
-    let endOffset = state.settings.minutesAfterLand*60000;
-    if (R_24HourTime.test(state.flights.byId[flightId].times.brief)) {
-        startTimeHr = state.flights.byId[flightId].times.brief.slice(0,2);
-        startTimeMn = state.flights.byId[flightId].times.brief.slice(2,4);
-    } else if (R_24HourTime.test(state.flights.byId[flightId].times.takeoff)) {
-        startTimeHr = state.flights.byId[flightId].times.takeoff.slice(0,2);
-        startTimeMn = state.flights.byId[flightId].times.takeoff.slice(2,4);
-        startOffset += state.settings.minutesBriefToTakeoff*60000;
+    let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
+    let startOffset = state.settings.minutesBeforeBrief * 60000;
+    let endOffset = state.settings.minutesAfterLand * 60000;
+    if (RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.brief)) {
+        startTimeHr = state.flights.byId[flightId].times.brief.slice(0, 2);
+        startTimeMn = state.flights.byId[flightId].times.brief.slice(2, 4);
+    } else if (RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.takeoff)) {
+        startTimeHr = state.flights.byId[flightId].times.takeoff.slice(0, 2);
+        startTimeMn = state.flights.byId[flightId].times.takeoff.slice(2, 4);
+        startOffset += state.settings.minutesBriefToTakeoff * 60000;
     } else {
         startTimeHr = '00';
         startTimeMn = '00';
         startOffset = 0;
     }
-    if (R_24HourTime.test(state.flights.byId[flightId].times.land)) {
-        const endTimeHr = state.flights.byId[flightId].times.land.slice(0,2);
-        const endTimeMn = state.flights.byId[flightId].times.land.slice(2,4);
+    if (RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.land)) {
+        endTimeHr = state.flights.byId[flightId].times.land.slice(0, 2);
+        endTimeMn = state.flights.byId[flightId].times.land.slice(2, 4);
     } else {
         startTimeHr = '23';
         startTimeMn = '59';
@@ -203,13 +233,13 @@ const getSchedFromFlightTimes = (
 };
 
 const getSchedFromNotes = (
-    activeAircrewRefs: ISchedBlock,
+    activeAircrewRefs: ISchedObject,
     state: IState,
     noteId: string,
     aircrewId: string,
     flightNote: boolean = false,
     flightId: string = ''
-): ISchedBlock => {
+): ISchedObject => {
     /**
      * Gets referenced aircrew start and end times from notes.
      * @param {ISchedBlock} activeAircrewRefs The working dict of refed aircrew and their scheduled times.
@@ -224,31 +254,37 @@ const getSchedFromNotes = (
      * If no land time, uses stardard note duration (default 60 min).
      * If times aren't specified, uses flight times in the same way as above.
      * If flightNote is false, skips using flight times, defaults to length.
+     *
+     * NEEDS:
+     * state.notes
+     * state.flights
+     * state.settings
+     * state.crewListUI.currentDay
      */
-    const noteTimes = R_startsWithTimeBlock.exec(state.notes.byId[noteId].content);
-    let startTimeHr, stateTimeMn, endTimeHr, endTimeMn;
+    const noteTimes = RGX_STARTS_WITH_TIME_BLOCK.exec(state.notes.byId[noteId].content);
+    let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
     let endOffset = 0;
     if (noteTimes) {
-        startTimeHr = noteTimes[1].slice(0,2);
-        startTimeMn = noteTimes[1].slice(2,4);
+        startTimeHr = noteTimes[1].slice(0, 2);
+        startTimeMn = noteTimes[1].slice(2, 4);
         if (noteTimes[2]) {
-            endTimeHr = noteTimes[2].slice(0,2);
-            endTimeMn = noteTimes[2].slice(2,4);
-        } else if (flightNote && R_24HourTime.test(state.flights.byId[flightId].times.land)) {
-            endTimeHr = state.flights.byId[flightId].times.land.slice(0,2);
-            endTimeMn = state.flights.byId[flightId].times.land.slice(2,4);
+            endTimeHr = noteTimes[2].slice(0, 2);
+            endTimeMn = noteTimes[2].slice(2, 4);
+        } else if (flightNote && RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.land)) {
+            endTimeHr = state.flights.byId[flightId].times.land.slice(0, 2);
+            endTimeMn = state.flights.byId[flightId].times.land.slice(2, 4);
         } else {
-            endOffset = state.settings.minutesNoteDuration*60000;
+            endOffset = state.settings.minutesNoteDuration * 60000;
         }
         const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000`);
         const endDate = endOffset === 0 ?
             new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000`) :
-            new Date(startDate.getTime + state.settings.minutesNoteDuration);
+            new Date(startDate.getTime() + state.settings.minutesNoteDuration);
         const schedBlock = {
             start: startDate,
             end: endDate,
             location: flightNote ? errorLocs.FLIGHT_NOTE : errorLocs.DAY_NOTE,
-            locationId: flightNote ? flightId : state.crewListUI.dayId,
+            locationId: flightNote ? flightId : state.crewListUI.currentDay,
         };
         activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
             [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
@@ -260,7 +296,7 @@ const getSchedFromNotes = (
                 start: new Date(`${state.crewListUI.currentDay}T00:00:00.000`),
                 end: new Date(`${state.crewListUI.currentDay}T23:59:00.000`),
                 location: flightNote ? errorLocs.FLIGHT_NOTE : errorLocs.DAY_NOTE,
-                locationId: flightNote ? flightId : state.crewListUI.dayId,
+                locationId: flightNote ? flightId : state.crewListUI.currentDay,
             };
             activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
                 [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
@@ -269,11 +305,11 @@ const getSchedFromNotes = (
     return activeAircrewRefs;
 };
 
-const getActiveAircrewRefs = (state: IState): ISchedBlock => {
+const getActiveAircrewRefs = (state: IState): ISchedObject => {
     /**
      * @param {IState} state The application state (store.getState())
      * @returns {object} keyed by aircrewId with values set to an array of the timespans associated with each ref
-     * This checks all the places aircrew Ids can be referenced in the current day, aggregates them into an object and 
+     * This checks all the places aircrew Ids can be referenced in the current day, aggregates them into an object and
      * includes the times they are scheduled for, so we can check for conflicts in another function.
      * Looks for names in:
      * state.days.byId[currentDay].flights (to find flights)
@@ -282,7 +318,13 @@ const getActiveAircrewRefs = (state: IState): ISchedBlock => {
      *  for each state.flights.byId[fligthId].notes (to find flight notes)
      * state.days.byId[currentDay].notes (to find day notes)
      * state.notes.byId[.allIds] (to read the notes)
-     * 
+     * NEEDS:
+     * state.crewListUI.currentDay
+     * state.days
+     * state.flights
+     * state.sorties
+     * state.notes
+     *
      * Optimization: as it is, this will run EVERY TIME THE STATE CHANGES, even if memoized.
      * For sure, just passing the needed slices will make the app faster. That way, for example, if crewList is
      * updated, this won't recalc. As of now, it will. However...
@@ -293,11 +335,11 @@ const getActiveAircrewRefs = (state: IState): ISchedBlock => {
      * change, we don't have to recompute all the other ones, but we'd still have to go all the way through flight
      * Notes...
      */
-    const activeAircrewRefs = {};
+    let activeAircrewRefs = {};
     state.days.byId[state.crewListUI.currentDay].flights.forEach(flightId => {
         state.flights.byId[flightId].sorties.forEach(sortieId => {
             seats.forEach(seat => {
-                state.sorties.byId[sortieId][seat].aircrewRefIds.forEach(aircrewId => {
+                state.sorties.byId[sortieId][seat].aircrewRefIds.forEach((aircrewId: string) => {
                     /** Get all the referenced aircrew from sorties in the current day */
                     activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
                 });
@@ -324,72 +366,85 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
      * @param {IAircrew[]} aircrewList Array containing full list of aircrew objects.
      * @param {string} inputValue The actual value of the input field
      * @returns {IAircrew[]} Array of aircrew objects with name fields tha match the input
-     * 
+     *
      * Finds the aircrew that are referenced in this input.
-     * 
+     *
      * Should I use first or even last name? First is not likely to be unique. Maybe if I had a way to suggest name
      * matches instead of assume a match. Also, first and last can be ''. I'd have to check for that first. I think
-     * includes would return true 
-     * 
+     * includes would return true
+     *
      * This is its own function because I think this will become more complex later.
      */
     return aircrewList.filter(aircrew => inputValue.includes(aircrew.callsign));
 };
 
-const getOnChangeWithNameMatch = ({
-    state: IState,
-    aircrewList: IAircrew[],
-    aircrewRefList: IAircrew[],
-    dispatch: any,
-    ownProps: IFlexInputContainerProps
-    oldErrors: IErrors[],
-}): ((e: any) => any) => {
-    /** 
-     * @param {function} dispatch
-     * @param {IFlexInputContainerProps} ownProps Props passed to this container
+interface IGetOnChangeWithNameMatchArgs {
+    state: IState;
+    aircrewList: IAircrew[];
+    dispatch: any;
+    ownProps: IFlexInputContainerProps;
+    oldErrors: IErrors[];
+}
+
+const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any) => any) => {
+    /**
+     * @param {object}
      * @returns {function} If addNameIdTo is specified, returns updated onChange function.
      * It wraps the onChange function passed and:
-     * compares the value being updated with all the aircrew names
+     * clears the old errors,
+     * compares the value being updated with all the aircrew names,
+     * finds scheduling conflicts and dispatches appropriate errors,
      * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
      */
-    if (!ownProps.addNameIdTo) {
+    const { state, aircrewList, dispatch, ownProps, oldErrors } = args;
+    const addNameIdTo = ownProps.addNameIdTo;
+    if (!addNameIdTo) {
         return ownProps.onChange;
-        // locationSpecificDispatch = (matchedAircrewIds: string[]) => {return;}
     }
-    let locationSpecificDispatch;
-    switch (ownProps.addNameIdTo.nameLocation) {
+    let locationSpecificDispatch: (ids: string[]) => void;
+    switch (addNameIdTo.nameLocation) {
         case nameLocation.FRONT_SEAT:
             locationSpecificDispatch = (matchedAircrewIds: string[]) => {
-                dispatch(actions.updateSeatCrewRefs(ownProps.addNameIdTo.entityId, 'front', matchedAircrewIds));
+                dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'front', matchedAircrewIds));
             };
         case nameLocation.BACK_SEAT:
             locationSpecificDispatch = (matchedAircrewIds: string[]) => {
-                dispatch(actions.updateSeatCrewRefs(ownProps.addNameIdTo.entityId, 'back', matchedAircrewIds));
+                dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'back', matchedAircrewIds));
             };
         case nameLocation.NOTE:
             locationSpecificDispatch = (matchedAircrewIds: string[]) => {
-                dispatch(actions.(ownProps.addNameIdTo.entityId, matchedAircrewIds));
+                dispatch(actions.updateNoteCrewRefs(addNameIdTo.entityId, matchedAircrewIds));
             };
         default:
-            locationSpecificDispatch = (matchedAircrewIds: string[]) => {return;}
+            locationSpecificDispatch = (matchedAircrewIds: string[]) => { return; };
     }
     return (e) => {
+        /** update the aircrewRefs state for this input */
         const matchedAircrewIds = nameMatch(aircrewList, e.target.value).map(aircrew => aircrew.id);
         locationSpecificDispatch(matchedAircrewIds);
         /** the input changed, clear the old errors */
         oldErrors.forEach(error => {
-            if (error.type === errorTypes.SCHEDULE_CONFLICT)
-                dispatch(clearError(error.id, state.crewListUI.currentDay));
+            if (error.type === errorTypes.SCHEDULE_CONFLICT) {
+                dispatch(actions.clearError(error.id, state.crewListUI.currentDay));
+            }
         });
-        const errors = matchedAircrewIds.length > 0 ? getSchedErrors(state, matchedAircrewIds) : [];
-        errors.forEach(error => {
+        /** get the new scheds conflict errors and dispatch to state. If no match aircrew, don't check for errors */
+        const newErrors = matchedAircrewIds.length > 0 ? findSchedErrors(state, matchedAircrewIds) : [];
+        newErrors.forEach(error => {
             dispatch(actions.addError(error));
-        };
-        /** How do I clear errors here? */
+        });
+        /** run the original onChange passed to this container as a prop (update the input value) */
         ownProps.onChange(e);
     };
 };
+
+interface IFlexInputStateProps {
+    aircrewList: IAircrew[];
+    aircrewRefList: IAircrew[];
+    state: IState;
+    schedErrors: IErrors[];
+}
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
     const aircrewRefList = getAircrewRefList(state, ownProps.addNameIdTo);
@@ -399,39 +454,40 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
         aircrewRefList,
         state,
-        errors: getErrors(state.errors, aircrewRefList.map(aircrew => aircrew.id)), // and combine them all here
+        schedErrors: getSchedErrors(getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]),
+                                    aircrewRefList.map(aircrew => aircrew.id)),
     };
 };
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => {
+const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownProps: IFlexInputContainerProps) => {
     /**
      * Necessary because I need a slice of the state in the dispatch I'm wrapping here. Specifically, depending on
      * ownProps.addNameIdTo, I'm comparing the input value (about to be dispatched by ownProps.onChange) to all the
      * other aircrew (the state I need) to see if there are matches and dispatching to update the state with the
      * referenced aircrewIds if there are.
-     * 
+     *
      * @property onChange The wrapped version overwrites the one passed to this container.
      * @property aircrewRefList is the list of aircrew objects whose Ids are refed in this component (in the future,
      * this will affect display at the presentational component level).
-     * 
+     *
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
     return Object.assign({}, ownProps, {
         onChange: getOnChangeWithNameMatch({
             state: stateProps.state,
             aircrewList: stateProps.aircrewList,
-            aircrewRefList: stateProps.aircrewRefList
             dispatch: dispatchProps.dispatch,
             ownProps: ownProps,
-            oldErrors: stateProps.errors,
+            oldErrors: stateProps.schedErrors,
         }),
+        schedErrors: stateProps.schedErrors,
         aircrewRefList: stateProps.aircrewRefList,
     });
 };
 
 const FlexInputContainer = connect(
     mapStateToProps,
-    ((dispatch) => {dispatch}),
+    ((dispatch) => { return { dispatch: dispatch }; }),
     mergeProps
 )(FlexInput);
 

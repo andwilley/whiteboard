@@ -3,7 +3,7 @@ import Aircrew from './Aircrew';
 import AddButton from '../components/AddButton';
 import DelButton from '../components/DelButton';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
-import { ERR_NO_RESULTS_FOUND } from '../errors';
+import { errorMessages } from '../errors';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 
 interface ICrewListProps {
@@ -55,11 +55,11 @@ const CrewList: React.SFC<ICrewListProps> = ({
         <div>
             <h3>Pilots</h3>
             <ul>
-                {pilotList.length > 0 ? pilotList : ERR_NO_RESULTS_FOUND}
+                {pilotList.length > 0 ? pilotList : errorMessages.ERR_NO_RESULTS_FOUND}
             </ul>
             <h3>WSOs</h3>
             <ul>
-                {wsoList.length > 0 ? wsoList : ERR_NO_RESULTS_FOUND}
+                {wsoList.length > 0 ? wsoList : errorMessages.ERR_NO_RESULTS_FOUND}
             </ul>
             {formDisplayButton}
         </div>

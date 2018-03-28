@@ -218,7 +218,7 @@ export const INITIAL_STATE = {
     errors: {
         byId: {},
         activeIds: [],
-        inactiveIds: [],
+        allIds: [],
     },
     addUpdateAircrewFormValues: {
         id: '',
@@ -234,5 +234,6 @@ export const INITIAL_STATE = {
         minutesAfterLand: 60,
         minutesBeforeBrief: 60,
         minutesBriefToTakeoff: 120,
+        minutesNoteDuration: 60,
     },
 };

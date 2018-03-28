@@ -113,7 +113,7 @@ export interface IUpdateAirspace {
     input: string;
 }
 
-interface IAddErrorArgs {
+export interface IAddErrorArgs {
     dayId: string;
     type: string;
     location: string;
@@ -328,7 +328,8 @@ export const actions = {
             name: args.name,
         },
     })),
-    updateSeatCrewRefs: createAction(UPDATE_SEAT_CREW_REFS, (sortieId: string, crewPosition: string, aircrewIds: string[]) => ({
+    updateSeatCrewRefs: createAction(UPDATE_SEAT_CREW_REFS,
+      (sortieId: string, crewPosition: string, aircrewIds: string[]) => ({
         type: UPDATE_SEAT_CREW_REFS,
         payload: {
             sortieId,
@@ -465,7 +466,7 @@ export const actions = {
             errorId,
         },
         meta: {
-            timeHiddenToggled: new Date();
+            timeHiddenToggled: new Date(),
         },
     })),
     clearError: createAction(CLEAR_ERROR, (errorId: string, dayId: string) => ({
@@ -475,8 +476,8 @@ export const actions = {
             dayId,
         },
         meta: {
-            timeInactive: new Date();
-        }
+            timeInactive: new Date(),
+        },
     })),
     delError: createAction(DEL_ERROR, (errorId: string, dayId: string) => ({
         type: DEL_ERROR,

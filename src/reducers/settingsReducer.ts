@@ -1,4 +1,3 @@
-import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { ISettings } from '../types/State';
 import { actions, IAction } from '../actions';
@@ -11,6 +10,7 @@ const settingsReducer = (state = {
                          },
                          action: IAction): ISettings => {
     switch (action.type) {
+        case getType(actions.addDay): // filler
         default:
             return state;
     }
