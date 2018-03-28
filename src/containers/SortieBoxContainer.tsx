@@ -1,29 +1,32 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { IState } from '../types/State';
+import { IState, ISorties } from '../types/State';
 import SortieBox from '../components/SortieBox';
 const { addSortie } = actions;
 
-interface SortieBoxContainerProps {
+interface ISortieBoxContainerProps {
     flightId: string;
 }
 
-const getSortieIds = (state: IState, flightId: string): string[] => {
+const getSorties = (state: IState, flightId: string): ISorties[] => {
     // slices of the state this needs for future optimization reference:
     // state.flights.allIds
-    return state.flights.byId[flightId].sorties;
+    state.flights.byId[flightId].sorties.map(sortieId => {
+        console.log(`sortie: ${state.sorties.byId[sortieId]}`); return;
+    });
+    return state.flights.byId[flightId].sorties.map(sortieId => state.sorties.byId[sortieId]);
 };
 
-const mapStateToProps = (state: IState, ownProps: SortieBoxContainerProps) => {
+const mapStateToProps = (state: IState, ownProps: ISortieBoxContainerProps) => {
     return {
-        sortieIds: getSortieIds(state, ownProps.flightId),
+        sorties: getSorties(state, ownProps.flightId),
     };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: any, ownProps: ISortieBoxContainerProps) => {
     return {
-        onAddSortieClick: (flightId: string) => {
-            dispatch(addSortie(flightId));
+        onAddSortieClick: () => {
+            dispatch(addSortie(ownProps.flightId));
         },
     };
 };

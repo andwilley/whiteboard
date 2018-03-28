@@ -1,20 +1,21 @@
 import * as React from 'react';
 import Sortie from './Sortie';
+import { ISorties } from '../types/State';
 import AddButton from './AddButton';
 
 interface ISortieBoxProps {
     flightId: string;
     sorties: ISorties[];
-    onAddSortieClick: (flightId: string) => void;
+    onAddSortieClick: () => void;
 }
 
 const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieClick }) => {
-    const sortieComponents = sorties.map(id => (<Sortie key={id} sortie={sortie} />));
+    const sortieComponents = sorties.map(sortie => (<Sortie key={sortie.id} sortie={sortie} />));
     return (
         <div>
             {sortieComponents}
             <AddButton
-                onClick={() => onAddSortieClick(flightId)}
+                onClick={() => onAddSortieClick()}
             />
         </div>
     );

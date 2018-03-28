@@ -56,7 +56,7 @@ const flightsById = (state = {}, action: IAction) => {
                 ...state,
                 [action.payload.flightId]: {
                     ...state[action.payload.flightId],
-                    sorties: state[action.payload.flightId].sorties.concat(action.payload.id),
+                    sorties: state[action.payload.flightId].sorties.concat(action.payload.sortieId),
                 },
             };
         case getType(actions.delSortie):

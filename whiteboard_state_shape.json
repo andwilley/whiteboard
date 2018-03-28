@@ -409,15 +409,16 @@ App
 					//	End
 					//	AddButton(airspace)
 				SortieBox - *container
-					Sortie - *container
-						CodeBox
-							Codes
+					Sortie
+						LoadoutBox - *container
 							Loadout
-						CrewBox
+						CrewBox - *container
 							Crew
-								Symbols
+							Codes
+							Symbols
 							Crew
-								Symbols
+							Codes
+							Symbols
 					AddButton(sortie)
 					Errors(sortie) - *container
 				FlightNoteBox - *container

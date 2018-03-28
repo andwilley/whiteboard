@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Symbols from './Symbols';
 
 interface ICrewBoxProps {
     pilot: string;
@@ -22,13 +21,13 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbol
             type="text"
             placeholder="Pilot Codes"
             name="crew"
-            value={pilot}
+            value={pilotCodes}
         />
         <input
             type="text"
             placeholder="Pilot Symbols"
             name="crew"
-            value={pilot}
+            value={pilotSymbols}
         />
         <input
             type="text"
@@ -40,13 +39,13 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbol
             type="text"
             placeholder="WSO Codes"
             name="crew"
-            value={pilot}
+            value={wsoCodes}
         />
         <input
             type="text"
             placeholder="WSO Symbols"
             name="crew"
-            value={pilot}
+            value={wsoSymbols}
         />
     </div>
 );

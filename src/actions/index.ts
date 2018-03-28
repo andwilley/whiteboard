@@ -302,6 +302,11 @@ export const actions = {
         },
     })),
     addSortie: createAction(ADD_SORTIE, (flightId: string) => {
+        /**
+         * adds sortie entity to sorties.byId
+         * adds sortieId to sorties.allIds
+         * adds sortieId to flights.byId[flightId].sorties
+         */
         const sortieId = cuid();
         // testSortieId++;
         // const sortieId = testSortieId;

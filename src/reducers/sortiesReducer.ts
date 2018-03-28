@@ -13,13 +13,13 @@ const sortiesById = (state = {}, action: IAction) => {
                     id: action.payload.sortieId,
                     front: {
                         inputName: '',
-                        aircrewRefId: null,
+                        aircrewRefIds: [],
                         codes: [],
                         symbols: [],
                     },
                     back: {
                         inputName: '',
-                        aircrewRefId: null,
+                        aircrewRefIds: [],
                         codes: [],
                         symbols: [],
                     },
