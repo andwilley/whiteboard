@@ -3,12 +3,14 @@ import Symbols from './Symbols';
 
 interface ICrewBoxProps {
     pilot: string;
+    pilotCodes: string;
     pilotSymbols: string;
     wso: string;
+    wsoCodes: string;
     wsoSymbols: string;
 }
 
-const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbols }) => (
+const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbols, pilotCodes, wsoCodes }) => (
     <div>
         <input
             type="text"
@@ -16,9 +18,17 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbol
             name="crew"
             value={pilot}
         />
-        <Symbols
-            symbols={pilotSymbols}
-            seat="pilot"
+        <input
+            type="text"
+            placeholder="Pilot Codes"
+            name="crew"
+            value={pilot}
+        />
+        <input
+            type="text"
+            placeholder="Pilot Symbols"
+            name="crew"
+            value={pilot}
         />
         <input
             type="text"
@@ -26,9 +36,17 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ pilot, wso, pilotSymbols, wsoSymbol
             name="crew"
             value={wso}
         />
-        <Symbols
-            symbols={wsoSymbols}
-            seat="wso"
+        <input
+            type="text"
+            placeholder="WSO Codes"
+            name="crew"
+            value={pilot}
+        />
+        <input
+            type="text"
+            placeholder="WSO Symbols"
+            name="crew"
+            value={pilot}
         />
     </div>
 );

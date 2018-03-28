@@ -1,6 +1,6 @@
 import * as React from 'react';
 import TimesBox from './TimesBox';
-import SortieBox from './SortieBox';
+import SortieBoxContainer from '../containers/SortieBoxContainer';
 import FlightNoteBox from './FlightNoteBox';
 
 interface IFlightProps {
@@ -13,7 +13,7 @@ const Flight: React.SFC<IFlightProps> = ({ flightId }) => (
         <TimesBox
             flightId={flightId}
         />
-        <SortieBox />
+        <SortieBoxContainer flightId={flightId} />
         <FlightNoteBox />
     </div>
 );
