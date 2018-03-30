@@ -117,12 +117,12 @@ export const INITIAL_STATE = {
             a: {
                 id: 'a',
                 content: 'test flight note',
-                aircrewRefIds: ['a', 'b', 'c'],
+                aircrewRefIds: [],
             },
             b: {
                 id: 'b',
                 content: 'test day note',
-                aircrewRefIds: ['a', 'b', 'c'],
+                aircrewRefIds: [],
             },
         },
         allIds: ['a', 'b'],
@@ -144,13 +144,13 @@ export const INITIAL_STATE = {
                 id: 'a',
                 front: {
                     inputName: '',
-                    aircrewRefIds: ['a'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    aircrewRefIds: ['b'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },
@@ -161,13 +161,13 @@ export const INITIAL_STATE = {
                 id: 'b',
                 front: {
                     inputName: '',
-                    aircrewRefIds: ['a'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    aircrewRefIds: ['b'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },
@@ -178,13 +178,13 @@ export const INITIAL_STATE = {
                 id: 'c',
                 front: {
                     inputName: '',
-                    aircrewRefIds: ['c'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    aircrewRefIds: ['a'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },
@@ -195,13 +195,13 @@ export const INITIAL_STATE = {
                 id: 'd',
                 front: {
                     inputName: '',
-                    aircrewRefIds: ['c'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },
                 back: {
                     inputName: '',
-                    aircrewRefIds: ['a'],
+                    aircrewRefIds: [],
                     codes: [],
                     symbols: [],
                 },

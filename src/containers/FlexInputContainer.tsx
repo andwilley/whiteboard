@@ -215,8 +215,8 @@ const getSchedFromFlightTimes = (
         endTimeHr = state.flights.byId[flightId].times.land.slice(0, 2);
         endTimeMn = state.flights.byId[flightId].times.land.slice(2, 4);
     } else {
-        startTimeHr = '23';
-        startTimeMn = '59';
+        endTimeHr = '23';
+        endTimeMn = '59';
         endOffset = 0;
     }
     const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000`);
@@ -396,6 +396,8 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
      * finds scheduling conflicts and dispatches appropriate errors,
      * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
+     *
+     * Optimization: obviously I should not be passing state to this function.
      */
     const { state, aircrewList, dispatch, ownProps, oldErrors } = args;
     const addNameIdTo = ownProps.addNameIdTo;
@@ -408,16 +410,20 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
             locationSpecificDispatch = (matchedAircrewIds: string[]) => {
                 dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'front', matchedAircrewIds));
             };
+            break;
         case nameLocation.BACK_SEAT:
             locationSpecificDispatch = (matchedAircrewIds: string[]) => {
                 dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'back', matchedAircrewIds));
             };
+            break;
         case nameLocation.NOTE:
             locationSpecificDispatch = (matchedAircrewIds: string[]) => {
                 dispatch(actions.updateNoteCrewRefs(addNameIdTo.entityId, matchedAircrewIds));
             };
+            break;
         default:
             locationSpecificDispatch = (matchedAircrewIds: string[]) => { return; };
+            break;
     }
     return (e) => {
         /** update the aircrewRefs state for this input */

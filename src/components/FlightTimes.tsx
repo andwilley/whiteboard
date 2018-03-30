@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { IFlightTimes } from '../types/State';
-import FlexInputContainer, { nameLocation } from '../containers/FlexInputContainer';
 
 interface IFlightTimesProps {
     times: IFlightTimes;
@@ -33,13 +32,13 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
     // }
     return (
         <form>
-            <FlexInputContainer
-                placeHolder="Brief Time"
+            <input
+                type="text"
+                placeholder="Brief Time"
                 name="flightTimes"
                 value={times.brief}
-                onChange={(e: any) => onInputChange('brief', e.target.value)}
-                validators={['is24HourTime']}
-                addNameIdTo={{nameLocation: nameLocation.FRONT_SEAT, entityId: 'a'}}
+                style={{borderColor: timeIsValid.takeoff ? '' : 'orange'}}
+                onChange={(e) => onInputChange('brief', e.target.value)}
             />
             <input
                 type="text"
