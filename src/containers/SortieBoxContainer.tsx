@@ -11,9 +11,6 @@ interface ISortieBoxContainerProps {
 const getSorties = (state: IState, flightId: string): ISorties[] => {
     // slices of the state this needs for future optimization reference:
     // state.flights.allIds
-    state.flights.byId[flightId].sorties.map(sortieId => {
-        console.log(`sortie: ${state.sorties.byId[sortieId]}`); return;
-    });
     return state.flights.byId[flightId].sorties.map(sortieId => state.sorties.byId[sortieId]);
 };
 

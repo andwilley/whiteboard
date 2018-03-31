@@ -21,22 +21,26 @@ const getDayPucks = (state: IState): IAircrewDayPucks => {
   //    state.days.byId[~currentDay].notes
   // state.flights.byId
   // state.notes.byId
-  let crewId: number, eventType: string;
+  let crewIds: string[], eventType: string;
   const aircrewCurrentDayPucks = state.days.byId[state.crewListUI.currentDay].flights
     .reduce((flightPucks: any, flightId: string) => {
       eventType = state.flights.byId[flightId].sim ? 'sim' : 'flight';
       state.flights.byId[flightId].sorties.forEach((sortieId: string) => {
         seats.forEach(seat => {
-          crewId = state.sorties.byId[sortieId][seat].crewId;
-          flightPucks[crewId] = flightPucks[crewId] ?
-            {
-              ...flightPucks[crewId],
-              [eventType]: flightPucks[crewId][eventType] + 1,
-            } :
-            {
-              ...newPuck,
-              [eventType]: 1,
-            };
+          crewIds = state.sorties.byId[sortieId][seat].aircrewRefIds;
+          if (crewIds.length > 0) {
+            crewIds.forEach(crewId => {
+              flightPucks[crewId] = flightPucks[crewId] ?
+                {
+                  ...flightPucks[crewId],
+                  [eventType]: flightPucks[crewId][eventType] + 1,
+                } :
+                {
+                  ...newPuck,
+                  [eventType]: 1,
+                };
+            });
+          }
         });
       });
       state.flights.byId[flightId].notes.forEach((noteId: string) => {

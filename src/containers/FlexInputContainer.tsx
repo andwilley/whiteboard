@@ -378,6 +378,15 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
     return aircrewList.filter(aircrew => inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()));
 };
 
+const checkErrorsOnFreshState = (matchedAircrewIds: string[]) => {
+    return (dispatch: any, getState: () => IState) => {
+        const newErrors = matchedAircrewIds.length > 0 ? findSchedErrors(getState(), matchedAircrewIds) : [];
+        newErrors.forEach(error => {
+            dispatch(actions.addError(error));
+        });
+    };
+};
+
 interface IGetOnChangeWithNameMatchArgs {
     state: IState;
     aircrewList: IAircrew[];
@@ -436,10 +445,11 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
             }
         });
         /** get the new scheds conflict errors and dispatch to state. If no match aircrew, don't check for errors */
-        const newErrors = matchedAircrewIds.length > 0 ? findSchedErrors(state, matchedAircrewIds) : [];
-        newErrors.forEach(error => {
-            dispatch(actions.addError(error));
-        });
+        dispatch(checkErrorsOnFreshState(matchedAircrewIds));
+        // const newErrors = matchedAircrewIds.length > 0 ? findSchedErrors(state, matchedAircrewIds) : [];
+        // newErrors.forEach(error => {
+        //     dispatch(actions.addError(error));
+        // });
         /** run the original onChange passed to this container as a prop (update the input value) */
         ownProps.onChange(e);
     };
