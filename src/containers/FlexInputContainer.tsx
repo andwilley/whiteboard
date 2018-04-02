@@ -413,31 +413,31 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
     if (!addNameIdTo) {
         return ownProps.onChange;
     }
-    let locationSpecificDispatch: (ids: string[]) => void;
+    let aircrewRefIdDispatch: (ids: string[]) => void;
     switch (addNameIdTo.nameLocation) {
         case nameLocation.FRONT_SEAT:
-            locationSpecificDispatch = (matchedAircrewIds: string[]) => {
+            aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
                 dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'front', matchedAircrewIds));
             };
             break;
         case nameLocation.BACK_SEAT:
-            locationSpecificDispatch = (matchedAircrewIds: string[]) => {
+            aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
                 dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'back', matchedAircrewIds));
             };
             break;
         case nameLocation.NOTE:
-            locationSpecificDispatch = (matchedAircrewIds: string[]) => {
+            aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
                 dispatch(actions.updateNoteCrewRefs(addNameIdTo.entityId, matchedAircrewIds));
             };
             break;
         default:
-            locationSpecificDispatch = (matchedAircrewIds: string[]) => { return; };
+            aircrewRefIdDispatch = (matchedAircrewIds: string[]) => { return; };
             break;
     }
     return (e) => {
         /** update the aircrewRefs state for this input */
         const matchedAircrewIds = nameMatch(aircrewList, e.target.value).map(aircrew => aircrew.id);
-        locationSpecificDispatch(matchedAircrewIds);
+        aircrewRefIdDispatch(matchedAircrewIds);
         /** the input changed, clear the old errors */
         oldErrors.forEach(error => {
             if (error.type === errorTypes.SCHEDULE_CONFLICT) {
