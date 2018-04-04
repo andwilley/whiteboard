@@ -8,7 +8,7 @@ export const errorLevels = {
 
 // error types
 export const errorTypes = {
-    FORM_VAL_ERROR: 'FORM_VAL_ERROR',
+    FORM_VALIDATION: 'FORM_VALIDATION',
     SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT',
 };
 
