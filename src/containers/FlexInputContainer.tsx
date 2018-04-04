@@ -30,6 +30,10 @@ interface IFlexInputContainerProps {
     name: string;
     value: string;
     onChange: (e: any) => any;
+    errorTypes: {
+        update: string[];
+        show: string[];
+    };
     validators?: string[];
     addNameIdTo?: {nameLocation: string; entityId: string};
 }
@@ -79,6 +83,17 @@ const getAircrewRefList = (state: IState,
         default:
             return [];
     }
+};
+
+const getComponentErrors = (dayErrors: IErrors[],
+                            aircrewRefIds: string[],
+                            errorTypesToGet: {update: string[]; show: string[]}
+): IErrors[] => {
+    /**
+     * Should collect all the errors specified in errorsTypes in ownProps.
+     */
+    const schedErrors = getSchedErrors(dayErrors, aircrewRefIds);
+    return [...schedErrors];
 };
 
 const getDayErrors = (errorsById: { [id: string]: IErrors }, currentDay: IDays): IErrors[] => {
@@ -459,19 +474,20 @@ interface IFlexInputStateProps {
     aircrewList: IAircrew[];
     aircrewRefList: IAircrew[];
     state: IState;
-    schedErrors: IErrors[];
+    errors: IErrors[];
 }
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
     const aircrewRefList = getAircrewRefList(state, ownProps.addNameIdTo);
-    // I should do getErrors here
     // and getValErrors here
+    const dayErrors = getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
+    const componentErrors = getComponentErrors(dayErrors,
+                                               aircrewRefList.map(aircrew => aircrew.id), ownProps.errorTypes);
     return {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
         aircrewRefList,
         state,
-        schedErrors: getSchedErrors(getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]),
-                                    aircrewRefList.map(aircrew => aircrew.id)),
+        errors: componentErrors,
     };
 };
 
@@ -494,16 +510,16 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             aircrewList: stateProps.aircrewList,
             dispatch: dispatchProps.dispatch,
             ownProps: ownProps,
-            oldErrors: stateProps.schedErrors,
+            oldErrors: stateProps.errors,
         }),
-        schedErrors: stateProps.schedErrors,
+        errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,
     });
 };
 
 const FlexInputContainer = connect(
     mapStateToProps,
-    ((dispatch) => { return { dispatch: dispatch }; }),
+    ((dispatch: any) => { return { dispatch: dispatch }; }),
     mergeProps
 )(FlexInput);
 
