@@ -7,7 +7,7 @@ interface IFlexInputProps {
     value: string;
     onChange: (e: any) => any;
     aircrewRefList: IAircrew[];
-    schedErrors?: IErrors[];
+    errors: IErrors[];
 }
 
 const FlexInput: React.SFC<IFlexInputProps> = ({
@@ -16,11 +16,11 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     value,
     onChange,
     aircrewRefList,
-    schedErrors = [],
+    errors = [],
 }) => {
     // const valResults = validator(validators, value);
     // const formErrors = [...valResults, ...errors].filter(error => error !== null);
-    const errorComponents = schedErrors.map(error =>
+    const errorComponents = errors.map(error =>
         (
             <span
                 key={error.id}

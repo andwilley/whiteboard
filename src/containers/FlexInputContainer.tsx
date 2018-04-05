@@ -66,9 +66,9 @@ const getAircrewRefList = (state: IState,
      * display as required.
      *
      * State it needs:
-     * state.aircrew.byId
-     * state.sorties.byId
-     * state.notes.byId
+     * state.aircrew.byId[addNameIdTo.entityId]
+     * state.sorties.byId[addNameIdTo.entityId]
+     * state.notes.byId[addNameIdTo.entityId]
      */
     if (!addNameIdTo) {
         return [];
@@ -90,9 +90,15 @@ const getComponentErrors = (dayErrors: IErrors[],
                             errorTypesToGet: {update: string[]; show: string[]}
 ): IErrors[] => {
     /**
-     * Should collect all the errors specified in errorsTypes in ownProps.
+     * Should collect all the errors specified in errorsTypes from ownProps.
+     * Right now, there is only one error type.
+     * Have to get both update and show errors. show errors obviously to show them in the component.
+     * update errors because when onChange is dispatched, it needs to know about the errors this
+     * component should update.
      */
-    const schedErrors = getSchedErrors(dayErrors, aircrewRefIds);
+    const schedErrors = errorTypesToGet.update.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ||
+                        errorTypesToGet.show.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ?
+                        getSchedErrors(dayErrors, aircrewRefIds) : [];
     return [...schedErrors];
 };
 
@@ -112,7 +118,7 @@ const getSchedErrors = (dayErrors: IErrors[], aircrewRefIds: string[]): IErrors[
      * @param
      * @param
      * @returns {IErrors[]} an array of errors that apply to this input.
-     * Finds the active errors with any of aircrewRefIds in the meta.
+     * Finds the active errors with any of aircrewRefIds for this input in the meta.
      * Also runs the val??? Might screw with memoization.
      */
     const schedErrors = aircrewRefIds.length > 0 ? dayErrors.filter(error => {
@@ -479,10 +485,10 @@ interface IFlexInputStateProps {
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
     const aircrewRefList = getAircrewRefList(state, ownProps.addNameIdTo);
-    // and getValErrors here
+    const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
+    // and getValErrors here?
     const dayErrors = getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
-    const componentErrors = getComponentErrors(dayErrors,
-                                               aircrewRefList.map(aircrew => aircrew.id), ownProps.errorTypes);
+    const componentErrors = getComponentErrors(dayErrors, aircrewRefIds, ownProps.errorTypes);
     return {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
         aircrewRefList,
