@@ -10,6 +10,7 @@ export const errorLevels = {
 export const errorTypes = {
     FORM_VALIDATION: 'FORM_VALIDATION',
     SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT',
+    FORM_VAL_ERROR: 'FORM_VAL_ERROR',
 };
 
 // error messages

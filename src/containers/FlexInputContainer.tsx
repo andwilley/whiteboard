@@ -30,10 +30,7 @@ interface IFlexInputContainerProps {
     name: string;
     value: string;
     onChange: (e: any) => any;
-    errorTypes: {
-        update: string[];
-        show: string[];
-    };
+    errorTypes: string[];
     validators?: string[];
     addNameIdTo?: {nameLocation: string; entityId: string};
 }
@@ -87,17 +84,14 @@ const getAircrewRefList = (state: IState,
 
 const getComponentErrors = (dayErrors: IErrors[],
                             aircrewRefIds: string[],
-                            errorTypesToGet: {update: string[]; show: string[]}
+                            errorTypesToGet: string[]
 ): IErrors[] => {
     /**
-     * Should collect all the errors specified in errorsTypes from ownProps.
+     * Should collect all the errors specified in errorsTypes.show from ownProps.
      * Right now, there is only one error type.
-     * Have to get both update and show errors. show errors obviously to show them in the component.
-     * update errors because when onChange is dispatched, it needs to know about the errors this
-     * component should update.
+     * Passes shown errors to component
      */
-    const schedErrors = errorTypesToGet.update.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ||
-                        errorTypesToGet.show.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ?
+    const schedErrors = errorTypesToGet.length > -1 ?
                         getSchedErrors(dayErrors, aircrewRefIds) : [];
     return [...schedErrors];
 };
@@ -399,9 +393,16 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
     return aircrewList.filter(aircrew => inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()));
 };
 
-const checkErrorsOnFreshState = (matchedAircrewIds: string[]) => {
+const resetErrorsOnFreshState = (matchedAircrewIds: string[], oldErrors: IErrors[]) => {
     return (dispatch: any, getState: () => IState) => {
-        const newErrors = matchedAircrewIds.length > 0 ? findSchedErrors(getState(), matchedAircrewIds) : [];
+        const state = getState();
+        /** the input changed, clear the old errors */
+        oldErrors.forEach(error => {
+            if (error.type === errorTypes.SCHEDULE_CONFLICT) {
+                dispatch(actions.clearError(error.id, state.crewListUI.currentDay));
+            }
+        });
+        const newErrors = matchedAircrewIds.length > 0 ? findSchedErrors(state, matchedAircrewIds) : [];
         newErrors.forEach(error => {
             dispatch(actions.addError(error));
         });
@@ -409,7 +410,6 @@ const checkErrorsOnFreshState = (matchedAircrewIds: string[]) => {
 };
 
 interface IGetOnChangeWithNameMatchArgs {
-    state: IState;
     aircrewList: IAircrew[];
     dispatch: any;
     ownProps: IFlexInputContainerProps;
@@ -426,10 +426,8 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
      * finds scheduling conflicts and dispatches appropriate errors,
      * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
-     *
-     * Optimization: obviously I should not be passing state to this function.
      */
-    const { state, aircrewList, dispatch, ownProps, oldErrors } = args;
+    const { aircrewList, dispatch, ownProps, oldErrors } = args;
     const addNameIdTo = ownProps.addNameIdTo;
     if (!addNameIdTo) {
         return ownProps.onChange;
@@ -459,18 +457,8 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
         /** update the aircrewRefs state for this input */
         const matchedAircrewIds = nameMatch(aircrewList, e.target.value).map(aircrew => aircrew.id);
         aircrewRefIdDispatch(matchedAircrewIds);
-        /** the input changed, clear the old errors */
-        oldErrors.forEach(error => {
-            if (error.type === errorTypes.SCHEDULE_CONFLICT) {
-                dispatch(actions.clearError(error.id, state.crewListUI.currentDay));
-            }
-        });
         /** get the new scheds conflict errors and dispatch to state. If no match aircrew, don't check for errors */
-        dispatch(checkErrorsOnFreshState(matchedAircrewIds));
-        // const newErrors = matchedAircrewIds.length > 0 ? findSchedErrors(state, matchedAircrewIds) : [];
-        // newErrors.forEach(error => {
-        //     dispatch(actions.addError(error));
-        // });
+        dispatch(resetErrorsOnFreshState(matchedAircrewIds, oldErrors));
         /** run the original onChange passed to this container as a prop (update the input value) */
         ownProps.onChange(e);
     };
@@ -512,7 +500,6 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      */
     return Object.assign({}, ownProps, {
         onChange: getOnChangeWithNameMatch({
-            state: stateProps.state,
             aircrewList: stateProps.aircrewList,
             dispatch: dispatchProps.dispatch,
             ownProps: ownProps,
