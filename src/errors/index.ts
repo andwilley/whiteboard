@@ -26,5 +26,6 @@ export const errorLocs = {
     DAY: 'DAY',
     DAY_NOTE: 'DAY_NOTE',
     CREWLIST: 'CREWLIST',
+    SNIV: 'SNIV',
     APP: 'APP',
 };
