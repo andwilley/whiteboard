@@ -96,7 +96,7 @@ export interface IAddUpdateAircrewFormValues {
     readonly rank: number;
     readonly seat: string;
     readonly quals: string[];
-    existingAircrewUnchanged: boolean;
+    readonly existingAircrewUnchanged: boolean;
 }
 
 export interface IErrorMeta {

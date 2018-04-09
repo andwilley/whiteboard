@@ -30,7 +30,10 @@ interface IFlexInputContainerProps {
     name: string;
     value: string;
     onChange: (e: any) => any;
-    errorTypes: string[];
+    errorTypes: {
+        show: string[];
+        update: string[];
+    };
     validators?: string[];
     addNameIdTo?: {nameLocation: string; entityId: string};
 }
@@ -91,7 +94,7 @@ const getComponentErrors = (dayErrors: IErrors[],
      * Right now, there is only one error type.
      * Passes shown errors to component
      */
-    const schedErrors = errorTypesToGet.length > -1 ?
+    const schedErrors = errorTypesToGet.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ?
                         getSchedErrors(dayErrors, aircrewRefIds) : [];
     return [...schedErrors];
 };
@@ -101,9 +104,7 @@ const getDayErrors = (errorsById: { [id: string]: IErrors }, currentDay: IDays):
      * days.byId[currentDay].errors
      * state.errors.byId
      */
-    const dayErrors = currentDay.errors.map(errorId => {
-        return errorsById[errorId];
-    });
+    const dayErrors = currentDay.errors.map(errorId => errorsById[errorId]).filter(error => error.display);
     return dayErrors;
 };
 
@@ -429,7 +430,7 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
      * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
      */
-    const { aircrewList, dispatch, ownProps, errorTypesToCheck } = args;
+    const { aircrewList, dispatch, ownProps } = args;
     const addNameIdTo = ownProps.addNameIdTo;
     let aircrewRefIdDispatch: (ids: string[]) => void;
     if (!addNameIdTo) {
@@ -437,7 +438,9 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
     } else {
         switch (addNameIdTo.nameLocation) {
             case nameLocation.FRONT_SEAT:
-                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => { return; };
+                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
+                    dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'front', matchedAircrewIds));
+                };
                 break;
             case nameLocation.BACK_SEAT:
                 aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
@@ -458,10 +461,10 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
         /** update the aircrewRefs state for this input */
         const matchedAircrewIds = nameMatch(aircrewList, e.target.value).map(aircrew => aircrew.id);
         aircrewRefIdDispatch(matchedAircrewIds);
-        /** get the new errors and dispatch to state. */
-        dispatch(resetErrorsOnFreshState(errorTypesToCheck));
         /** run the original onChange passed to this container as a prop (update the input value) */
         ownProps.onChange(e);
+        /** get the new errors and dispatch to state. */
+        dispatch(resetErrorsOnFreshState(ownProps.errorTypes.update));
     };
 };
 
@@ -477,7 +480,7 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
     const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
     // and getValErrors here?
     const dayErrors = getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
-    const componentErrors = getComponentErrors(dayErrors, aircrewRefIds, ownProps.errorTypes);
+    const componentErrors = getComponentErrors(dayErrors, aircrewRefIds, ownProps.errorTypes.show);
     return {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
         aircrewRefList,
@@ -504,7 +507,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             aircrewList: stateProps.aircrewList,
             dispatch: dispatchProps.dispatch,
             ownProps: ownProps,
-            errorTypesToCheck: ownProps.errorTypes,
+            errorTypesToCheck: ownProps.errorTypes.update,
         }),
         errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,

@@ -22,7 +22,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, onInputChange }) => 
             name="pilot"
             value={sortieStrings.pilot}
             onChange={onInputChange}
-            errorTypes={[errorTypes.SCHEDULE_CONFLICT]}
+            errorTypes={{show: [errorTypes.SCHEDULE_CONFLICT], update: [errorTypes.SCHEDULE_CONFLICT]}}
             addNameIdTo={{nameLocation: nameLocation.FRONT_SEAT, entityId: sortieStrings.sortieId}}
         />
         <FlexInputContainer
@@ -30,21 +30,21 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, onInputChange }) => 
             name="pilotCodes"
             value={sortieStrings.pilotCodes}
             onChange={onInputChange}
-            errorTypes={[]}
+            errorTypes={{show: [], update: []}}
         />
         <FlexInputContainer
             placeHolder="Pilot Symbols"
             name="pilotSymbols"
             value={sortieStrings.pilotSymbols}
             onChange={onInputChange}
-            errorTypes={[]}
+            errorTypes={{show: [], update: []}}
         />
         <FlexInputContainer
             placeHolder="WSO"
             name="wso"
             value={sortieStrings.wso}
             onChange={onInputChange}
-            errorTypes={[errorTypes.SCHEDULE_CONFLICT]}
+            errorTypes={{show: [errorTypes.SCHEDULE_CONFLICT], update: [errorTypes.SCHEDULE_CONFLICT]}}
             addNameIdTo={{nameLocation: nameLocation.BACK_SEAT, entityId: sortieStrings.sortieId}}
         />
         <FlexInputContainer
@@ -52,14 +52,14 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, onInputChange }) => 
             name="wsoCodes"
             value={sortieStrings.wsoCodes}
             onChange={onInputChange}
-            errorTypes={[]}
+            errorTypes={{show: [], update: []}}
         />
         <FlexInputContainer
             placeHolder="WSO Symbols"
             name="wsoSymbols"
             value={sortieStrings.wsoSymbols}
             onChange={onInputChange}
-            errorTypes={[]}
+            errorTypes={{show: [], update: []}}
         />
     </div>
 );

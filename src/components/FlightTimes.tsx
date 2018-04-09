@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { IFlightTimes } from '../types/State';
+import { errorTypes } from '../errors';
+import FlexInputContainer from '../containers/FlexInputContainer';
 
 interface IFlightTimesProps {
     times: IFlightTimes;
@@ -32,12 +34,11 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
     // }
     return (
         <form>
-            <input
-                type="text"
-                placeholder="Brief Time"
+            <FlexInputContainer
+                placeHolder="Brief Time"
                 name="flightTimes"
                 value={times.brief}
-                style={{borderColor: timeIsValid.takeoff ? '' : 'orange'}}
+                errorTypes={{show: [], update: [errorTypes.SCHEDULE_CONFLICT]}}
                 onChange={(e) => onInputChange('brief', e.target.value)}
             />
             <input
