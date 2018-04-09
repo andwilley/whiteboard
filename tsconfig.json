@@ -27,6 +27,6 @@
     "src/setupTests.ts",
     "src/App.test.js",
     "src/App.test.ts",
-    "src/whiteboard_state_shape.json"
+    "src/whiteboard_state_shape.txt"
   ]
 }
