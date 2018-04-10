@@ -30,9 +30,11 @@ interface IFlexInputContainerProps {
     name: string;
     value: string;
     onChange: (e: any) => any;
-    errorTypes: {
+    errorConfig: {
         show: string[];
         update: string[];
+        errorLoc: string;
+        errorLocId: string;
     };
     validators?: string[];
     addNameIdTo?: {nameLocation: string; entityId: string};
@@ -85,9 +87,12 @@ const getAircrewRefList = (state: IState,
     }
 };
 
-const getComponentErrors = (dayErrors: IErrors[],
-                            aircrewRefIds: string[],
-                            errorTypesToGet: string[]
+const getComponentErrors = (
+    dayErrors: IErrors[],
+    errorLoc: string,
+    errorLocId: string,
+    errorTypesToGet: string[],
+    aircrewRefIds: string[]
 ): IErrors[] => {
     /**
      * Should collect all the errors specified in errorsTypes.show from ownProps.
@@ -95,7 +100,7 @@ const getComponentErrors = (dayErrors: IErrors[],
      * Passes shown errors to component
      */
     const schedErrors = errorTypesToGet.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ?
-                        getSchedErrors(dayErrors, aircrewRefIds) : [];
+                        getSchedErrors(dayErrors, errorLoc, errorLocId, aircrewRefIds) : [];
     return [...schedErrors];
 };
 
@@ -108,7 +113,12 @@ const getDayErrors = (errorsById: { [id: string]: IErrors }, currentDay: IDays):
     return dayErrors;
 };
 
-const getSchedErrors = (dayErrors: IErrors[], aircrewRefIds: string[]): IErrors[] => {
+const getSchedErrors = (
+    dayErrors: IErrors[],
+    errorLoc: string,
+    errorLocId: string,
+    aircrewRefIds: string[]
+): IErrors[] => {
     /**
      * @param
      * @param
@@ -116,10 +126,12 @@ const getSchedErrors = (dayErrors: IErrors[], aircrewRefIds: string[]): IErrors[
      * Finds the active errors with any of aircrewRefIds for this input in the meta.
      * Also runs the val??? Might screw with memoization.
      */
-    const schedErrors = aircrewRefIds.length > 0 ? dayErrors.filter(error => {
+    const schedErrors = dayErrors.filter(error => {
         return (error.type === errorTypes.SCHEDULE_CONFLICT &&
+                error.location === errorLoc &&
+                error.locationId === errorLocId &&
                 aircrewRefIds.indexOf(error.meta.aircrewId) > -1);
-    }) : [];
+    });
     return schedErrors;
 };
 
@@ -464,7 +476,7 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
         /** run the original onChange passed to this container as a prop (update the input value) */
         ownProps.onChange(e);
         /** get the new errors and dispatch to state. */
-        dispatch(resetErrorsOnFreshState(ownProps.errorTypes.update));
+        dispatch(resetErrorsOnFreshState(ownProps.errorConfig.update));
     };
 };
 
@@ -480,7 +492,13 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
     const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
     // and getValErrors here?
     const dayErrors = getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
-    const componentErrors = getComponentErrors(dayErrors, aircrewRefIds, ownProps.errorTypes.show);
+    const componentErrors = getComponentErrors(
+        dayErrors,
+        ownProps.errorConfig.errorLoc,
+        ownProps.errorConfig.errorLocId,
+        ownProps.errorConfig.show,
+        aircrewRefIds
+    );
     return {
         aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
         aircrewRefList,
@@ -507,7 +525,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             aircrewList: stateProps.aircrewList,
             dispatch: dispatchProps.dispatch,
             ownProps: ownProps,
-            errorTypesToCheck: ownProps.errorTypes.update,
+            errorTypesToCheck: ownProps.errorConfig.update,
         }),
         errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,

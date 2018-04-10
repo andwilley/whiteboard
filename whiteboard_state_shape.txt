@@ -421,12 +421,12 @@ App
 							Symbols
 					AddButton(sortie)
 					Errors(sortie) - *container
-				FlightNoteBox - *container
+				NoteBox(flight) - *container
 					Note
 					AddButton(flightNote)
 				Errors(flight) - *container
 			AddButton(flight)
-		DayNoteBox
+		NoteBox(day) - *container
 			Note
 			AddButton(dayNote)
 		Errors(day) - *container

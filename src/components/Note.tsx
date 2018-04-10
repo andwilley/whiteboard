@@ -1,14 +1,26 @@
 import * as React from 'react';
 import { INotes } from '../types/State';
+import { errorTypes, errorLocs } from '../errors';
+import FlexInputContainer from '../containers/FlexInputContainer';
 
 interface INoteProps {
-    note: INotes; // should this be an array like aircrew?
+    note: INotes;
+    onInputChange: (e: any) => any;
 }
 
-const Note: React.SFC<INoteProps> = ({ note }) => {
-    // create notes array of jsx elements
+const Note: React.SFC<INoteProps> = ({ note, onInputChange }) => {
     return (
-        <div>This is a Note: {note.content}</div>
+        <FlexInputContainer
+            placeHolder="Flight Note"
+            name="flightNote"
+            value={note.content}
+            errorConfig={{
+                show: [errorTypes.SCHEDULE_CONFLICT],
+                update: [errorTypes.SCHEDULE_CONFLICT],
+                errorLoc: errorLocs.FLIGHT_NOTE,
+                errorLocId: note.id}}
+            onChange={onInputChange}
+        />
     );
 };
 

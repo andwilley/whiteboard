@@ -10,7 +10,7 @@ interface ISortieBoxProps {
 }
 
 const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieClick }) => {
-    const sortieComponents = sorties.map(sortie => (<Sortie key={sortie.id} sortie={sortie} />));
+    const sortieComponents = sorties.map(sortie => (<Sortie key={sortie.id} sortie={sortie} flightId={flightId} />));
     return (
         <div>
             {sortieComponents}
