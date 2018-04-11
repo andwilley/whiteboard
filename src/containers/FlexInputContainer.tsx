@@ -307,7 +307,7 @@ const getSchedFromNotes = (
         const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000`);
         const endDate = endOffset === 0 ?
             new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000`) :
-            new Date(startDate.getTime() + state.settings.minutesNoteDuration);
+            new Date(startDate.getTime() + endOffset);
         const schedBlock = {
             start: startDate,
             end: endDate,
