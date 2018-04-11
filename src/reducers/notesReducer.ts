@@ -11,7 +11,8 @@ const notesById = (state = {}, action: IAction) => {
                 [action.payload.id]: {
                     id: action.payload.id,
                     content: action.payload.content,
-                    aircrewRefIds: [],
+                    aircrewRefIds: state[action.payload.id] ?
+                        state[action.payload.id].aircrewRefIds : [],
                     // keep track of who added, edited, time added etc later
                 },
             };

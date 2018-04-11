@@ -267,15 +267,15 @@ export const actions = {
     })),
     addUpdateNote: createAction(ADD_UPDATE_NOTE, (args: IAddUpdateNoteArgs) => {
         const noteId = args.id ? args.id : cuid();
-        // below for testing
-        // let noteId;
-        // if (args.id) {
-        //     noteId = args.id;
-        // } else {
-        //     cnoteId++;
-        //     noteId = cnoteId;
-        // }
-        // end testing code
+        /**
+         * entities are noteEntity.* from ../whiteboard-constants
+         *
+         * updates:
+         * flights reducer
+         * days reducer
+         * sorties reducer
+         * aircrew reducer
+         */
         return {
             type: ADD_UPDATE_NOTE,
             payload: {

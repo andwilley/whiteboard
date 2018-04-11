@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { INotes } from '../types/State';
 import { errorTypes, errorLocs } from '../errors';
-import FlexInputContainer from '../containers/FlexInputContainer';
+import FlexInputContainer, { nameLocation } from '../containers/FlexInputContainer';
 
 interface INoteProps {
     note: INotes;
@@ -11,7 +11,7 @@ interface INoteProps {
 const Note: React.SFC<INoteProps> = ({ note, onInputChange }) => {
     return (
         <FlexInputContainer
-            placeHolder="Flight Note"
+            placeHolder="time-time: Note text."
             name="flightNote"
             value={note.content}
             errorConfig={{
@@ -20,6 +20,10 @@ const Note: React.SFC<INoteProps> = ({ note, onInputChange }) => {
                 errorLoc: errorLocs.FLIGHT_NOTE,
                 errorLocId: note.id}}
             onChange={onInputChange}
+            addNameIdTo={{
+                nameLocation: nameLocation.NOTE,
+                entityId: note.id,
+            }}
         />
     );
 };

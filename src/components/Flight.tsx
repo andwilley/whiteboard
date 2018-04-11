@@ -1,7 +1,8 @@
 import * as React from 'react';
 import TimesBox from './TimesBox';
+import { noteEntity } from '../whiteboard-constants';
 import SortieBoxContainer from '../containers/SortieBoxContainer';
-import FlightNoteBox from './FlightNoteBox';
+import NoteBoxContainer from '../containers/NoteBoxContainer';
 
 interface IFlightProps {
     flightId: string;
@@ -14,7 +15,10 @@ const Flight: React.SFC<IFlightProps> = ({ flightId }) => (
             flightId={flightId}
         />
         <SortieBoxContainer flightId={flightId} />
-        <FlightNoteBox />
+        <NoteBoxContainer
+            entityId={flightId}
+            entityType={noteEntity.FLIGHT}
+        />
     </div>
 );
 

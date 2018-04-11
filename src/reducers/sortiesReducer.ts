@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { IEntity, ISorties } from '../types/State';
 import { actions, IAction } from '../actions';
+import { noteEntity } from '../whiteboard-constants';
 
 const sortiesById = (state = {}, action: IAction) => {
     switch (action.type) {
@@ -52,7 +53,7 @@ const sortiesById = (state = {}, action: IAction) => {
             });
             return newSortiesById;
         case getType(actions.addUpdateNote):
-            if (action.payload.entity !== 'sortie' ||
+            if (action.payload.entity !== noteEntity.SORTIE ||
                 state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }

@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { IEntity, IDays } from '../types/State';
 import { actions, IAction } from '../actions';
+import { noteEntity } from '../whiteboard-constants';
 
 const daysById = (state = {}, action: IAction) => {
     switch (action.type) {
@@ -44,7 +45,7 @@ const daysById = (state = {}, action: IAction) => {
                 },
             };
         case getType(actions.addUpdateNote):
-            if (action.payload.entity !== 'day' ||
+            if (action.payload.entity !== noteEntity.DAY ||
                 state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }

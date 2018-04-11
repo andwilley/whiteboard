@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { IEntity, IAircrew } from '../types/State';
 import { actions, IAction } from '../actions';
+import { noteEntity } from '../whiteboard-constants';
 
 const aircrewById = (state = {}, action: IAction) => {
     switch (action.type) {
@@ -30,7 +31,7 @@ const aircrewById = (state = {}, action: IAction) => {
             // let { [action.id]: delcrew, ...rest } = state;
             return rest;
         case getType(actions.addUpdateNote):
-            if (action.payload.entity !== 'aircrew' ||
+            if (action.payload.entity !== noteEntity.AIRCREW ||
                 state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { IState } from '../types/State';
+import { noteEntity } from '../whiteboard-constants';
+import { IState, INotes } from '../types/State';
 import NoteBox from '../components/NoteBox';
 const { addUpdateNote } = actions;
 
@@ -9,30 +10,61 @@ interface INoteBoxContainerProps {
     entityId: string;
 }
 
-const getNotes = () => {
-    // write this
+const getNotes = (entityType: string, entityId: string, state: IState): INotes[] => {
+    /**
+     * @param
+     * @param
+     * @param
+     * @returns array of note entities.
+     *
+     * needs:
+     * state.notes.byId
+     * state.flights.byId
+     * state.days.byId
+     * state.sorties.byId
+     *
+     * could pass the actual entity to this so it can cache the value and just pass notes to this.
+     *  - i.e. do the switch in mapStateToProps
+     */
+    let entity;
+    switch (entityType) {
+        case noteEntity.FLIGHT:
+            entity = state.flights.byId[entityId];
+            break;
+        case noteEntity.DAY:
+            entity = state.days.byId[entityId];
+            break;
+        case noteEntity.SORTIE:
+            entity = state.sorties.byId[entityId];
+            break;
+        default:
+            return [];
+    }
+
+    return entity.notes.map(noteId => state.notes.byId[noteId]);
 };
 
 const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
     return {
-        notes: getNotes(),
+        notes: getNotes(ownProps.entityType, ownProps.entityId, state),
     };
 };
 
 const mapDispatchToProps = (dispatch: any, ownProps: INoteBoxContainerProps) => {
-    const getNoteActionProps = (content: string) => {
-        return {
-            entity: ownProps.entityType,
-            entityId: ownProps.entityId,
-            content,
-        };
-    };
     return {
         onAddNoteClick: () => {
-            dispatch(addUpdateNote(getNoteActionProps('')));
+            dispatch(addUpdateNote({
+                entity: ownProps.entityType,
+                entityId: ownProps.entityId,
+            }));
         },
-        onInputChange: (e: any) => {
-            dispatch(addUpdateNote(getNoteActionProps(e.target.value)));
+        onInputChange: (noteId: string) => (e: any): void => {
+            dispatch(addUpdateNote({
+                id: noteId,
+                entity: ownProps.entityType,
+                entityId: ownProps.entityId,
+                content: e.target.value,
+            }));
         },
     };
 };

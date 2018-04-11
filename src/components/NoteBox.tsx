@@ -5,17 +5,18 @@ import AddButton from './AddButton';
 
 interface INoteBoxProps {
     notes: INotes[];
-    onInputChange: (e: any) => void;
+    onInputChange: (noteId: string) => (e: any) => void;
     onAddNoteClick: () => void;
 }
 
 const NoteBox: React.SFC<INoteBoxProps> = ({ notes, onInputChange, onAddNoteClick }) => {
-    const noteComponentsList = notes.map(note => (<Note note={note} key={note.id} onInputChange={onInputChange} />));
+    const noteComponentsList = notes.map(note =>
+        (<Note note={note} key={note.id} onInputChange={onInputChange(note.id)} />));
     return (
         <div>
             {noteComponentsList}
             <AddButton
-                onClick={() => alert('Add Flight Note')}
+                onClick={onAddNoteClick}
             />
         </div>
     );

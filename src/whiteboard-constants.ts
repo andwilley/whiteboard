@@ -14,3 +14,10 @@ export const blankAddUpdateAircrewForm = {
 };
 
 export const seats = ['front', 'back'];
+
+export const noteEntity = {
+    DAY: 'DAY',
+    FLIGHT: 'FLIGHT',
+    SORTIE: 'SORTIE',
+    AIRCREW: 'AIRCREW',
+};
