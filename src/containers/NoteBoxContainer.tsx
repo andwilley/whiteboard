@@ -8,6 +8,7 @@ const { addUpdateNote } = actions;
 interface INoteBoxContainerProps {
     entityType: string;
     entityId: string;
+    errorLoc: string;
 }
 
 const getNotes = (entityType: string, entityId: string, state: IState): INotes[] => {
@@ -47,6 +48,7 @@ const getNotes = (entityType: string, entityId: string, state: IState): INotes[]
 const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
     return {
         notes: getNotes(ownProps.entityType, ownProps.entityId, state),
+        errorLoc: ownProps.errorLoc,
     };
 };
 

@@ -3,7 +3,7 @@ import { getType } from 'typesafe-actions';
 import { IEntity, IErrors } from '../types/State';
 import { actions, IAction } from '../actions';
 
-const errorsById = (state = {}, action: IAction) => {
+const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addError):
             return {
@@ -22,6 +22,7 @@ const errorsById = (state = {}, action: IAction) => {
                 },
             };
         case getType(actions.toggleShowError):
+            const timeHiddenToggled = state[action.payload.errorId].meta.timeHiddenToggled;
             return {
                 ...state,
                 [action.payload.errorId]: {
@@ -29,8 +30,8 @@ const errorsById = (state = {}, action: IAction) => {
                     display: !state[action.payload.errorId].display,
                     meta: {
                         ...state[action.payload.errorId].meta,
-                        timeHiddenToggled: state[action.payload.errorId].meta.timeHiddenToggled ?
-                            state[action.payload.errorId].meta.concat(action.meta.timeHiddenToggled) :
+                        timeHiddenToggled: timeHiddenToggled ?
+                            timeHiddenToggled.concat(action.meta.timeHiddenToggled) :
                             [action.meta.timeHiddenToggled],
                     },
                 },

@@ -1,5 +1,7 @@
+import { IErrorTypes, IErrorLocs, IErrorLevels } from '../types/State';
+
 // error levels
-export const errorLevels = {
+export const errorLevels: IErrorLevels = {
     ERROR: 'ERROR',
     WARN: 'WARN',
     CAUT: 'CAUT',
@@ -7,7 +9,7 @@ export const errorLevels = {
 };
 
 // error types
-export const errorTypes = {
+export const errorTypes: IErrorTypes = {
     FORM_VALIDATION: 'FORM_VALIDATION',
     SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT',
     FORM_VAL_ERROR: 'FORM_VAL_ERROR',
@@ -18,7 +20,7 @@ export const errorMessages = {
     ERR_NO_RESULTS_FOUND: 'No results match your search.',
 };
 
-export const errorLocs = {
+export const errorLocs: IErrorLocs = {
     FLIGHT: 'FLIGHT',
     FLIGHT_TIMES: 'FLIGHT_TIMES',
     FLIGHT_NOTE: 'FLIGHT_NOTE',

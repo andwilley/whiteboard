@@ -87,12 +87,11 @@ const getAircrewRefList = (state: IState,
     }
 };
 
-const getComponentErrors = (
-    dayErrors: IErrors[],
-    errorLoc: string,
-    errorLocId: string,
-    errorTypesToGet: string[],
-    aircrewRefIds: string[]
+const getComponentErrors = (dayErrors: IErrors[],
+                            errorLoc: string,
+                            errorLocId: string,
+                            errorTypesToGet: string[],
+                            aircrewRefIds: string[]
 ): IErrors[] => {
     /**
      * Should collect all the errors specified in errorsTypes.show from ownProps.
@@ -113,11 +112,10 @@ const getDayErrors = (errorsById: { [id: string]: IErrors }, currentDay: IDays):
     return dayErrors;
 };
 
-const getSchedErrors = (
-    dayErrors: IErrors[],
-    errorLoc: string,
-    errorLocId: string,
-    aircrewRefIds: string[]
+const getSchedErrors = (dayErrors: IErrors[],
+                        errorLoc: string,
+                        errorLocId: string,
+                        aircrewRefIds: string[]
 ): IErrors[] => {
     /**
      * @param

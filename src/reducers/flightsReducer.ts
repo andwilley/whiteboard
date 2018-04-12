@@ -4,7 +4,7 @@ import { IEntity, IFlights } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 
-const flightsById = (state = {}, action: IAction) => {
+const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
             return {
@@ -50,7 +50,7 @@ const flightsById = (state = {}, action: IAction) => {
                 },
             };
         case getType(actions.addSortie):
-            if (state[action.payload.flightId].sorties.indexOf(action.payload.id) > -1) {
+            if (state[action.payload.flightId].sorties.indexOf(action.payload.sortieId) > -1) {
                 return state;
             }
             return {
@@ -66,7 +66,7 @@ const flightsById = (state = {}, action: IAction) => {
                 [action.payload.flightId]: {
                     ...state[action.payload.flightId],
                     sorties: state[action.payload.flightId].sorties
-                        .filter((sortieId: number) => sortieId !== action.payload.id),
+                        .filter(sortieId => sortieId !== action.payload.id),
                 },
             };
         case getType(actions.addUpdateNote):
@@ -90,7 +90,7 @@ const flightsById = (state = {}, action: IAction) => {
                 [action.payload.entityId]: {
                     ...state[action.payload.entityId],
                     notes: state[action.payload.entityId].notes
-                        .filter((noteId: number) => noteId !== action.payload.id),
+                        .filter(noteId => noteId !== action.payload.id),
                 },
             };
         case getType(actions.addAirspace):
@@ -110,7 +110,7 @@ const flightsById = (state = {}, action: IAction) => {
                 [action.payload.flightId]: {
                     ...state[action.payload.flightId],
                     airspace: state[action.payload.flightId].airspace
-                        .filter((airspaceId: number) => airspaceId !== action.payload.id),
+                        .filter(airspaceId => airspaceId !== action.payload.id),
                 },
             };
         default:

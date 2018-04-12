@@ -4,7 +4,7 @@ import { IEntity, IDays } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 
-const daysById = (state = {}, action: IAction) => {
+const daysById = (state: {[id: string]: IDays} = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addDay):
             return {
@@ -41,7 +41,7 @@ const daysById = (state = {}, action: IAction) => {
                 [action.payload.dayId]: {
                     ...state[action.payload.dayId],
                     flights: state[action.payload.dayId].flights
-                        .filter((flightId: number) => flightId !== action.payload.id),
+                        .filter(flightId => flightId !== action.payload.id),
                 },
             };
         case getType(actions.addUpdateNote):

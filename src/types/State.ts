@@ -1,10 +1,10 @@
 export interface IEntity<E> {
-    readonly byId: { [id: string]: E };
+    readonly byId: { readonly [id: string]: E };
     readonly allIds: string[];
 }
 
 export interface IEntityWithActive<E> {
-    readonly byId: { [id: string]: E };
+    readonly byId: { readonly [id: string]: E };
     readonly activeIds: string[];
     readonly allIds: string[];
 }
@@ -18,7 +18,7 @@ export interface IAircrew {
     readonly seat: string;
     readonly quals: string[];
     readonly odos: number;
-    readonly notes: number[];
+    readonly notes: string[];
     readonly flightPucks: string[];
     readonly simPucks: string[];
     readonly snivs: string[];
@@ -99,31 +99,87 @@ export interface IAddUpdateAircrewFormValues {
     readonly existingAircrewUnchanged: boolean;
 }
 
-export interface IErrorMeta {
+export interface IErrorTypes {
+    FORM_VALIDATION: 'FORM_VALIDATION';
+    SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT';
+    FORM_VAL_ERROR: 'FORM_VAL_ERROR';
+}
+
+export type UErrorTypes = Exclude<keyof IErrorTypes, IErrorTypes['SCHEDULE_CONFLICT']>;
+
+// export type UErrorTypes = IErrorTypes['FORM_VALIDATION'] | IErrorTypes['FORM_VAL_ERROR'];
+
+export interface IErrorLocs {
+    FLIGHT: 'FLIGHT';
+    FLIGHT_TIMES: 'FLIGHT_TIMES';
+    FLIGHT_NOTE: 'FLIGHT_NOTE';
+    SORTIE: 'SORTIE';
+    SORTIE_NOTE: 'SORTIE_NOTE';
+    DAY: 'DAY';
+    DAY_NOTE: 'DAY_NOTE';
+    CREWLIST: 'CREWLIST';
+    SNIVS: 'SNIVS';
+    APP: 'APP';
+}
+
+export type UErrorLocs = IErrorLocs[keyof IErrorLocs];
+
+export interface IErrorLevels {
+    ERROR: 'ERROR';
+    WARN: 'WARN';
+    CAUT: 'CAUT';
+    SUCCESS: 'SUCCESS';
+}
+
+export type UErrorLevels = IErrorLevels[keyof IErrorLevels];
+
+export interface IGenericErrorMeta {
+    readonly aircrewId?: string;
+    readonly timeHiddenToggled?: Date[];
+    readonly timeInactive?: Date;
+}
+
+export interface ISchedErrorMeta {
     readonly aircrewId: string;
     readonly timeHiddenToggled?: Date[];
     readonly timeInactive?: Date;
 }
 
-export interface IErrors {
+export interface IGenericErrors {
     readonly id: string;
     readonly time: Date;
     readonly dayId: string;
-    readonly type: string;
-    readonly location: string;
+    readonly type: UErrorTypes;
+    readonly location: UErrorLocs;
     readonly locationId: string;
-    readonly level: string;
+    readonly level: UErrorLevels;
     readonly message: string;
     readonly display: boolean;
     readonly active: boolean;
-    readonly meta: IErrorMeta;
+    readonly meta: IGenericErrorMeta;
 }
 
+export interface ISchedErrors {
+    readonly id: string;
+    readonly time: Date;
+    readonly dayId: string;
+    readonly type: IErrorTypes['SCHEDULE_CONFLICT'];
+    readonly location: UErrorLocs;
+    readonly locationId: string;
+    readonly level: UErrorLevels;
+    readonly message: string;
+    readonly display: boolean;
+    readonly active: boolean;
+    readonly meta: ISchedErrorMeta;
+}
+
+export type IErrors = IGenericErrors | ISchedErrors;
+
 export interface ISettings {
-    minutesBeforeBrief: number;
-    minutesAfterLand: number;
-    minutesBriefToTakeoff: number;
-    minutesNoteDuration: number;
+    readonly minutesBeforeBrief: number;
+    readonly minutesBriefToTakeoff: number;
+    readonly minutesNoteDuration: number;
+    readonly minutesAfterLand: number;
 }
 
 export interface IState {

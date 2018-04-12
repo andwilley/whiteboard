@@ -4,7 +4,7 @@ import { IEntity, IAircrew } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 
-const aircrewById = (state = {}, action: IAction) => {
+const aircrewById = (state: {[id: string]: IAircrew} = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateAircrew):
             return {
@@ -51,7 +51,7 @@ const aircrewById = (state = {}, action: IAction) => {
                 [action.payload.entityId]: {
                     ...state[action.payload.entityId],
                     notes: state[action.payload.entityId].notes
-                        .filter((noteId: number) => noteId !== action.payload.id),
+                        .filter(noteId => noteId !== action.payload.id),
                 },
             };
         default:

@@ -1,7 +1,8 @@
 import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
+import { IAddUpdateAircrewFormValues } from '../types/State';
 
-const addUpdateAircrewFormValuesReducer = (state = {
+const addUpdateAircrewFormValuesReducer = (state: IAddUpdateAircrewFormValues = {
                                                id: '',
                                                callsign: '',
                                                first: '',

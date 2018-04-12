@@ -5,10 +5,11 @@ import FlexInputContainer, { nameLocation } from '../containers/FlexInputContain
 
 interface INoteProps {
     note: INotes;
+    errorLoc: string;
     onInputChange: (e: any) => any;
 }
 
-const Note: React.SFC<INoteProps> = ({ note, onInputChange }) => {
+const Note: React.SFC<INoteProps> = ({ note, onInputChange, errorLoc }) => {
     return (
         <FlexInputContainer
             placeHolder="time-time: Note text."

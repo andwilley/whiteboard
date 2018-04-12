@@ -1,5 +1,5 @@
 import * as cuid from 'cuid';
-import { IErrorMeta } from '../types/State';
+import { IGenericErrorMeta } from '../types/State';
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 
@@ -120,7 +120,7 @@ export interface IAddErrorArgs {
     locationId: string;
     level: string;
     message: string;
-    meta: IErrorMeta;
+    meta: IGenericErrorMeta;
 }
 
 // let crewId = 0;
@@ -149,14 +149,7 @@ export const actions = {
         },
     })),
     addUpdateAircrew: createAction(ADD_UPDATE_AIRCREW, (args: IAddAircrewArgs) => {
-        const aircrewId = args.id === '' ? cuid() : args.id; // uncomment after testing
-        // let aircrewId; // for testing
-        // if (args.id) {
-        // 	aircrewId = args.id;
-        // } else {
-        // 	crewId++;
-        // 	aircrewId = crewId;
-        // }// for testing
+        const aircrewId = (!args.id || args.id === '') ? cuid() : args.id;
         return {
             type: ADD_UPDATE_AIRCREW,
             payload: {
@@ -497,5 +490,5 @@ export const actions = {
     })),
 };
 
-const returnsOfActions = (Object as any).values(actions).map($call);
+const returnsOfActions = Object.values(actions).map($call);
 export type IAction = typeof returnsOfActions[number];

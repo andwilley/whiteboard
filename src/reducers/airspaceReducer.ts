@@ -3,7 +3,7 @@ import { getType } from 'typesafe-actions';
 import { IEntity, IAirspace } from '../types/State';
 import { actions, IAction } from '../actions';
 
-const airspaceById = (state = {}, action: IAction) => {
+const airspaceById = (state: {[id: string]: IAirspace} = {}, action: IAction) => {
     // add these cases to sortiesById as well
     switch (action.type) {
         case getType(actions.addAirspace):
@@ -34,7 +34,7 @@ const airspaceById = (state = {}, action: IAction) => {
     }
 };
 
-const allAirspace = (state = [], action: IAction) => {
+const allAirspace = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addAirspace):
             return state.concat(action.payload.id);

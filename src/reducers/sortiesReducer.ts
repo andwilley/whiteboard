@@ -4,7 +4,7 @@ import { IEntity, ISorties } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 
-const sortiesById = (state = {}, action: IAction) => {
+const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
         case getType(actions.addSortie):
@@ -35,20 +35,26 @@ const sortiesById = (state = {}, action: IAction) => {
         case getType(actions.delAircrew):
             const newSortiesById = Object.assign({}, state);
             Object.keys(newSortiesById).forEach(sortieId => {
-                newSortiesById[sortieId] = Object.assign({}, state[sortieId]);
-                if (action.payload.id === newSortiesById[sortieId].front.crewId) {
-                    newSortiesById[sortieId].front = Object.assign({}, state[sortieId].front, {
+                // newSortiesById[sortieId] = Object.assign({}, state[sortieId]);
+                if (newSortiesById[sortieId].front.aircrewRefIds.indexOf(action.payload.id) > -1) {
+                    newSortiesById[sortieId] = Object.assign({}, state[sortieId], {front: {
+                            ...state[sortieId].front,
                             inputName: '',
-                            crewId: null,
-                        }
+                            aircrewRefIds: state[sortieId].front.aircrewRefIds.filter(aircrewId => {
+                                return aircrewId !== action.payload.id;
+                            }),
+                        }}
                     );
                 }
-                if (action.payload.id === newSortiesById[sortieId].back.crewId) {
-                    newSortiesById[sortieId].back = Object.assign({}, state[sortieId].back, {
-                            inputName: '',
-                            crewId: null,
-                        }
-                    );
+                if (newSortiesById[sortieId].back.aircrewRefIds.indexOf(action.payload.id)) {
+                    newSortiesById[sortieId] = Object.assign({}, state[sortieId], {back: {
+                        ...state[sortieId].back,
+                        inputName: '',
+                        aircrewRefIds: state[sortieId].back.aircrewRefIds.filter(aircrewId => {
+                            return aircrewId !== action.payload.id;
+                        }),
+                    }}
+                );
                 }
             });
             return newSortiesById;
@@ -73,7 +79,7 @@ const sortiesById = (state = {}, action: IAction) => {
                 [action.payload.entityId]: {
                     ...state[action.payload.entityId],
                     notes: state[action.payload.entityId].notes
-                        .filter((noteId: number) => noteId !== action.payload.id),
+                        .filter(noteId => noteId !== action.payload.id),
                 },
             };
         case getType(actions.updatePuckName):
@@ -116,7 +122,7 @@ const sortiesById = (state = {}, action: IAction) => {
                     ...state[action.payload.sortieId],
                     [action.payload.crewPosition]: {
                         ...state[action.payload.sortieId][action.payload.crewPosition],
-                        symbols: action.payload.symbols,
+                        symbols: action.payload.symbolList,
                     },
                 },
             };
@@ -133,7 +139,7 @@ const sortiesById = (state = {}, action: IAction) => {
     }
 };
 
-const allSorties = (state = [], action: IAction) => {
+const allSorties = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
         case getType(actions.addSortie):
