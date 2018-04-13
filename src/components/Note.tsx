@@ -1,15 +1,16 @@
 import * as React from 'react';
 import { INotes } from '../types/State';
-import { errorTypes, errorLocs } from '../errors';
+import { errorTypes } from '../errors';
 import FlexInputContainer, { nameLocation } from '../containers/FlexInputContainer';
 
 interface INoteProps {
     note: INotes;
     errorLoc: string;
+    errorLocId: string;
     onInputChange: (e: any) => any;
 }
 
-const Note: React.SFC<INoteProps> = ({ note, onInputChange, errorLoc }) => {
+const Note: React.SFC<INoteProps> = ({ note, onInputChange, errorLoc, errorLocId }) => {
     return (
         <FlexInputContainer
             placeHolder="time-time: Note text."
@@ -18,13 +19,10 @@ const Note: React.SFC<INoteProps> = ({ note, onInputChange, errorLoc }) => {
             errorConfig={{
                 show: [errorTypes.SCHEDULE_CONFLICT],
                 update: [errorTypes.SCHEDULE_CONFLICT],
-                errorLoc: errorLocs.FLIGHT_NOTE,
-                errorLocId: note.id}}
+                errorLoc,
+                errorLocId}}
             onChange={onInputChange}
-            addNameIdTo={{
-                nameLocation: nameLocation.NOTE,
-                entityId: note.id,
-            }}
+            addNameIdTo={{nameLocation: nameLocation.NOTE, entityId: note.id}}
         />
     );
 };

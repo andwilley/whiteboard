@@ -2,7 +2,6 @@ import * as React from 'react';
 import FlightBoxContainer from '../containers/FlightBoxContainer';
 import NoteBoxContainer from '../containers/NoteBoxContainer';
 import { noteEntity } from '../whiteboard-constants';
-import { errorLocs } from '../errors';
 
 const Day: React.SFC = () => (
     <div style={{border: '1px solid black', marginTop: '20px'}}>
@@ -11,7 +10,6 @@ const Day: React.SFC = () => (
         <NoteBoxContainer
             entityType={noteEntity.DAY}
             entityId={'2018-01-24'}
-            errorLoc={errorLocs.DAY}
         />
     </div>
 );

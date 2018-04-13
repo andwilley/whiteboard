@@ -309,7 +309,7 @@ const getSchedFromNotes = (
         const schedBlock = {
             start: startDate,
             end: endDate,
-            location: flightNote ? errorLocs.FLIGHT_NOTE : errorLocs.DAY_NOTE,
+            location: flightNote ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
             locationId: flightNote ? flightId : state.crewListUI.currentDay,
         };
         activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
@@ -321,7 +321,7 @@ const getSchedFromNotes = (
             const schedBlock = {
                 start: new Date(`${state.crewListUI.currentDay}T00:00:00.000`),
                 end: new Date(`${state.crewListUI.currentDay}T23:59:00.000`),
-                location: flightNote ? errorLocs.FLIGHT_NOTE : errorLocs.DAY_NOTE,
+                location: flightNote ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
                 locationId: flightNote ? flightId : state.crewListUI.currentDay,
             };
             activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?

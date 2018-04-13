@@ -22,10 +22,7 @@ export const errorMessages = {
 
 export const errorLocs: IErrorLocs = {
     FLIGHT: 'FLIGHT',
-    FLIGHT_TIMES: 'FLIGHT_TIMES',
-    FLIGHT_NOTE: 'FLIGHT_NOTE',
     SORTIE: 'SORTIE',
-    SORTIE_NOTE: 'SORTIE_NOTE',
     DAY: 'DAY',
     DAY_NOTE: 'DAY_NOTE',
     CREWLIST: 'CREWLIST',

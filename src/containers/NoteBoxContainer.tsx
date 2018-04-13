@@ -1,14 +1,14 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
-import { IState, INotes } from '../types/State';
+import { errorLocs } from '../errors';
+import { IState, INotes, IFlights, IDays, ISorties, IAircrew } from '../types/State';
 import NoteBox from '../components/NoteBox';
 const { addUpdateNote } = actions;
 
 interface INoteBoxContainerProps {
     entityType: string;
     entityId: string;
-    errorLoc: string;
 }
 
 const getNotes = (entityType: string, entityId: string, state: IState): INotes[] => {
@@ -27,7 +27,7 @@ const getNotes = (entityType: string, entityId: string, state: IState): INotes[]
      * could pass the actual entity to this so it can cache the value and just pass notes to this.
      *  - i.e. do the switch in mapStateToProps
      */
-    let entity;
+    let entity: IFlights | IDays | ISorties | IAircrew;
     switch (entityType) {
         case noteEntity.FLIGHT:
             entity = state.flights.byId[entityId];
@@ -38,6 +38,9 @@ const getNotes = (entityType: string, entityId: string, state: IState): INotes[]
         case noteEntity.SORTIE:
             entity = state.sorties.byId[entityId];
             break;
+        case noteEntity.AIRCREW:
+            entity = state.aircrew.byId[entityId];
+            break;
         default:
             return [];
     }
@@ -45,10 +48,18 @@ const getNotes = (entityType: string, entityId: string, state: IState): INotes[]
     return entity.notes.map(noteId => state.notes.byId[noteId]);
 };
 
+const noteErrorLocMap = {
+    FLIGHT: errorLocs.FLIGHT,
+    DAY: errorLocs.DAY_NOTE,
+    SORTIE: errorLocs.SORTIE,
+    AIRCREW: errorLocs.CREWLIST,
+};
+
 const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
     return {
         notes: getNotes(ownProps.entityType, ownProps.entityId, state),
-        errorLoc: ownProps.errorLoc,
+        errorLoc: noteErrorLocMap[ownProps.entityType],
+        errorLocId: ownProps.entityId,
     };
 };
 

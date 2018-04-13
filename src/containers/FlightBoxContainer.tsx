@@ -1,7 +1,8 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { IState } from '../types/State';
+import { IState, IErrors } from '../types/State';
 import FlightBox from '../components/FlightBox';
+import { errorLocs } from '../errors';
 const { addFlight } = actions;
 
 const getDayId = (state: IState): string => {
@@ -16,11 +17,23 @@ const getFlightIds = (state: IState, currentDayId: string): string[] => {
     return state.days.byId[currentDayId].flights;
 };
 
+const getFlightErrors = (errorsById: {[id: string]: IErrors}, activeIds: string[]) => {
+    return activeIds.reduce((flightErrors, errorId) => {
+        if (errorsById[errorId].location === errorLocs.FLIGHT) {
+            flightErrors[errorsById[errorId].locationId] = flightErrors[errorsById[errorId].locationId] ?
+            flightErrors[errorsById[errorId].locationId].concat(errorsById[errorId]) :
+            [errorsById[errorId]];
+        }
+        return flightErrors;
+    }, {});
+};
+
 const mapStateToProps = (state: IState) => {
     const currentDayId = getDayId(state);
     return {
         dayId: currentDayId,
         flightIds: getFlightIds(state, currentDayId),
+        errors: getFlightErrors(state.errors.byId, state.errors.activeIds),
     };
 };
 
