@@ -395,7 +395,7 @@ App
 			Aircrew
 			AddButton(aircrew)
 		Errors(crewList) - *container
-	Day
+	Day - *container
 		FlightBox - *container
 			Flight
 				TimesBox
@@ -430,4 +430,5 @@ App
 			Note
 			AddButton(dayNote)
 		Errors(day) - *container
+	AddButton(day)
 }

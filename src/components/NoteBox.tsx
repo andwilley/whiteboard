@@ -1,7 +1,8 @@
 import * as React from 'react';
 import Note from './Note';
-import { INotes } from '../types/State';
+import { INotes, IErrors } from '../types/State';
 import AddButton from './AddButton';
+import ErrorList from './ErrorList';
 
 interface INoteBoxProps {
     notes: INotes[];
@@ -9,9 +10,10 @@ interface INoteBoxProps {
     errorLocId: string;
     onInputChange: (noteId: string) => (e: any) => void;
     onAddNoteClick: () => void;
+    errors?: IErrors[];
 }
 
-const NoteBox: React.SFC<INoteBoxProps> = ({ notes, onInputChange, onAddNoteClick, errorLoc, errorLocId }) => {
+const NoteBox: React.SFC<INoteBoxProps> = ({ notes, onInputChange, onAddNoteClick, errorLoc, errorLocId, errors }) => {
     const noteComponentsList = notes.map(note =>
         (
         <Note
@@ -23,8 +25,10 @@ const NoteBox: React.SFC<INoteBoxProps> = ({ notes, onInputChange, onAddNoteClic
         />
         )
     );
+    const noteErrors = errors ? errors : [];
     return (
         <div>
+            {errors && <ErrorList errors={noteErrors} />}
             {noteComponentsList}
             <AddButton
                 onClick={onAddNoteClick}

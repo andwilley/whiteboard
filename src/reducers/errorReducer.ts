@@ -92,4 +92,18 @@ const errorReducer = combineReducers<IEntity<IErrors>>({
     allIds: allErrors,
 });
 
+export const getEntityErrors = (errorById: {[id: string]: IErrors},
+                                activeErrorIds: string[],
+                                errorLoc: string
+): {[id: string]: IErrors[]} => {
+    return activeErrorIds.reduce((errors, errorId) => {
+        if (errorById[errorId].location === errorLoc) {
+            errors[errorById[errorId].locationId] = errors[errorById[errorId].locationId] ?
+            errors[errorById[errorId].locationId].concat(errorById[errorId]) :
+            [errorById[errorId]];
+        }
+        return errors;
+    }, {});
+};
+
 export default errorReducer;

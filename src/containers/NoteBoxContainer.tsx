@@ -2,13 +2,14 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 import { errorLocs } from '../errors';
-import { IState, INotes, IFlights, IDays, ISorties, IAircrew } from '../types/State';
+import { IState, INotes, IFlights, IDays, ISorties, IAircrew, IErrors } from '../types/State';
 import NoteBox from '../components/NoteBox';
 const { addUpdateNote } = actions;
 
 interface INoteBoxContainerProps {
     entityType: string;
     entityId: string;
+    errors?: IErrors[];
 }
 
 const getNotes = (entityType: string, entityId: string, state: IState): INotes[] => {
