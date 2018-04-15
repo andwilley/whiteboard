@@ -20,16 +20,6 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
 }) => {
     // const valResults = validator(validators, value);
     // const formErrors = [...valResults, ...errors].filter(error => error !== null);
-    const errorComponents = errors.map(error =>
-        (
-            <span
-                key={error.id}
-                className={`form-error error-level-${error.level}`}
-            >
-                {error.message}
-            </span>
-        )
-    );
     return (
         <label htmlFor={name}>
             <input
@@ -39,7 +29,6 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
                 value={value}
                 onChange={onChange}
             />
-            {errorComponents}
         </label>
     );
 };

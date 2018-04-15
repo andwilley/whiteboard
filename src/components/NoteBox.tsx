@@ -28,7 +28,7 @@ const NoteBox: React.SFC<INoteBoxProps> = ({ notes, onInputChange, onAddNoteClic
     const noteErrors = errors ? errors : [];
     return (
         <div>
-            {errors && <ErrorList errors={noteErrors} />}
+            <ErrorList errors={noteErrors} />
             {noteComponentsList}
             <AddButton
                 onClick={onAddNoteClick}
