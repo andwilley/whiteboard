@@ -429,7 +429,7 @@ interface IGetOnChangeWithNameMatchArgs {
     errorTypesToCheck: string[];
 }
 
-const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any) => any) => {
+const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((val: string) => void) => {
     /**
      * @param {object}
      * @returns {function} If addNameIdTo is specified, returns updated onChange function.
@@ -467,12 +467,12 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
                 break;
         }
     }
-    return (e) => {
+    return (val) => {
         /** update the aircrewRefs state for this input */
-        const matchedAircrewIds = nameMatch(aircrewList, e.target.value).map(aircrew => aircrew.id);
+        const matchedAircrewIds = nameMatch(aircrewList, val).map(aircrew => aircrew.id);
         aircrewRefIdDispatch(matchedAircrewIds);
         /** run the original onChange passed to this container as a prop (update the input value) */
-        ownProps.onChange(e);
+        ownProps.onChange(val);
         /** get the new errors and dispatch to state. */
         dispatch(resetErrorsOnFreshState(ownProps.errorConfig.update));
     };

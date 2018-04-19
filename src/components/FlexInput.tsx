@@ -18,6 +18,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     aircrewRefList,
     errors = [],
 }) => {
+    const textRef = React.createRef<HTMLDivElement>();
     // const valResults = validator(validators, value);
     // const formErrors = [...valResults, ...errors].filter(error => error !== null);
     aircrewRefList.forEach(aircrew => {
@@ -29,10 +30,8 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
                 id={name}
                 className=""
                 contentEditable={true}
-                onInput={(e) => {
-                    console.log(e);
-                    onChange(e);
-                }}
+                onInput={() => onChange(textRef.current ? textRef.current.innerHTML : '')}
+                ref={textRef}
             >
                 {value}
             </div>

@@ -13,7 +13,14 @@ interface ICrewBoxProps {
         wsoSymbols: string;
     };
     flightId: string;
-    onInputChange: (e: any) => void;
+    onInputChange: {
+        onPilotNameChange: (val: string) => void;
+        onPilotCodeChange: (val: string) => void;
+        onPilotSymbolChange: (val: string) => void;
+        onWSONameChange: (val: string) => void;
+        onWSOCodeChange: (val: string) => void;
+        onWSOSymbolChange: (val: string) => void;
+    };
 }
 
 const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputChange }) => (
@@ -22,7 +29,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             placeHolder="Pilot"
             name="pilot"
             value={sortieStrings.pilot}
-            onChange={onInputChange}
+            onChange={onInputChange.onPilotNameChange}
             errorConfig={{
                 show: [errorTypes.SCHEDULE_CONFLICT],
                 update: [errorTypes.SCHEDULE_CONFLICT],
@@ -35,21 +42,21 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             placeHolder="Pilot Codes"
             name="pilotCodes"
             value={sortieStrings.pilotCodes}
-            onChange={onInputChange}
+            onChange={onInputChange.onPilotCodeChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
         />
         {/* <FlexInputContainer
             placeHolder="Pilot Symbols"
             name="pilotSymbols"
             value={sortieStrings.pilotSymbols}
-            onChange={onInputChange}
+            onChange={onInputChange.onPilotSymbolChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
         /> */}
         <FlexInputContainer
             placeHolder="WSO"
             name="wso"
             value={sortieStrings.wso}
-            onChange={onInputChange}
+            onChange={onInputChange.onWSONameChange}
             errorConfig={{
                 show: [errorTypes.SCHEDULE_CONFLICT],
                 update: [errorTypes.SCHEDULE_CONFLICT],
@@ -62,14 +69,14 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             placeHolder="WSO Codes"
             name="wsoCodes"
             value={sortieStrings.wsoCodes}
-            onChange={onInputChange}
+            onChange={onInputChange.onWSOCodeChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
         />
         {/* <FlexInputContainer
             placeHolder="WSO Symbols"
             name="wsoSymbols"
             value={sortieStrings.wsoSymbols}
-            onChange={onInputChange}
+            onChange={onInputChange.onWSOSymbolChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
         /> */}
     </div>
