@@ -43,7 +43,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(val) => onInputChange('brief', val)}
+                onChange={(e) => onInputChange('brief', e)}
             />
             <FlexInputContainer
                 placeHolder="Takeoff Time"
@@ -54,7 +54,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(val) => onInputChange('takeoff', val)}
+                onChange={(e) => onInputChange('takeoff', e)}
             />
             <FlexInputContainer
                 placeHolder="Land Time"
@@ -65,7 +65,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(val) => onInputChange('land', val)}
+                onChange={(e) => onInputChange('land', e)}
             />
         </form>
     );

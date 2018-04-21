@@ -1,18 +1,19 @@
 import * as React from 'react';
 
-interface IContentEditableProps {
-    tagName: string;
-    html: string;
-    style: string;
-    className: string;
-    disabled: boolean;
-    onChange: (e: any) => void;
-    onBlur: (e: any) => void;
-}
-
 const stripNbsp = (str: string) => str.replace(/&nbsp;|\u202F|\u00A0/g, ' ');
 
-class ContentEditable extends React.Component<IContentEditableProps> {
+interface IContentEditableProps {
+    html: string;
+    tagName?: string;
+    style?: string;
+    className?: string;
+    disabled?: boolean;
+    onChange?: (e: any) => void;
+    onBlur?: (e: any) => void;
+    [props: string]: any;
+}
+
+export default class ContentEditable extends React.Component<IContentEditableProps> {
   htmlEl: React.RefObject<HTMLElement>;
   lastHtml: string;
   constructor(props: IContentEditableProps) {
@@ -88,5 +89,3 @@ class ContentEditable extends React.Component<IContentEditableProps> {
     this.lastHtml = html;
   }
 }
-
-export default ContentEditable;

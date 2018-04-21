@@ -30,30 +30,30 @@ const mapStateToProps = (state: IState, ownProps: ICrewBoxContainerProps) => {
 const mapDispatchToProps = (dispatch: any, ownProps: ICrewBoxContainerProps) => {
     return {
         onInputChange: {
-            onPilotNameChange: (val: string) => {
+            onPilotNameChange: (e: any) => {
                 dispatch(actions.updatePuckName({
                     sortieId: ownProps.sortieId,
                     crewPosition: 'front',
-                    name: val,
+                    name: e.target.value,
                 }));
             },
-            onPilotCodeChange: (val: string) => {
+            onPilotCodeChange: (e: string) => {
                 dispatch({type: 'NOTHING'});
             },
-            onPilotSymbolChange: (val: string) => {
+            onPilotSymbolChange: (e: string) => {
                 dispatch({type: 'NOTHING'});
             },
-            onWSONameChange: (val: string) => {
+            onWSONameChange: (e: any) => {
                 dispatch(actions.updatePuckName({
                     sortieId: ownProps.sortieId,
                     crewPosition: 'back',
-                    name: val,
+                    name: e.target.value,
                 }));
             },
-            onWSOCodeChange: (val: string) => {
+            onWSOCodeChange: (e: string) => {
                 dispatch({type: 'NOTHING'});
             },
-            onWSOSymbolChange: (val: string) => {
+            onWSOSymbolChange: (e: string) => {
                 dispatch({type: 'NOTHING'});
             },
         },
