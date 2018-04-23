@@ -22,21 +22,18 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     // const textRef = React.createRef<HTMLDivElement>();
     // const valResults = validator(validators, value);
     // const formErrors = [...valResults, ...errors].filter(error => error !== null);
-    aircrewRefList.forEach(aircrew => {
-        value = value.replace(aircrew.callsign, `<span class="pill">${aircrew.callsign}</span>`);
-    });
     return (
         <label htmlFor={name}>
-            <ContentEditable
-                tagName={'div'}
-                html={value}
-                onChange={onChange}
-                // id={name}
-                // className=""
-                // contentEditable={true}
-                // onInput={() => onChange(textRef.current ? textRef.current.innerHTML : '')}
-                // ref={textRef}
-            />
+        <ContentEditable
+            tagName={'div'}
+            html={value}
+            onChange={onChange}
+            // id={name}
+            // className=""
+            // contentEditable={true}
+            // onInput={() => onChange(textRef.current ? textRef.current.innerHTML : '')}
+            // ref={textRef}
+        />
         </label>
     );
 };
