@@ -17,6 +17,7 @@ const getFlightTimes = (state: IState, flightId: string): IFlightTimes => {
 const mapStateToProps = (state: IState, ownProps: IFlightTimesContainerProps) => {
     return {
         times: getFlightTimes(state, ownProps.flightId),
+        flightId: ownProps.flightId,
     };
 };
 

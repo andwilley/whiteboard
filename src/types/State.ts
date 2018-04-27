@@ -1,3 +1,6 @@
+import { EditorState } from 'draft-js';
+import { UEditables, NullForAll } from './WhiteboardTypes';
+
 export interface IEntity<E> {
     readonly byId: { readonly [id: string]: E };
     readonly allIds: string[];
@@ -179,6 +182,18 @@ export interface ISettings {
     readonly minutesAfterLand: number;
 }
 
+export interface IInputElement {
+    readonly element: UEditables;
+    readonly entityId: string;
+}
+
+export type IElementBeingEdited = IInputElement | NullForAll<IInputElement>;
+
+export interface IEditor {
+    readonly editorState: EditorState;
+    readonly elementBeingEdited: IElementBeingEdited;
+}
+
 export interface IState {
     readonly aircrew: IEntity<IAircrew>;
     readonly days: IEntity<IDays>;
@@ -190,4 +205,5 @@ export interface IState {
     readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
     readonly settings: ISettings;
     readonly errors: IEntityWithActive<IErrors>;
+    readonly editor: IEditor;
 }

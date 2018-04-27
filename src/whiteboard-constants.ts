@@ -1,3 +1,5 @@
+import { INameLocations, IEditables } from './types/WhiteboardTypes';
+
 export const qualsList =
     ['SL', 'DL', 'MC', 'NSI', 'FAI', 'MDTI', 'WTI', 'FAC(A)', 'FAC(A)I', 'NS', 'ACM', 'LAT', 'PMCF', 'ODO'];
 
@@ -20,4 +22,23 @@ export const noteEntity = {
     FLIGHT: 'FLIGHT',
     SORTIE: 'SORTIE',
     AIRCREW: 'AIRCREW',
+};
+
+export const nameLocation: INameLocations = {
+    FRONT_SEAT_NAME: 'FRONT_SEAT_NAME',
+    BACK_SEAT_NAME: 'BACK_SEAT_NAME',
+    NOTE: 'NOTE',
+};
+
+export const editables: IEditables = {
+    ...nameLocation,
+    BRIEF: 'BRIEF',
+    TAKEOFF: 'TAKEOFF',
+    LAND: 'LAND',
+    FRONT_SEAT_CODE: 'FRONT_SEAT_CODE',
+    FRONT_SEAT_SYMBOL: 'FRONT_SEAT_SYMBOL',
+    BACK_SEAT_CODE: 'BACK_SEAT_CODE',
+    BACK_SEAT_SYMBOL: 'BACK_SEAT_SYMBOL',
+    LOADOUT: 'LOADOUT',
+    AIRSPACE: 'AIRSPACE',
 };

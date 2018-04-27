@@ -1,18 +1,14 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { seats } from '../whiteboard-constants';
+import { seats, nameLocation } from '../whiteboard-constants';
+import { EditorState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
-import { IState, IAircrew, IEntity, IErrors, IDays } from '../types/State';
+import { IState, IAircrew, IEntity, IErrors, IDays, IEditor, IElementBeingEdited } from '../types/State';
+import { UEditables } from '../types/WhiteboardTypes';
 import { IAddErrorArgs } from '../actions';
 import FlexInput from '../components/FlexInput';
 import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/validator';
 type IAircrewEntity = IEntity<IAircrew>;
-
-export const nameLocation = {
-    FRONT_SEAT: 'FRONT_SEAT',
-    BACK_SEAT: 'BACK_SEAT',
-    NOTE: 'NOTE',
-};
 
 /**
  * This component is responsible for displaying all the input elements, their errors from validation and does the
@@ -38,6 +34,8 @@ interface IFlexInputContainerProps {
     };
     validators?: string[];
     addNameIdTo?: {nameLocation: string; entityId: string};
+    element: UEditables;
+    entityId: string;
 }
 
 interface ISchedBlock {
@@ -76,9 +74,9 @@ const getAircrewRefList = (state: IState,
         return [];
     }
     switch (addNameIdTo.nameLocation) {
-        case nameLocation.FRONT_SEAT:
+        case nameLocation.FRONT_SEAT_NAME:
             return state.sorties.byId[addNameIdTo.entityId].front.aircrewRefIds.map(id => state.aircrew.byId[id]);
-        case nameLocation.BACK_SEAT:
+        case nameLocation.BACK_SEAT_NAME:
             return state.sorties.byId[addNameIdTo.entityId].back.aircrewRefIds.map(id => state.aircrew.byId[id]);
         case nameLocation.NOTE:
             return state.notes.byId[addNameIdTo.entityId].aircrewRefIds.map(id => state.aircrew.byId[id]);
@@ -429,7 +427,7 @@ interface IGetOnChangeWithNameMatchArgs {
     errorTypesToCheck: string[];
 }
 
-const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any) => void) => {
+const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((editorState: EditorState) => void) => {
     /**
      * @param {object}
      * @returns {function} If addNameIdTo is specified, returns updated onChange function.
@@ -447,12 +445,12 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
         aircrewRefIdDispatch = (matchedAircrewIds: string[]) => { return; };
     } else {
         switch (addNameIdTo.nameLocation) {
-            case nameLocation.FRONT_SEAT:
+            case nameLocation.FRONT_SEAT_NAME:
                 aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
                     dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'front', matchedAircrewIds));
                 };
                 break;
-            case nameLocation.BACK_SEAT:
+            case nameLocation.BACK_SEAT_NAME:
                 aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
                     dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'back', matchedAircrewIds));
                 };
@@ -467,15 +465,36 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((e: any
                 break;
         }
     }
-    return (e) => {
+    return (editorState) => {
         /** update the aircrewRefs state for this input */
-        const matchedAircrewIds = nameMatch(aircrewList, e.target.value).map(aircrew => aircrew.id);
+        const matchedAircrewIds = nameMatch(
+            aircrewList,
+            editorState.getCurrentContent().getPlainText()).map(aircrew => aircrew.id
+        );
         aircrewRefIdDispatch(matchedAircrewIds);
+        /** update the editor state */
+        dispatch(actions.setEditorState(editorState));
         /** run the original onChange passed to this container as a prop (update the input value) */
-        ownProps.onChange(e);
+        ownProps.onChange(editorState.getCurrentContent().getPlainText());
         /** get the new errors and dispatch to state. */
         dispatch(resetErrorsOnFreshState(ownProps.errorConfig.update));
     };
+};
+
+const getEditorState = (state: IState) => {
+    return state.editor.editorState;
+};
+
+const getElementBeingEdited = (state: IState) => {
+    return state.editor.elementBeingEdited;
+};
+
+const isInputActive = (state: IState, ownProps: IFlexInputContainerProps) => {
+    if (ownProps.element === state.editor.elementBeingEdited.element &&
+        ownProps.entityId === state.editor.elementBeingEdited.entityId) {
+            return true;
+    }
+    return false;
 };
 
 interface IFlexInputStateProps {
@@ -483,9 +502,12 @@ interface IFlexInputStateProps {
     aircrewRefList: IAircrew[];
     state: IState;
     errors: IErrors[];
+    editorState: EditorState;
+    elementBeingEdited: IElementBeingEdited;
+    isInputActive: boolean;
 }
 
-const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
+const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFlexInputStateProps => {
     const aircrewRefList = getAircrewRefList(state, ownProps.addNameIdTo);
     const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
     // and getValErrors here?
@@ -502,6 +524,9 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps) => {
         aircrewRefList,
         state,
         errors: componentErrors,
+        editorState: getEditorState(state),
+        elementBeingEdited: getElementBeingEdited(state),
+        isInputActive: isInputActive(state, ownProps),
     };
 };
 
@@ -525,8 +550,19 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             ownProps: ownProps,
             errorTypesToCheck: ownProps.errorConfig.update,
         }),
+        onClick: () => {
+            if (stateProps.isInputActive) {
+                return;
+            }
+            dispatchProps.dispatch(actions.setEditedElement(ownProps.element, ownProps.entityId));
+        },
+        onBlur: () => {
+            dispatchProps.dispatch(actions.setEditedElement(null, null));
+        },
         errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,
+        editorState: stateProps.editorState,
+        showEditor: stateProps.isInputActive,
     });
 };
 

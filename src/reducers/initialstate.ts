@@ -1,4 +1,5 @@
 import { qualsList } from '../whiteboard-constants';
+import { EditorState } from 'draft-js';
 
 export const INITIAL_STATE = {
     aircrew: {
@@ -236,4 +237,5 @@ export const INITIAL_STATE = {
         minutesBriefToTakeoff: 120,
         minutesNoteDuration: 60,
     },
+    editorState: EditorState.createEmpty(),
 };

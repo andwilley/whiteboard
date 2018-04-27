@@ -2,13 +2,15 @@ import * as React from 'react';
 import { IFlightTimes } from '../types/State';
 import { errorTypes } from '../errors';
 import FlexInputContainer from '../containers/FlexInputContainer';
+import { editables } from '../whiteboard-constants';
 
 interface IFlightTimesProps {
     times: IFlightTimes;
+    flightId: string;
     onInputChange: (timeType: string, time: string) => any;
 }
 
-const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
+const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputChange}) => {
     const timeIsValid = {
         brief: true,
         takeoff: true,
@@ -44,6 +46,8 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
                     errorLoc: '',
                     errorLocId: ''}}
                 onChange={(e) => onInputChange('brief', e)}
+                element={editables.BRIEF}
+                entityId={flightId}
             />
             <FlexInputContainer
                 placeHolder="Takeoff Time"
@@ -55,6 +59,8 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
                     errorLoc: '',
                     errorLocId: ''}}
                 onChange={(e) => onInputChange('takeoff', e)}
+                element={editables.TAKEOFF}
+                entityId={flightId}
             />
             <FlexInputContainer
                 placeHolder="Land Time"
@@ -66,6 +72,8 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, onInputChange}) => {
                     errorLoc: '',
                     errorLocId: ''}}
                 onChange={(e) => onInputChange('land', e)}
+                element={editables.LAND}
+                entityId={flightId}
             />
         </form>
     );

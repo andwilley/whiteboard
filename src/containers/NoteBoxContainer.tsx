@@ -72,12 +72,12 @@ const mapDispatchToProps = (dispatch: any, ownProps: INoteBoxContainerProps) => 
                 entityId: ownProps.entityId,
             }));
         },
-        onInputChange: (noteId: string) => (e: any): void => {
+        onInputChange: (noteId: string) => (inputValue: string): void => {
             dispatch(addUpdateNote({
                 id: noteId,
                 entity: ownProps.entityType,
                 entityId: ownProps.entityId,
-                content: e.target.value,
+                content: inputValue,
             }));
         },
     };

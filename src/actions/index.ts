@@ -2,6 +2,8 @@ import * as cuid from 'cuid';
 import { IGenericErrorMeta } from '../types/State';
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
+import { EditorState } from 'draft-js';
+import { UEditables } from '../types/WhiteboardTypes';
 
 // Action Types
 export const ADD_UPDATE_AIRCREW_FORM_ADD_QUAL = 'ADD_UPDATE_AIRCREW_FORM_ADD_QUAL';
@@ -36,6 +38,8 @@ export const ADD_ERROR = 'ADD_ERROR';
 export const TOGGLE_SHOW_ERROR = 'TOGGLE_SHOW_ERROR';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const DEL_ERROR = 'DEL_ERROR';
+export const SET_EDITOR_STATE = 'SET_EDITOR_STATE';
+export const SET_EDITED_ELEMENT = 'SET_EDITED_ELEMENT';
 
 // const makeActionCreator = (type, ...payloadNames) => {
 //     return (...payloadValues) => {
@@ -486,6 +490,19 @@ export const actions = {
         payload: {
             errorId,
             dayId,
+        },
+    })),
+    setEditorState: createAction(SET_EDITOR_STATE, (editorState: EditorState) => ({
+        type: SET_EDITOR_STATE,
+        payload: {
+            editorState,
+        },
+    })),
+    setEditedElement: createAction(SET_EDITED_ELEMENT, (editable: UEditables | null, entityId: string | null) => ({
+        type: SET_EDITED_ELEMENT,
+        payload: {
+            editable,
+            entityId,
         },
     })),
 };

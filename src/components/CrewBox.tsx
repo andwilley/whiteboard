@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { errorTypes, errorLocs } from '../errors';
-import FlexInputContainer, { nameLocation } from '../containers/FlexInputContainer';
+import { nameLocation, editables } from '../whiteboard-constants';
+import FlexInputContainer from '../containers/FlexInputContainer';
 
 interface ICrewBoxProps {
     sortieStrings: {
@@ -36,7 +37,9 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
                 errorLoc: errorLocs.FLIGHT,
                 errorLocId: flightId,
             }}
-            addNameIdTo={{nameLocation: nameLocation.FRONT_SEAT, entityId: sortieStrings.sortieId}}
+            addNameIdTo={{nameLocation: nameLocation.FRONT_SEAT_NAME, entityId: sortieStrings.sortieId}}
+            element={editables.FRONT_SEAT_NAME}
+            entityId={flightId}
         />
         <FlexInputContainer
             placeHolder="Pilot Codes"
@@ -44,6 +47,8 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             value={sortieStrings.pilotCodes}
             onChange={onInputChange.onPilotCodeChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
+            element={editables.FRONT_SEAT_CODE}
+            entityId={flightId}
         />
         {/* <FlexInputContainer
             placeHolder="Pilot Symbols"
@@ -63,7 +68,9 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
                 errorLoc: errorLocs.FLIGHT,
                 errorLocId: flightId,
             }}
-            addNameIdTo={{nameLocation: nameLocation.BACK_SEAT, entityId: sortieStrings.sortieId}}
+            addNameIdTo={{nameLocation: nameLocation.BACK_SEAT_NAME, entityId: sortieStrings.sortieId}}
+            element={editables.BACK_SEAT_NAME}
+            entityId={flightId}
         />
         <FlexInputContainer
             placeHolder="WSO Codes"
@@ -71,6 +78,8 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             value={sortieStrings.wsoCodes}
             onChange={onInputChange.onWSOCodeChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
+            element={editables.BACK_SEAT_CODE}
+            entityId={flightId}
         />
         {/* <FlexInputContainer
             placeHolder="WSO Symbols"
