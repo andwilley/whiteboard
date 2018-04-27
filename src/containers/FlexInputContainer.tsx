@@ -3,7 +3,7 @@ import { actions } from '../actions';
 import { seats, nameLocation } from '../whiteboard-constants';
 import { EditorState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
-import { IState, IAircrew, IEntity, IErrors, IDays, IEditor, IElementBeingEdited } from '../types/State';
+import { IState, IAircrew, IEntity, IErrors, IDays, IElementBeingEdited } from '../types/State';
 import { UEditables } from '../types/WhiteboardTypes';
 import { IAddErrorArgs } from '../actions';
 import FlexInput from '../components/FlexInput';
