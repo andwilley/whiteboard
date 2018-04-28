@@ -8,7 +8,7 @@ interface IFlexInputProps {
     value: string;
     onChange: (e: EditorState) => void;
     onClick: () => void;
-    onBlur: () => void;
+    onBlur: (e: any) => void;
     aircrewRefList: IAircrew[];
     errors: IErrors[];
     editorState: EditorState;
@@ -27,42 +27,27 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     showEditor,
     errors = [],
 }) => {
-    // const decorators = aircrewRefList.map(aircrew => {
-    //     return {
-    //         strategy: nameStrategy(aircrew.id),
-    //         component: nameSpan(aircrew.callsign),
-    //     };
-    // });
-    // const compositeDecorators = new CompositeDecorator(decorators);
-    return showEditor ? <Editor editorState={editorState} onChange={onChange} onBlur={onBlur} placeholder="test" /> :
-            <p onClick={onClick}>{editorState.getCurrentContent().getPlainText()}</p>;
+    const ref = React.createRef<any>();
+    const getRef = () => ref;
+    /** set focus once the Editor mounts. */
+    if (showEditor && !editorState.getSelection().getHasFocus()) {
+        setTimeout(() => {
+            const updRef = getRef();
+            if (updRef && updRef.current) {
+                updRef.current.focus();
+            }
+        }, 0);
+    }
+    return showEditor ?
+        (
+            <Editor
+                editorState={editorState}
+                onChange={onChange}
+                ref={ref}
+                // onBlur={onBlur}
+            />
+        ) :
+            <p onClick={onClick}>{value || placeHolder}</p>;
 };
-
-// const FlexInput: React.SFC<IFlexInputProps> = ({
-//     placeHolder,
-//     name,
-//     value,
-//     onChange,
-//     aircrewRefList,
-//     errors = [],
-// }) => {
-//     // const textRef = React.createRef<HTMLDivElement>();
-//     // const valResults = validator(validators, value);
-//     // const formErrors = [...valResults, ...errors].filter(error => error !== null);
-//     return (
-//         <label htmlFor={name}>
-//         <ContentEditable
-//             tagName={'div'}
-//             html={value}
-//             onChange={onChange}
-//             // id={name}
-//             // className=""
-//             // contentEditable={true}
-//             // onInput={() => onChange(textRef.current ? textRef.current.innerHTML : '')}
-//             // ref={textRef}
-//         />
-//         </label>
-//     );
-// };
 
 export default FlexInput;

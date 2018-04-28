@@ -1,7 +1,8 @@
+import * as React from 'react';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { seats, nameLocation } from '../whiteboard-constants';
-import { EditorState } from 'draft-js';
+import { EditorState, ContentState, CompositeDecorator, ContentBlock } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
 import { IState, IAircrew, IEntity, IErrors, IDays, IElementBeingEdited } from '../types/State';
 import { UEditables } from '../types/WhiteboardTypes';
@@ -402,7 +403,7 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
     return aircrewList.filter(aircrew => inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()));
 };
 
-const resetErrorsOnFreshState = (errorTypesToCheck: string[]) => {
+const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
     return (dispatch: any, getState: () => IState) => {
         const state = getState();
         /** clear and recalc schedule conflict errors */
@@ -467,17 +468,20 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((editor
     }
     return (editorState) => {
         /** update the aircrewRefs state for this input */
-        const matchedAircrewIds = nameMatch(
+        const matchedAircrew = nameMatch(
             aircrewList,
-            editorState.getCurrentContent().getPlainText()).map(aircrew => aircrew.id
+            editorState.getCurrentContent().getPlainText()
         );
+        const matchedAircrewIds = matchedAircrew.map(aircrew => aircrew.id);
         aircrewRefIdDispatch(matchedAircrewIds);
-        /** update the editor state */
-        dispatch(actions.setEditorState(editorState));
+        /** update the editor state and reset the decorators for the editor */
+        const decorator = getDecorators(matchedAircrew);
+        const newEditorState = EditorState.set(editorState, {decorator});
+        dispatch(actions.setEditorState(newEditorState));
         /** run the original onChange passed to this container as a prop (update the input value) */
         ownProps.onChange(editorState.getCurrentContent().getPlainText());
         /** get the new errors and dispatch to state. */
-        dispatch(resetErrorsOnFreshState(ownProps.errorConfig.update));
+        dispatch(setErrorsOnFreshState(ownProps.errorConfig.update));
     };
 };
 
@@ -495,6 +499,43 @@ const isInputActive = (state: IState, ownProps: IFlexInputContainerProps) => {
             return true;
     }
     return false;
+};
+
+const nameStrategy = (name: string) => (contentBlock: ContentBlock,
+                                        callback: (start: number, end: number) => void,
+                                        contentState: ContentState) => {
+    const text = contentBlock.getText().toLowerCase();
+    const start = text.indexOf(name.toLowerCase());
+    if (start > -1) {
+        callback(start, start + name.length);
+    }
+};
+
+const nameSpan = (id: string) => (props: any) => {
+    return (
+        <span
+            style={{color: 'blue'}}
+            data-offset-key={props.dataOffsetKey}
+            onClick={onXClick(id)}
+        >
+        {props.children}
+        </span>
+    );
+};
+
+const onXClick = (id: string) => (e: any) => {
+    alert(id);
+};
+
+const getDecorators = (aircrewRefList: IAircrew[]): CompositeDecorator => {
+    const decorators = aircrewRefList.map(aircrew => {
+        return {
+            strategy: nameStrategy(aircrew.callsign),
+            component: nameSpan(aircrew.id),
+        };
+    });
+    const compositeDecorators = new CompositeDecorator(decorators);
+    return compositeDecorators;
 };
 
 interface IFlexInputStateProps {
@@ -543,6 +584,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      *
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
+    const decorators = getDecorators(stateProps.aircrewRefList);
     return Object.assign({}, ownProps, {
         onChange: getOnChangeWithNameMatch({
             aircrewList: stateProps.aircrewList,
@@ -554,10 +596,13 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             if (stateProps.isInputActive) {
                 return;
             }
+            const contentState = ContentState.createFromText(ownProps.value);
+            dispatchProps.dispatch(actions.setEditorState(EditorState.createWithContent(contentState, decorators)));
             dispatchProps.dispatch(actions.setEditedElement(ownProps.element, ownProps.entityId));
         },
-        onBlur: () => {
-            dispatchProps.dispatch(actions.setEditedElement(null, null));
+        onBlur: (e: any) => {
+            // console.log(e.relatedTarget);
+            // dispatchProps.dispatch(actions.setEditedElement(null, null));
         },
         errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,

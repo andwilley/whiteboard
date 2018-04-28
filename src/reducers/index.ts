@@ -24,5 +24,5 @@ export const whiteboardApp = combineReducers<IState>({
     addUpdateAircrewFormValues: addUpdateAircrewFormValuesReducer,
     settings: settingsReducer,
     errors: errorReducer,
-    editorState: editorStateReducer,
+    editor: editorStateReducer,
 });

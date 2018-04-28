@@ -39,7 +39,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             }}
             addNameIdTo={{nameLocation: nameLocation.FRONT_SEAT_NAME, entityId: sortieStrings.sortieId}}
             element={editables.FRONT_SEAT_NAME}
-            entityId={flightId}
+            entityId={sortieStrings.sortieId}
         />
         <FlexInputContainer
             placeHolder="Pilot Codes"
@@ -48,7 +48,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             onChange={onInputChange.onPilotCodeChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
             element={editables.FRONT_SEAT_CODE}
-            entityId={flightId}
+            entityId={sortieStrings.sortieId}
         />
         {/* <FlexInputContainer
             placeHolder="Pilot Symbols"
@@ -70,7 +70,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             }}
             addNameIdTo={{nameLocation: nameLocation.BACK_SEAT_NAME, entityId: sortieStrings.sortieId}}
             element={editables.BACK_SEAT_NAME}
-            entityId={flightId}
+            entityId={sortieStrings.sortieId}
         />
         <FlexInputContainer
             placeHolder="WSO Codes"
@@ -79,7 +79,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             onChange={onInputChange.onWSOCodeChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
             element={editables.BACK_SEAT_CODE}
-            entityId={flightId}
+            entityId={sortieStrings.sortieId}
         />
         {/* <FlexInputContainer
             placeHolder="WSO Symbols"

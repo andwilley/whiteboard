@@ -1,7 +1,8 @@
 import { qualsList } from '../whiteboard-constants';
 import { EditorState } from 'draft-js';
+import { IState } from '../types/State';
 
-export const INITIAL_STATE = {
+export const INITIAL_STATE: IState = {
     aircrew: {
         byId: {
             a: {
@@ -237,5 +238,11 @@ export const INITIAL_STATE = {
         minutesBriefToTakeoff: 120,
         minutesNoteDuration: 60,
     },
-    editorState: EditorState.createEmpty(),
+    editor: {
+        editorState: EditorState.createEmpty(),
+        elementBeingEdited: {
+            element: null,
+            entityId: null,
+        },
+    },
 };

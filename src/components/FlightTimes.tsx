@@ -45,7 +45,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(e) => onInputChange('brief', e)}
+                onChange={(time: string) => onInputChange('brief', time)}
                 element={editables.BRIEF}
                 entityId={flightId}
             />
@@ -58,7 +58,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(e) => onInputChange('takeoff', e)}
+                onChange={(time: string) => onInputChange('takeoff', time)}
                 element={editables.TAKEOFF}
                 entityId={flightId}
             />
@@ -71,7 +71,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(e) => onInputChange('land', e)}
+                onChange={(time: string) => onInputChange('land', time)}
                 element={editables.LAND}
                 entityId={flightId}
             />
