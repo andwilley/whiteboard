@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { seats, nameLocation } from '../whiteboard-constants';
-import { EditorState, ContentState, CompositeDecorator, ContentBlock } from 'draft-js';
+import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
 import { IState, IAircrew, IEntity, IErrors, IDays, IElementBeingEdited } from '../types/State';
 import { UEditables } from '../types/WhiteboardTypes';
@@ -596,13 +596,26 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             if (stateProps.isInputActive) {
                 return;
             }
+            /** cursor to end on mount */
             const contentState = ContentState.createFromText(ownProps.value);
-            dispatchProps.dispatch(actions.setEditorState(EditorState.createWithContent(contentState, decorators)));
+            const initEditorState = EditorState.createWithContent(contentState, decorators);
+            const blockMap = contentState.getBlockMap();
+            const key = blockMap.first().getKey();
+            const offset = blockMap.first().getLength();
+            const selectionState = new SelectionState({
+                anchorKey: key,
+                anchorOffset: offset,
+                focusKey: key,
+                focusOffset: offset,
+            });
+            const editorState = EditorState.forceSelection(initEditorState, selectionState);
+            /** set and dispatch editorState and elementBeingEdited */
+            dispatchProps.dispatch(actions.setEditorState(editorState));
             dispatchProps.dispatch(actions.setEditedElement(ownProps.element, ownProps.entityId));
         },
         onBlur: (e: any) => {
             // console.log(e.relatedTarget);
-            // dispatchProps.dispatch(actions.setEditedElement(null, null));
+            dispatchProps.dispatch(actions.setEditedElement(null, null));
         },
         errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,

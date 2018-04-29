@@ -29,6 +29,19 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
 }) => {
     const ref = React.createRef<any>();
     const getRef = () => ref;
+    const thereAreErrors = errors.length > 0 ? true : false;
+    const errorStyle = {
+        border: '1px solid red',
+    };
+    const pStyle = {
+        margin: '0px',
+        color: 'black',
+    };
+    const pStyleEmpty = {
+        'margin': '0px',
+        'color': '#cdcdcd',
+        'font-style': 'italic',
+    };
     /** set focus once the Editor mounts. */
     if (showEditor && !editorState.getSelection().getHasFocus()) {
         setTimeout(() => {
@@ -38,16 +51,20 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
             }
         }, 0);
     }
-    return showEditor ?
+    return (
+        <div className={'flexInput'} style={thereAreErrors ? errorStyle : {border: '1px solid white'}}>
+        {showEditor ?
         (
             <Editor
                 editorState={editorState}
                 onChange={onChange}
                 ref={ref}
-                // onBlur={onBlur}
+                onBlur={onBlur}
             />
         ) :
-            <p onClick={onClick}>{value || placeHolder}</p>;
+            <p style={value.length > 0 ? pStyle : pStyleEmpty} onClick={onClick}>{value || placeHolder}</p>}
+        </div>
+        );
 };
 
 export default FlexInput;
