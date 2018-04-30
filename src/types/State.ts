@@ -125,9 +125,9 @@ export interface IErrorLocs {
 export type UErrorLocs = IErrorLocs[keyof IErrorLocs];
 
 export interface IErrorLevels {
-    ERROR: 'ERROR';
     WARN: 'WARN';
     CAUT: 'CAUT';
+    INFO: 'INFO';
     SUCCESS: 'SUCCESS';
 }
 

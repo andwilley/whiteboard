@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
+import validator, { Validator } from '../util/validator';
 import { seats, nameLocation } from '../whiteboard-constants';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
@@ -8,7 +9,7 @@ import { IState, IAircrew, IEntity, IErrors, IDays, IElementBeingEdited } from '
 import { UEditables } from '../types/WhiteboardTypes';
 import { IAddErrorArgs } from '../actions';
 import FlexInput from '../components/FlexInput';
-import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/validator';
+import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/regEx';
 type IAircrewEntity = IEntity<IAircrew>;
 
 /**
@@ -33,10 +34,10 @@ interface IFlexInputContainerProps {
         errorLoc: string;
         errorLocId: string;
     };
-    validators?: string[];
-    addNameIdTo?: {nameLocation: string; entityId: string};
     element: UEditables;
     entityId: string;
+    validators?: Validator[];
+    addNameIdTo?: {nameLocation: string; entityId: string};
 }
 
 interface ISchedBlock {
@@ -132,13 +133,12 @@ const getSchedErrors = (dayErrors: IErrors[],
     return schedErrors;
 };
 
-// const getValidationErrors = () => {
-//     if (ownProps.validators.length > 0) {
-//         /**
-//          * Check the input against the provided validation functions
-//          */
-//     }
-// };
+const getValidationErrors = (text: string, validators?: Validator[]) => {
+    if (!validators || validators.length === 0) {
+        return [];
+    }
+    return validator(text, ...validators);
+};
 
 interface IFindSchedErrorsReducePreviousValue {
     lastBlock: ISchedBlock;
@@ -185,7 +185,7 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
                         type: errorTypes.SCHEDULE_CONFLICT,
                         location: block.location,
                         locationId: block.locationId,
-                        level: errorLevels.ERROR,
+                        level: errorLevels.WARN,
                         message: `${state.aircrew.byId[aircrewId].callsign} has a schedule conflict.`,
                         meta: {
                             aircrewId,
@@ -201,11 +201,10 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
     return errors;
 };
 
-const getSchedFromFlightTimes = (
-    activeAircrewRefs: ISchedObject,
-    state: IState,
-    flightId: string,
-    aircrewId: string
+const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
+                                 state: IState,
+                                 flightId: string,
+                                 aircrewId: string
 ): ISchedObject => {
     /**
      * Assumes worst case for flights unless we can deduce it from the settings.
@@ -224,21 +223,24 @@ const getSchedFromFlightTimes = (
     let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
     let startOffset = state.settings.minutesBeforeBrief * 60000;
     let endOffset = state.settings.minutesAfterLand * 60000;
-    if (RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.brief)) {
-        startTimeHr = state.flights.byId[flightId].times.brief.slice(0, 2);
-        startTimeMn = state.flights.byId[flightId].times.brief.slice(2, 4);
-    } else if (RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.takeoff)) {
-        startTimeHr = state.flights.byId[flightId].times.takeoff.slice(0, 2);
-        startTimeMn = state.flights.byId[flightId].times.takeoff.slice(2, 4);
+    const briefTime = state.flights.byId[flightId].times.brief.replace(':', '');
+    const takeoffTime = state.flights.byId[flightId].times.takeoff.replace(':', '');
+    const landTime = state.flights.byId[flightId].times.land.replace(':', '');
+    if (RGX_24HOUR_TIME.test(briefTime)) {
+        startTimeHr = briefTime.slice(0, 2);
+        startTimeMn = briefTime.slice(2, 4);
+    } else if (RGX_24HOUR_TIME.test(takeoffTime)) {
+        startTimeHr = takeoffTime.slice(0, 2);
+        startTimeMn = takeoffTime.slice(2, 4);
         startOffset += state.settings.minutesBriefToTakeoff * 60000;
     } else {
         startTimeHr = '00';
         startTimeMn = '00';
         startOffset = 0;
     }
-    if (RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.land)) {
-        endTimeHr = state.flights.byId[flightId].times.land.slice(0, 2);
-        endTimeMn = state.flights.byId[flightId].times.land.slice(2, 4);
+    if (RGX_24HOUR_TIME.test(landTime)) {
+        endTimeHr = landTime.slice(0, 2);
+        endTimeMn = landTime.slice(2, 4);
     } else {
         endTimeHr = '23';
         endTimeMn = '59';
@@ -257,13 +259,12 @@ const getSchedFromFlightTimes = (
     return activeAircrewRefs;
 };
 
-const getSchedFromNotes = (
-    activeAircrewRefs: ISchedObject,
-    state: IState,
-    noteId: string,
-    aircrewId: string,
-    flightNote: boolean = false,
-    flightId: string = ''
+const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
+                           state: IState,
+                           noteId: string,
+                           aircrewId: string,
+                           flightNote: boolean = false,
+                           flightId: string = ''
 ): ISchedObject => {
     /**
      * Gets referenced aircrew start and end times from notes.
@@ -290,11 +291,13 @@ const getSchedFromNotes = (
     let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
     let endOffset = 0;
     if (noteTimes) {
-        startTimeHr = noteTimes[1].slice(0, 2);
-        startTimeMn = noteTimes[1].slice(2, 4);
+        const startTime = noteTimes[1].replace(':', '');
+        startTimeHr = startTime.slice(0, 2);
+        startTimeMn = startTime.slice(2, 4);
         if (noteTimes[2]) {
-            endTimeHr = noteTimes[2].slice(0, 2);
-            endTimeMn = noteTimes[2].slice(2, 4);
+            const endTime = noteTimes[2].replace(':', '');
+            endTimeHr = endTime.slice(0, 2);
+            endTimeMn = endTime.slice(2, 4);
         } else if (flightNote && RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.land)) {
             endTimeHr = state.flights.byId[flightId].times.land.slice(0, 2);
             endTimeMn = state.flights.byId[flightId].times.land.slice(2, 4);
@@ -577,10 +580,10 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      * ownProps.addNameIdTo, I'm comparing the input value (about to be dispatched by ownProps.onChange) to all the
      * other aircrew (the state I need) to see if there are matches and dispatching to update the state with the
      * referenced aircrewIds if there are.
-     *
-     * @property onChange The wrapped version overwrites the one passed to this container.
-     * @property aircrewRefList is the list of aircrew objects whose Ids are refed in this component (in the future,
-     * this will affect display at the presentational component level).
+     * @param stateProps Object returned by mapStateToProps above
+     * @param dispatchProps The redux dispatch function (passed in connect below)
+     * @param ownProps The props passed into this element at render (the container)
+     * @returns Final props object to FlexInput for rendering.
      *
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
@@ -596,7 +599,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             if (stateProps.isInputActive) {
                 return;
             }
-            /** cursor to end on mount */
+            /** cursor to end of text on mount */
             const contentState = ContentState.createFromText(ownProps.value);
             const initEditorState = EditorState.createWithContent(contentState, decorators);
             const blockMap = contentState.getBlockMap();
@@ -621,6 +624,8 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
         aircrewRefList: stateProps.aircrewRefList,
         editorState: stateProps.editorState,
         showEditor: stateProps.isInputActive,
+        validationErrors: getValidationErrors(stateProps.editorState.getCurrentContent().getPlainText(),
+                                              ownProps.validators),
     });
 };
 

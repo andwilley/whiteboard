@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { IFlightTimes } from '../types/State';
 import { errorTypes } from '../errors';
+import { is24HourTime } from '../util/validator';
 import FlexInputContainer from '../containers/FlexInputContainer';
 import { editables } from '../whiteboard-constants';
 
@@ -48,6 +49,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 onChange={(time: string) => onInputChange('brief', time)}
                 element={editables.BRIEF}
                 entityId={flightId}
+                validators={[is24HourTime()]}
             />
             <FlexInputContainer
                 placeHolder="Takeoff Time"

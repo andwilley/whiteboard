@@ -1,4 +1,4 @@
-import { IAircrew } from './State';
+import { IAircrew, UErrorTypes, UErrorLevels, IErrors } from './State';
 
 export interface IPucks {
     flight: number;
@@ -43,3 +43,12 @@ export type UEditables = IEditables[keyof IEditables];
 export type NullForAll<T> = {
     [P in keyof T]: null;
 };
+
+export interface IUntrackedErrors {
+    id: string;
+    type: UErrorTypes;
+    level: UErrorLevels;
+    message: string;
+}
+
+export type AllErrors = IErrors | IUntrackedErrors;
