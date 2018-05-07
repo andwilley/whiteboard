@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import validator, { Validator } from '../util/validator';
+import validator, { ValidatorFn } from '../util/validator';
 import { seats, nameLocation } from '../whiteboard-constants';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
@@ -10,6 +10,7 @@ import { UEditables } from '../types/WhiteboardTypes';
 import { IAddErrorArgs } from '../actions';
 import FlexInput from '../components/FlexInput';
 import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/regEx';
+import restrictor, { RestrictorFn } from '../util/restrictor';
 type IAircrewEntity = IEntity<IAircrew>;
 
 /**
@@ -36,7 +37,8 @@ interface IFlexInputContainerProps {
     };
     element: UEditables;
     entityId: string;
-    validators?: Validator[];
+    validators?: ValidatorFn[];
+    restrictorFns?: RestrictorFn[];
     addNameIdTo?: {nameLocation: string; entityId: string};
 }
 
@@ -133,7 +135,7 @@ const getSchedErrors = (dayErrors: IErrors[],
     return schedErrors;
 };
 
-const getValidationErrors = (text: string, validators?: Validator[]) => {
+const getValidationErrors = (text: string, validators?: ValidatorFn[]) => {
     if (!validators || validators.length === 0) {
         return [];
     }
@@ -298,7 +300,9 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
             const endTime = noteTimes[2].replace(':', '');
             endTimeHr = endTime.slice(0, 2);
             endTimeMn = endTime.slice(2, 4);
-        } else if (flightNote && RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.land)) {
+        } else if (flightNote &&
+                   RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.land) &&
+                   state.flights.byId[flightId].times.land > startTime) {
             endTimeHr = state.flights.byId[flightId].times.land.slice(0, 2);
             endTimeMn = state.flights.byId[flightId].times.land.slice(2, 4);
         } else {
@@ -588,6 +592,15 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
     const decorators = getDecorators(stateProps.aircrewRefList);
+    /** handle text insert and paste. function signatures are different, but function is the same. */
+    const restrictorFn = ownProps.restrictorFns && ownProps.restrictorFns.length > 0 ?
+        restrictor(...ownProps.restrictorFns) : null;
+    const inputRestrictor = restrictorFn ?
+        {
+            textInput: restrictorFn,
+            pasteInput: (text: string, html: string, editorState: EditorState) =>
+                restrictorFn(text, editorState),
+        } : undefined;
     return Object.assign({}, ownProps, {
         onChange: getOnChangeWithNameMatch({
             aircrewList: stateProps.aircrewList,
@@ -624,7 +637,8 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
         aircrewRefList: stateProps.aircrewRefList,
         editorState: stateProps.editorState,
         showEditor: stateProps.isInputActive,
-        validationErrors: getValidationErrors(stateProps.editorState.getCurrentContent().getPlainText(),
+        restrictor: inputRestrictor,
+        validationErrors: getValidationErrors(ownProps.value,
                                               ownProps.validators),
     });
 };

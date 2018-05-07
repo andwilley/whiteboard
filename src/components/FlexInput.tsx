@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Editor, EditorState } from 'draft-js';
+import { Editor, EditorState, DraftHandleValue } from 'draft-js';
 import { IUntrackedErrors } from '../types/WhiteboardTypes';
 import { IErrors, IAircrew } from '../types/State';
 import { getHighestErrorLevel } from '../errors';
@@ -16,6 +16,10 @@ interface IFlexInputProps {
     editorState: EditorState;
     showEditor: boolean;
     validationErrors: IUntrackedErrors[];
+    restrictor: {
+        textInput: ((text: string, editorState: EditorState) => DraftHandleValue);
+        pasteInput: ((text: string, html: string, editorState: EditorState) => DraftHandleValue);
+    } | undefined;
 }
 
 const FlexInput: React.SFC<IFlexInputProps> = ({
@@ -29,6 +33,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     editorState,
     showEditor,
     validationErrors,
+    restrictor,
     errors = [],
 }) => {
     const ref = React.createRef<any>();
@@ -38,9 +43,9 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     const highestValErrorLevel = getHighestErrorLevel(validationErrors);
     let errorClasses = '';
     if (thereAreErrors) {
-        const errorClass = errors.length > 0 ? `error${highestErrorLevel}` : '';
-        const valErrorClass = validationErrors.length > 0 && showEditor ? `valError${highestValErrorLevel}` : '';
-        errorClasses = `${errorClass} ${valErrorClass}`;
+        const errorClass = errors.length > 0 ? ` error${highestErrorLevel}` : '';
+        const valErrorClass = validationErrors.length > 0 ? ` valError${highestValErrorLevel}` : '';
+        errorClasses = `${errorClass}${valErrorClass}`;
     }
     /** set focus once the Editor mounts (this only happens onClick or tabbed from another element). */
     if (showEditor && !editorState.getSelection().getHasFocus()) {
@@ -52,7 +57,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
         }, 0);
     }
     return (
-        <div className={`flexInput ${errorClasses}`}>
+        <div className={`flexInput${errorClasses}`}>
         {showEditor ?
         (
             <Editor
@@ -60,6 +65,8 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
                 onChange={onChange}
                 ref={ref}
                 onBlur={onBlur}
+                handleBeforeInput={restrictor ? restrictor.textInput : restrictor}
+                handlePastedText={restrictor ? restrictor.pasteInput : restrictor}
             />
         ) :
             <p className={value.length > 0 ? 'pStyle' : 'pStyleEmpty'} onClick={onClick}>{value || placeHolder}</p>}

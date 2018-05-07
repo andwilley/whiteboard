@@ -13,7 +13,7 @@ interface IValArgs {
     message: string;
 }
 
-export type Validator = (text: string) => IUntrackedErrors | null;
+export type ValidatorFn = (text: string) => IUntrackedErrors | null;
 
 export const is24HourTime = (args?: IValArgs) => (text: string): IUntrackedErrors | null => {
     const valid = RGX_24HOUR_TIME.test(text);
@@ -22,13 +22,13 @@ export const is24HourTime = (args?: IValArgs) => (text: string): IUntrackedError
         {
             id: cuid(),
             type: errorTypes.FORM_VAL_ERROR,
-            level: args && args.level ? args.level : errorLevels.WARN,
+            level: args && args.level ? args.level : errorLevels.CAUT,
             message: args && args.message ? args.message : errorMessages.INVALID_TIME,
         };
 };
 
 const validator = (text: string,
-                   ...validatorFunctions: Validator[]):
+                   ...validatorFunctions: ValidatorFn[]):
 IUntrackedErrors[] => {
     /**
      * @param text String input to be validated

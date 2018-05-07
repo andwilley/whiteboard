@@ -4,6 +4,7 @@ import { errorTypes } from '../errors';
 import { is24HourTime } from '../util/validator';
 import FlexInputContainer from '../containers/FlexInputContainer';
 import { editables } from '../whiteboard-constants';
+import { restrictToTimeChars } from '../util/restrictor';
 
 interface IFlightTimesProps {
     times: IFlightTimes;
@@ -50,6 +51,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 element={editables.BRIEF}
                 entityId={flightId}
                 validators={[is24HourTime()]}
+                restrictorFns={[restrictToTimeChars]}
             />
             <FlexInputContainer
                 placeHolder="Takeoff Time"
