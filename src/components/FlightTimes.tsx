@@ -65,6 +65,8 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 onChange={(time: string) => onInputChange('takeoff', time)}
                 element={editables.TAKEOFF}
                 entityId={flightId}
+                validators={[is24HourTime()]}
+                restrictorFns={[restrictToTimeChars]}
             />
             <FlexInputContainer
                 placeHolder="Land Time"
@@ -78,6 +80,8 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 onChange={(time: string) => onInputChange('land', time)}
                 element={editables.LAND}
                 entityId={flightId}
+                validators={[is24HourTime()]}
+                restrictorFns={[restrictToTimeChars]}
             />
         </form>
     );
