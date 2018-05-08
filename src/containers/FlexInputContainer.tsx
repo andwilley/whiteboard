@@ -630,7 +630,6 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             dispatchProps.dispatch(actions.setEditedElement(ownProps.element, ownProps.entityId));
         },
         onBlur: (e: any) => {
-            // console.log(e.relatedTarget);
             dispatchProps.dispatch(actions.setEditedElement(null, null));
         },
         errors: stateProps.errors,
