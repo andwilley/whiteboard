@@ -4,6 +4,7 @@ import NoteBoxContainer from '../containers/NoteBoxContainer';
 import { noteEntity } from '../whiteboard-constants';
 import { IErrors } from '../types/State';
 import ErrorList from './ErrorList';
+import TabKeyNav from './TabKeyNav';
 
 interface IDayProps {
     dayId: string;
@@ -12,7 +13,7 @@ interface IDayProps {
 }
 
 const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors }) => (
-    <div style={{border: '1px solid black', marginTop: '20px'}}>
+    <TabKeyNav>
         <span style={{position: 'relative', top: '-10px', left: '10px', background: 'white'}}>Day</span>
         <ErrorList errors={dayErrors[dayId] ? dayErrors[dayId] : []} />
         <FlightBoxContainer />
@@ -21,7 +22,7 @@ const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors }) => (
             entityId={dayId}
             errors={noteErrors[dayId] ? noteErrors[dayId] : []}
         />
-    </div>
+    </TabKeyNav>
 );
 
 export default Day;

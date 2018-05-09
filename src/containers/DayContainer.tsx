@@ -8,9 +8,10 @@ const getDayId = (state: IState) => {
     return state.crewListUI.currentDay;
 };
 
-const mapStateToProps = (state: IState) => {
+const mapStateToProps = (state: IState, ownProps: any) => {
     const dayId = getDayId(state);
     return {
+        children: ownProps.children,
         dayId,
         dayErrors: getEntityErrors(state.errors.byId, state.days.byId[dayId].errors, errorLocs.DAY),
         noteErrors: getEntityErrors(state.errors.byId, state.days.byId[dayId].errors, errorLocs.DAY_NOTE),
