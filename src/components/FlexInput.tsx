@@ -69,7 +69,14 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
                 handlePastedText={restrictor ? restrictor.pasteInput : restrictor}
             />
         ) :
-            <p className={value.length > 0 ? 'pStyle' : 'pStyleEmpty'} onClick={onClick}>{value || placeHolder}</p>}
+            <p
+                tabIndex={0}
+                className={value.length > 0 ? 'pStyle' : 'pStyleEmpty'}
+                onClick={onClick}
+                onFocus={onClick}
+            >
+                {value || placeHolder}
+            </p>}
         </div>
         );
 };
