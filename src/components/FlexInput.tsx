@@ -47,7 +47,10 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
         const valErrorClass = validationErrors.length > 0 ? ` valError${highestValErrorLevel}` : '';
         errorClasses = `${errorClass}${valErrorClass}`;
     }
-    /** set focus once the Editor mounts (this only happens onClick or tabbed from another element). */
+    /**
+     * set focus once the Editor mounts (this only happens onClick or tabbed from another element).
+     * This is hacky. Probably need to use a React Class and the didComponentMount hook instead of timeout.
+     */
     if (showEditor && !editorState.getSelection().getHasFocus()) {
         setTimeout(() => {
             const updRef = getRef();

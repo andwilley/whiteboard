@@ -35,26 +35,25 @@ const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
         case getType(actions.delAircrew):
             const newSortiesById = Object.assign({}, state);
             Object.keys(newSortiesById).forEach(sortieId => {
-                // newSortiesById[sortieId] = Object.assign({}, state[sortieId]);
                 if (newSortiesById[sortieId].front.aircrewRefIds.indexOf(action.payload.id) > -1) {
-                    newSortiesById[sortieId] = Object.assign({}, state[sortieId], {front: {
+                    newSortiesById[sortieId] = Object.assign({}, newSortiesById[sortieId], {
+                        front: {
                             ...state[sortieId].front,
-                            inputName: '',
                             aircrewRefIds: state[sortieId].front.aircrewRefIds.filter(aircrewId => {
                                 return aircrewId !== action.payload.id;
                             }),
-                        }}
-                    );
+                        },
+                    });
                 }
-                if (newSortiesById[sortieId].back.aircrewRefIds.indexOf(action.payload.id)) {
-                    newSortiesById[sortieId] = Object.assign({}, state[sortieId], {back: {
-                        ...state[sortieId].back,
-                        inputName: '',
-                        aircrewRefIds: state[sortieId].back.aircrewRefIds.filter(aircrewId => {
-                            return aircrewId !== action.payload.id;
-                        }),
-                    }}
-                );
+                if (newSortiesById[sortieId].back.aircrewRefIds.indexOf(action.payload.id) > -1) {
+                    newSortiesById[sortieId] = Object.assign({}, newSortiesById[sortieId], {
+                        back: {
+                            ...state[sortieId].back,
+                            aircrewRefIds: state[sortieId].back.aircrewRefIds.filter(aircrewId => {
+                                return aircrewId !== action.payload.id;
+                            }),
+                        },
+                    });
                 }
             });
             return newSortiesById;

@@ -31,8 +31,9 @@ const notesById = (state: {[id: string]: INotes} = {}, action: IAction) => {
         case getType(actions.delAircrew):
             const newNotesById = Object.assign({}, state);
             Object.keys(newNotesById).forEach(noteId => {
-                newNotesById[noteId] = Object.assign({}, state[noteId], {aircrewRefIds: state[noteId].aircrewRefIds
-                    .filter(aircrewId => aircrewId !== action.payload.id)});
+                newNotesById[noteId] = Object.assign({}, state[noteId], {
+                    aircrewRefIds: state[noteId].aircrewRefIds.filter(aircrewId => aircrewId !== action.payload.id),
+                });
             });
             return newNotesById;
         default:
