@@ -5,7 +5,14 @@ import validator, { ValidatorFn } from '../util/validator';
 import { seats, nameLocation } from '../whiteboard-constants';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs } from '../errors';
-import { IState, IAircrew, IEntity, IErrors, IDays, IElementBeingEdited } from '../types/State';
+import { IState,
+         IAircrew,
+         IEntity,
+         IErrors,
+         IDays,
+         IElementBeingEdited,
+         UErrorTypes,
+         UErrorLocs } from '../types/State';
 import { UEditables } from '../types/WhiteboardTypes';
 import { IAddErrorArgs } from '../actions';
 import FlexInput from '../components/FlexInput';
@@ -24,22 +31,23 @@ type IAircrewEntity = IEntity<IAircrew>;
  * component to dictate its display.
  */
 
+interface IErrorConfig {
+    show: UErrorTypes[];
+    update: UErrorTypes[];
+    errorLoc: UErrorLocs | '';
+    errorLocId: string;
+}
+
 interface IFlexInputContainerProps {
     placeHolder: string;
     name: string;
     value: string;
     onChange: (e: any) => any;
-    errorConfig: {
-        show: string[];
-        update: string[];
-        errorLoc: string;
-        errorLocId: string;
-    };
+    errorConfig: IErrorConfig;
     element: UEditables;
     entityId: string;
     validators?: ValidatorFn[];
     restrictorFns?: RestrictorFn[];
-    addNameIdTo?: {nameLocation: string; entityId: string};
 }
 
 interface ISchedBlock {
@@ -58,32 +66,30 @@ const getAircrewList = (aircrew: IAircrewEntity): IAircrew[] => {
 };
 
 const getAircrewRefList = (state: IState,
-                           addNameIdTo: {nameLocation: string; entityId: string} | undefined
+                           element: UEditables,
+                           entityId: string
 ): IAircrew[] => {
     /**
      * @param {IState} state The application state
-     * @param {nameLocation: string, entityId: string} addNameIdTo Object passed the container component with info
-     * about applicable state slice.
+     * @param {UEditables} element element location
+     * @param {string} entityId id of the element above
      * @returns {IAircrew[]} Array of aircrew objects or empty array.
      *
      * This returns the aircrew that are referenced in the value of the input field for the presentational component to
      * display as required.
      *
      * State it needs:
-     * state.aircrew.byId[addNameIdTo.entityId]
-     * state.sorties.byId[addNameIdTo.entityId]
-     * state.notes.byId[addNameIdTo.entityId]
+     * state.aircrew.byId[entityId]
+     * state.sorties.byId[entityId]
+     * state.notes.byId[entityId]
      */
-    if (!addNameIdTo) {
-        return [];
-    }
-    switch (addNameIdTo.nameLocation) {
+    switch (element) {
         case nameLocation.FRONT_SEAT_NAME:
-            return state.sorties.byId[addNameIdTo.entityId].front.aircrewRefIds.map(id => state.aircrew.byId[id]);
+            return state.sorties.byId[entityId].front.aircrewRefIds.map(id => state.aircrew.byId[id]);
         case nameLocation.BACK_SEAT_NAME:
-            return state.sorties.byId[addNameIdTo.entityId].back.aircrewRefIds.map(id => state.aircrew.byId[id]);
+            return state.sorties.byId[entityId].back.aircrewRefIds.map(id => state.aircrew.byId[id]);
         case nameLocation.NOTE:
-            return state.notes.byId[addNameIdTo.entityId].aircrewRefIds.map(id => state.aircrew.byId[id]);
+            return state.notes.byId[entityId].aircrewRefIds.map(id => state.aircrew.byId[id]);
         default:
             return [];
     }
@@ -431,11 +437,24 @@ const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
 interface IGetOnChangeWithNameMatchArgs {
     aircrewList: IAircrew[];
     dispatch: any;
-    ownProps: IFlexInputContainerProps;
+    hasNames: boolean;
+    element: UEditables;
+    entityId: string;
     errorTypesToCheck: string[];
+    errorConfig: IErrorConfig;
+    onChange: (e: any) => any;
 }
 
-const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((editorState: EditorState) => void) => {
+const getOnChangeWithNameMatch = ({
+    aircrewList,
+    dispatch,
+    hasNames,
+    element,
+    entityId,
+    errorTypesToCheck,
+    errorConfig,
+    onChange,
+}: IGetOnChangeWithNameMatchArgs): ((editorState: EditorState) => void) => {
     /**
      * @param {object}
      * @returns {function} If addNameIdTo is specified, returns updated onChange function.
@@ -446,26 +465,24 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((editor
      * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
      */
-    const { aircrewList, dispatch, ownProps } = args;
-    const addNameIdTo = ownProps.addNameIdTo;
     let aircrewRefIdDispatch: (ids: string[]) => void;
-    if (!addNameIdTo) {
+    if (!hasNames) {
         aircrewRefIdDispatch = (matchedAircrewIds: string[]) => { return; };
     } else {
-        switch (addNameIdTo.nameLocation) {
+        switch (element) {
             case nameLocation.FRONT_SEAT_NAME:
                 aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
-                    dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'front', matchedAircrewIds));
+                    dispatch(actions.updateSeatCrewRefs(entityId, 'front', matchedAircrewIds));
                 };
                 break;
             case nameLocation.BACK_SEAT_NAME:
                 aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
-                    dispatch(actions.updateSeatCrewRefs(addNameIdTo.entityId, 'back', matchedAircrewIds));
+                    dispatch(actions.updateSeatCrewRefs(entityId, 'back', matchedAircrewIds));
                 };
                 break;
             case nameLocation.NOTE:
                 aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
-                    dispatch(actions.updateNoteCrewRefs(addNameIdTo.entityId, matchedAircrewIds));
+                    dispatch(actions.updateNoteCrewRefs(entityId, matchedAircrewIds));
                 };
                 break;
             default:
@@ -486,9 +503,9 @@ const getOnChangeWithNameMatch = (args: IGetOnChangeWithNameMatchArgs): ((editor
         const newEditorState = EditorState.set(editorState, {decorator});
         dispatch(actions.setEditorState(newEditorState));
         /** run the original onChange passed to this container as a prop (update the input value) */
-        ownProps.onChange(editorState.getCurrentContent().getPlainText());
+        onChange(editorState.getCurrentContent().getPlainText());
         /** get the new errors and dispatch to state. */
-        dispatch(setErrorsOnFreshState(ownProps.errorConfig.update));
+        dispatch(setErrorsOnFreshState(errorConfig.update));
     };
 };
 
@@ -545,6 +562,10 @@ const getDecorators = (aircrewRefList: IAircrew[]): CompositeDecorator => {
     return compositeDecorators;
 };
 
+const doesInputHaveNames = (editable: UEditables) => {
+    return (Object.values(nameLocation).indexOf(editable) > -1);
+};
+
 interface IFlexInputStateProps {
     aircrewList: IAircrew[];
     aircrewRefList: IAircrew[];
@@ -553,12 +574,13 @@ interface IFlexInputStateProps {
     editorState: EditorState;
     elementBeingEdited: IElementBeingEdited;
     isInputActive: boolean;
+    hasNames: boolean;
 }
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFlexInputStateProps => {
-    const aircrewRefList = getAircrewRefList(state, ownProps.addNameIdTo);
+    const hasNames = doesInputHaveNames(ownProps.element);
+    const aircrewRefList = hasNames ? getAircrewRefList(state, ownProps.element, ownProps.entityId) : [];
     const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
-    // and getValErrors here?
     const dayErrors = getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
     const componentErrors = getComponentErrors(
         dayErrors,
@@ -568,13 +590,14 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
         aircrewRefIds
     );
     return {
-        aircrewList: ownProps.addNameIdTo ? getAircrewList(state.aircrew) : [],
+        aircrewList: hasNames ? getAircrewList(state.aircrew) : [],
         aircrewRefList,
         state,
         errors: componentErrors,
         editorState: getEditorState(state),
         elementBeingEdited: getElementBeingEdited(state),
         isInputActive: isInputActive(state, ownProps),
+        hasNames,
     };
 };
 
@@ -605,8 +628,12 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
         onChange: getOnChangeWithNameMatch({
             aircrewList: stateProps.aircrewList,
             dispatch: dispatchProps.dispatch,
-            ownProps: ownProps,
+            hasNames: stateProps.hasNames,
+            element: ownProps.element,
+            entityId: ownProps.entityId,
             errorTypesToCheck: ownProps.errorConfig.update,
+            errorConfig: ownProps.errorConfig,
+            onChange: ownProps.onChange,
         }),
         onClick: () => {
             if (stateProps.isInputActive) {

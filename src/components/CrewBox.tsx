@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { errorTypes, errorLocs } from '../errors';
-import { nameLocation, editables } from '../whiteboard-constants';
+import { editables } from '../whiteboard-constants';
 import FlexInputContainer from '../containers/FlexInputContainer';
 
 interface ICrewBoxProps {
@@ -37,7 +37,6 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
                 errorLoc: errorLocs.FLIGHT,
                 errorLocId: flightId,
             }}
-            addNameIdTo={{nameLocation: nameLocation.FRONT_SEAT_NAME, entityId: sortieStrings.sortieId}}
             element={editables.FRONT_SEAT_NAME}
             entityId={sortieStrings.sortieId}
         />
@@ -57,6 +56,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             onChange={onInputChange.onPilotSymbolChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
         /> */}
+        <br />
         <FlexInputContainer
             placeHolder="WSO"
             name="wso"
@@ -68,7 +68,6 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
                 errorLoc: errorLocs.FLIGHT,
                 errorLocId: flightId,
             }}
-            addNameIdTo={{nameLocation: nameLocation.BACK_SEAT_NAME, entityId: sortieStrings.sortieId}}
             element={editables.BACK_SEAT_NAME}
             entityId={sortieStrings.sortieId}
         />

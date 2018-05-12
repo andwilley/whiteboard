@@ -26,6 +26,8 @@ export interface INameLocations {
     NOTE: 'NOTE';
 }
 
+export type UNameLocations = INameLocations[keyof INameLocations];
+
 export interface IEditables extends INameLocations {
     BRIEF: 'BRIEF';
     TAKEOFF: 'TAKEOFF';

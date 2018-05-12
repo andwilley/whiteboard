@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Note from './Note';
-import { INotes, IErrors } from '../types/State';
+import { INotes, IErrors, UErrorLocs } from '../types/State';
 import AddButton from './AddButton';
 import ErrorList from './ErrorList';
 
 interface INoteBoxProps {
     notes: INotes[];
-    errorLoc: string;
+    errorLoc: UErrorLocs;
     errorLocId: string;
     onInputChange: (noteId: string) => (e: any) => void;
     onAddNoteClick: () => void;
@@ -30,9 +30,9 @@ const NoteBox: React.SFC<INoteBoxProps> = ({ notes, onInputChange, onAddNoteClic
         <div>
             <ErrorList errors={noteErrors} />
             {noteComponentsList}
-            <AddButton
-                onClick={onAddNoteClick}
-            />
+            <AddButton onClick={onAddNoteClick}>
+                {`${errorLoc} Note`}
+            </AddButton>
         </div>
     );
 };

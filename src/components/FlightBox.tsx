@@ -16,9 +16,9 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({ dayId, flightIds, errors, onAdd
     return (
         <div>
             {flightComponents}
-            <AddButton
-                onClick={() => onAddFlightClick(dayId, false)}
-            />
+            <AddButton onClick={() => onAddFlightClick(dayId, false)}>
+                Flight
+            </AddButton>
         </div>
     );
 };

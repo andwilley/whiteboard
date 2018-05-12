@@ -14,9 +14,9 @@ const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieC
     return (
         <div>
             {sortieComponents}
-            <AddButton
-                onClick={() => onAddSortieClick()}
-            />
+            <AddButton onClick={() => onAddSortieClick()}>
+                Sortie
+            </AddButton>
         </div>
     );
 };

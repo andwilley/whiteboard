@@ -108,7 +108,8 @@ export interface IErrorTypes {
     FORM_VAL_ERROR: 'FORM_VAL_ERROR';
 }
 
-export type UErrorTypes = Exclude<keyof IErrorTypes, IErrorTypes['SCHEDULE_CONFLICT']>;
+export type UGenericErrorTypes = Exclude<keyof IErrorTypes, IErrorTypes['SCHEDULE_CONFLICT']>;
+export type UErrorTypes = IErrorTypes[keyof IErrorTypes];
 
 // export type UErrorTypes = IErrorTypes['FORM_VALIDATION'] | IErrorTypes['FORM_VAL_ERROR'];
 
@@ -149,7 +150,7 @@ export interface IGenericErrors {
     readonly id: string;
     readonly time: Date;
     readonly dayId: string;
-    readonly type: UErrorTypes;
+    readonly type: UGenericErrorTypes;
     readonly location: UErrorLocs;
     readonly locationId: string;
     readonly level: UErrorLevels;

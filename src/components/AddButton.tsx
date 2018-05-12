@@ -4,9 +4,9 @@ interface IAddButtonProps {
     onClick: () => any;
 }
 
-const AddButton: React.SFC<IAddButtonProps> = ({onClick}) => {
+const AddButton: React.SFC<IAddButtonProps> = ({onClick, children}) => {
     return (
-        <span onClick={onClick}>[+]</span>
+        <span onClick={onClick}>[+{children ? ` ${children}` : ''}]</span>
     );
 };
 
