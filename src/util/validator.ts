@@ -3,7 +3,7 @@ import { errorLevels } from '../errors';
 import { errorTypes } from '../errors';
 import { errorMessages } from '../errors';
 import { IUntrackedErrors } from '../types/WhiteboardTypes';
-import { RGX_24HOUR_TIME } from '../util/regEx';
+import { RGX_24HOUR_TIME, RGX_IS_TR_CODE_LIST } from '../util/regEx';
 import { UErrorLevels } from '../types/State';
 
 /** Validators - show user input errors (still updates state with invalid input) */
@@ -24,6 +24,18 @@ export const is24HourTime = (args?: IValArgs) => (text: string): IUntrackedError
             type: errorTypes.FORM_VAL_ERROR,
             level: args && args.level ? args.level : errorLevels.CAUT,
             message: args && args.message ? args.message : errorMessages.INVALID_TIME,
+        };
+};
+
+export const trCodeList = (args?: IValArgs) => (text: string): IUntrackedErrors | null => {
+    const valid = RGX_IS_TR_CODE_LIST.test(text);
+    return valid ?
+        null :
+        {
+            id: cuid(),
+            type: errorTypes.FORM_VAL_ERROR,
+            level: args && args.level ? args.level : errorLevels.CAUT,
+            message: args && args.message ? args.message : errorMessages.INVALID_CODE,
         };
 };
 

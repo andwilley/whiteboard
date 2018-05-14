@@ -59,7 +59,7 @@ export interface ISeat {
     readonly inputName: string;
     readonly aircrewRefIds: string[];
     readonly codes: string[];
-    readonly symbols: string[];
+    readonly symbols: string;
 }
 
 export interface ISorties {

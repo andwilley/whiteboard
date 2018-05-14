@@ -4,6 +4,7 @@ import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 import { EditorState } from 'draft-js';
 import { UEditables } from '../types/WhiteboardTypes';
+import { RGX_FIND_TR_CODES } from '../util/regEx';
 
 // Action Types
 export const ADD_UPDATE_AIRCREW_FORM_ADD_QUAL = 'ADD_UPDATE_AIRCREW_FORM_ADD_QUAL';
@@ -344,76 +345,35 @@ export const actions = {
         },
     })),
     updatePuckCode: createAction(UPDATE_PUCK_CODE, (args: IUpdatePuckCodeArgs) => {
-        // strip non-numeric chars from front and back of input
-        const newCodes = (codes: string) => {
-            let codesStartIndex = 0;
-            let codesEndIndex: number = codes.length;
-            const lenCodes = codes.length;
-            for (let i = 0; i < lenCodes; i++) {
-                codesStartIndex = i;
-                if (codes[i].match(/\d/)) {
-                    break;
-                }
-            }
-            for (let i = lenCodes - 1; i > 0; i--) {
-                codesEndIndex = i + 1;
-                if (codes[i].match(/\d/)) {
-                    break;
-                }
-            }
-            codes = codes.slice(codesStartIndex, codesEndIndex);
-            return codes;
-        };
-
-        const strippedCodes = newCodes(args.codes);
-
-        // make it an array
-        let codesList: string[] = strippedCodes.split(/[^\d]+/);
-
-        // get rid of duplicates or empty strings
-        const codeCount = {};
-        codesList = codesList.filter(code => {
-            if (codeCount[code] || code === '') {
-                return false;
-            }
-            codeCount[code] = code;
-            return true;
-        });
+        /**
+         * breaks if global flag isn't set. too brittle??
+         * we don't check for duplicates or invalid codes here. we rely on the input
+         * to be filtered by FlexInput... is this a bad idea? I have to do it there to
+         * keep the editor from showing it... if I did it here, we'd be doing it twice.
+         */
+        const codesList = args.codes.match(RGX_FIND_TR_CODES);
         return {
             type: UPDATE_PUCK_CODE,
             payload: {
                 sortieId: args.sortieId,
                 crewPosition: args.crewPosition,
-                codes: codesList,
+                codes: codesList || [],
             },
         };
     }),
-    updatePuckSymbol: createAction(UPDATE_PUCK_SYMBOL, (args: IUpdatePuckSymbolArgs) => {
-        // strip all non-symbols
-        const symbols = args.symbols.replace(/[^@!?~#$%*+=]+/g, ''); // [^@!\?~#\$%\*\+=+]
-
-        // make it an array
-        let symbolList = symbols.split('');
-
-        // get rid of duplicates and empty strings
-        // this is inefficient. can do it all in one step. this array will never be longer than 10 items, though.
-        const symbolCount = {};
-        symbolList = symbolList.filter((symbol: string) => {
-            if (symbolCount[symbol] || symbol === '') {
-                return false;
-            }
-            symbolCount[symbol] = symbol;
-            return true;
-        });
-        return {
-            type: UPDATE_PUCK_SYMBOL,
-            payload: {
-                sortieId: args.sortieId,
-                crewPosition: args.crewPosition,
-                symbolList,
-            },
-        };
-    }),
+    updatePuckSymbol: createAction(UPDATE_PUCK_SYMBOL, (args: IUpdatePuckSymbolArgs) => ({
+        /**
+         * we don't check for duplicates or invalid symbols here. we rely on the input
+         * to be filtered by FlexInput... is this a bad idea? I have to do it there to
+         * keep the editor from showing it... if I did it here, we'd be doing it twice.
+         */
+        type: UPDATE_PUCK_SYMBOL,
+        payload: {
+            sortieId: args.sortieId,
+            crewPosition: args.crewPosition,
+            symbols: args.symbols,
+        },
+    })),
     addAirspace: createAction(ADD_AIRSPACE, (flightId: string) => {
         const airspaceId = cuid();
         // airspaceId++;			// for testing

@@ -20,6 +20,7 @@ export const errorTypes: IErrorTypes = {
 export const errorMessages = {
     ERR_NO_RESULTS_FOUND: 'No results match your search.',
     INVALID_TIME: 'Please enter a valid 24 hour time.',
+    INVALID_CODE: 'Not all the codes you entered are valid.',
 };
 
 export const errorLocs: IErrorLocs = {

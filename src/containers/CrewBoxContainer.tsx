@@ -11,10 +11,10 @@ const getSortieStrings = (sortie: ISorties) => {
     return {
         pilot: sortie.front.inputName,
         pilotCodes: sortie.front.codes.join(' '),
-        pilotSymbols: sortie.front.symbols.join(),
+        pilotSymbols: sortie.front.symbols,
         wso: sortie.back.inputName,
         wsoCodes: sortie.back.codes.join(' '),
-        wsoSymbols: sortie.back.symbols.join(),
+        wsoSymbols: sortie.back.symbols,
     };
 };
 
@@ -38,10 +38,18 @@ const mapDispatchToProps = (dispatch: any, ownProps: ICrewBoxContainerProps) => 
                 }));
             },
             onPilotCodeChange: (inputValue: string) => {
-                dispatch({type: 'NOTHING'});
+                dispatch(actions.updatePuckCode({
+                    sortieId: ownProps.sortieId,
+                    crewPosition: 'front',
+                    codes: inputValue,
+                }));
             },
             onPilotSymbolChange: (inputValue: string) => {
-                dispatch({type: 'NOTHING'});
+                dispatch(actions.updatePuckSymbol({
+                    sortieId: ownProps.sortieId,
+                    crewPosition: 'front',
+                    symbols: inputValue,
+                }));
             },
             onWSONameChange: (inputValue: string) => {
                 dispatch(actions.updatePuckName({
@@ -51,10 +59,18 @@ const mapDispatchToProps = (dispatch: any, ownProps: ICrewBoxContainerProps) => 
                 }));
             },
             onWSOCodeChange: (inputValue: string) => {
-                dispatch({type: 'NOTHING'});
+                dispatch(actions.updatePuckCode({
+                    sortieId: ownProps.sortieId,
+                    crewPosition: 'back',
+                    codes: inputValue,
+                }));
             },
             onWSOSymbolChange: (inputValue: string) => {
-                dispatch({type: 'NOTHING'});
+                dispatch(actions.updatePuckSymbol({
+                    sortieId: ownProps.sortieId,
+                    crewPosition: 'back',
+                    symbols: inputValue,
+                }));
             },
         },
         // onInputChange: (e: any) => {

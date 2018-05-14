@@ -664,7 +664,9 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
         editorState: stateProps.editorState,
         showEditor: stateProps.isInputActive,
         restrictor: inputRestrictor,
-        validationErrors: getValidationErrors(ownProps.value,
+        validationErrors: getValidationErrors(stateProps.isInputActive ?
+                                                stateProps.editorState.getCurrentContent().getPlainText() :
+                                                ownProps.value,
                                               ownProps.validators),
     });
 };

@@ -121,7 +121,7 @@ const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
                     ...state[action.payload.sortieId],
                     [action.payload.crewPosition]: {
                         ...state[action.payload.sortieId][action.payload.crewPosition],
-                        symbols: action.payload.symbolList,
+                        symbols: action.payload.symbols,
                     },
                 },
             };

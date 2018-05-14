@@ -1,4 +1,4 @@
-import { RGX_PARTIAL_TIME } from '../util/regEx';
+import { RGX_PARTIAL_TIME, RGX_SYMBOLS, RGX_FIND_TR_CODES } from '../util/regEx';
 import { EditorState, DraftHandleValue } from 'draft-js';
 
 /**
@@ -11,6 +11,22 @@ export type RestrictorFn = (text: string) => boolean;
 
 export const restrictToTimeChars = (text: string) => {
     return RGX_PARTIAL_TIME.test(text);
+};
+
+export const restrictToSymbols = (text: string) => {
+    return RGX_SYMBOLS.test(text);
+};
+
+export const noDuplicateChars = (text: string) => {
+    const charCount = new Set(text);
+    return Array.from(charCount).join('') === text;
+};
+
+export const noDuplicateCodes = (text: string) => {
+    /** breaks if global flag isn't set */
+    const codes = text.match(RGX_FIND_TR_CODES) || [];
+    const uniqueCodes = new Set(codes);
+    return codes.length === uniqueCodes.size;
 };
 
 const restrictor = (...restrictorFunctions: RestrictorFn[]) =>
@@ -32,6 +48,7 @@ const restrictor = (...restrictorFunctions: RestrictorFn[]) =>
         return 'not-handled';
     }
 
+    /** use array.every for this. It breaks as soon as one is false. */
     return restrictorFunctions.reduce((inputIs: (DraftHandleValue), restrictorFn) => {
         if (!restrictorFn(text)) {
             inputIs = 'handled';

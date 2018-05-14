@@ -2,6 +2,8 @@ import * as React from 'react';
 import { errorTypes, errorLocs } from '../errors';
 import { editables } from '../whiteboard-constants';
 import FlexInputContainer from '../containers/FlexInputContainer';
+import { restrictToSymbols, noDuplicateChars, noDuplicateCodes } from '../util/restrictor';
+import { trCodeList } from '../util/validator';
 
 interface ICrewBoxProps {
     sortieStrings: {
@@ -48,14 +50,19 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
             element={editables.FRONT_SEAT_CODE}
             entityId={sortieStrings.sortieId}
+            validators={[trCodeList()]}
+            restrictorFns={[noDuplicateCodes]}
         />
-        {/* <FlexInputContainer
+        <FlexInputContainer
             placeHolder="Pilot Symbols"
             name="pilotSymbols"
             value={sortieStrings.pilotSymbols}
             onChange={onInputChange.onPilotSymbolChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
-        /> */}
+            element={editables.FRONT_SEAT_SYMBOL}
+            entityId={sortieStrings.sortieId}
+            restrictorFns={[restrictToSymbols, noDuplicateChars]}
+        />
         <br />
         <FlexInputContainer
             placeHolder="WSO"
@@ -79,14 +86,19 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
             element={editables.BACK_SEAT_CODE}
             entityId={sortieStrings.sortieId}
+            validators={[trCodeList()]}
+            restrictorFns={[noDuplicateCodes]}
         />
-        {/* <FlexInputContainer
+        <FlexInputContainer
             placeHolder="WSO Symbols"
             name="wsoSymbols"
             value={sortieStrings.wsoSymbols}
             onChange={onInputChange.onWSOSymbolChange}
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
-        /> */}
+            element={editables.BACK_SEAT_SYMBOL}
+            entityId={sortieStrings.sortieId}
+            restrictorFns={[restrictToSymbols, noDuplicateChars]}
+        />
     </div>
 );
 
