@@ -41,6 +41,8 @@ export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const DEL_ERROR = 'DEL_ERROR';
 export const SET_EDITOR_STATE = 'SET_EDITOR_STATE';
 export const SET_EDITED_ELEMENT = 'SET_EDITED_ELEMENT';
+export const ADD_UPDATE_SNIV = 'ADD_UPDATE_SNIV';
+export const DEL_SNIV = 'DEL_SNIV';
 
 // const makeActionCreator = (type, ...payloadNames) => {
 //     return (...payloadValues) => {
@@ -70,7 +72,7 @@ export interface ISetAircrewSearchArgs {
     rankFilter?: string[];
 }
 
-export interface IAddAircrewArgs {
+export interface IAddUpdateAircrewArgs {
     id?: string;
     callsign: string;
     first: string;
@@ -128,6 +130,15 @@ export interface IAddErrorArgs {
     meta: IGenericErrorMeta;
 }
 
+export interface IAddUpdateSnivArgs {
+    id?: string;
+    dayId: string;
+    aircrewId: string;
+    start: string;
+    end: string;
+    message: string;
+}
+
 // let crewId = 0;
 // let testFlightId = 0;
 // let cnoteId = 0;
@@ -153,7 +164,7 @@ export const actions = {
             ...args,
         },
     })),
-    addUpdateAircrew: createAction(ADD_UPDATE_AIRCREW, (args: IAddAircrewArgs) => {
+    addUpdateAircrew: createAction(ADD_UPDATE_AIRCREW, (args: IAddUpdateAircrewArgs) => {
         const aircrewId = (!args.id || args.id === '') ? cuid() : args.id;
         return {
             type: ADD_UPDATE_AIRCREW,
@@ -463,6 +474,22 @@ export const actions = {
         payload: {
             editable,
             entityId,
+        },
+    })),
+    addUpdateSniv: createAction(ADD_UPDATE_SNIV, (args: IAddUpdateSnivArgs) => ({
+        type: ADD_UPDATE_SNIV,
+        payload: {
+            ...args,
+            snivId: args.id || cuid(),
+            dateAdded: args.id ? null : new Date(),
+            lastUpdated: new Date(),
+        },
+    })),
+    delSniv: createAction(DEL_SNIV, (snivId: string, aircrewId: string) => ({
+        type: DEL_SNIV,
+        payload: {
+            snivId,
+            aircrewId,
         },
     })),
 };

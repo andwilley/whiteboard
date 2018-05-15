@@ -23,8 +23,9 @@ export const noDuplicateChars = (text: string) => {
 };
 
 export const noDuplicateCodes = (text: string) => {
-    /** breaks if global flag isn't set */
-    const codes = text.match(RGX_FIND_TR_CODES) || [];
+    /** breaks if global flag isn't set! */
+    let codes = text.match(RGX_FIND_TR_CODES) || [];
+    codes = codes.map(code => code.replace(/[ ,-]/, '').toLocaleLowerCase());
     const uniqueCodes = new Set(codes);
     return codes.length === uniqueCodes.size;
 };
@@ -48,7 +49,7 @@ const restrictor = (...restrictorFunctions: RestrictorFn[]) =>
         return 'not-handled';
     }
 
-    /** use array.every for this. It breaks as soon as one is false. */
+    /** use array.every for this. It will break as soon as one is false. */
     return restrictorFunctions.reduce((inputIs: (DraftHandleValue), restrictorFn) => {
         if (!restrictorFn(text)) {
             inputIs = 'handled';

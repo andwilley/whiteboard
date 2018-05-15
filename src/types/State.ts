@@ -49,6 +49,17 @@ export interface IFlights {
     readonly notes: string[];
 }
 
+export interface ISnivs {
+    readonly id: string;
+    readonly dayId: string;
+    readonly aircrewId: string;
+    readonly start: string;
+    readonly end: string;
+    readonly message: string;
+    readonly dateAdded: Date;
+    readonly lastUpdated: Date;
+}
+
 export interface INotes {
     readonly id: string;
     readonly content: string;
@@ -200,6 +211,7 @@ export interface IState {
     readonly days: IEntity<IDays>;
     readonly flights: IEntity<IFlights>;
     readonly sorties: IEntity<ISorties>;
+    readonly snivs: IEntity<ISnivs>;
     readonly notes: IEntity<INotes>;
     readonly airspace: IEntity<IAirspace>;
     readonly crewListUI: ICrewListUI;

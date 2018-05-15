@@ -114,6 +114,10 @@ export const INITIAL_STATE: IState = {
         },
         allIds: ['a', 'b'],
     },
+    snivs: {
+        byId: {},
+        allIds: [],
+    },
     notes: {
         byId: {
             a: {

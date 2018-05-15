@@ -50,7 +50,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
             element={editables.FRONT_SEAT_CODE}
             entityId={sortieStrings.sortieId}
-            validators={[trCodeList()]}
+            validatorFns={[trCodeList()]}
             restrictorFns={[noDuplicateCodes]}
         />
         <FlexInputContainer
@@ -86,7 +86,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
             element={editables.BACK_SEAT_CODE}
             entityId={sortieStrings.sortieId}
-            validators={[trCodeList()]}
+            validatorFns={[trCodeList()]}
             restrictorFns={[noDuplicateCodes]}
         />
         <FlexInputContainer

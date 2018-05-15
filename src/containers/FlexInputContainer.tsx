@@ -46,7 +46,7 @@ interface IFlexInputContainerProps {
     errorConfig: IErrorConfig;
     element: UEditables;
     entityId: string;
-    validators?: ValidatorFn[];
+    validatorFns?: ValidatorFn[];
     restrictorFns?: RestrictorFn[];
 }
 
@@ -141,11 +141,11 @@ const getSchedErrors = (dayErrors: IErrors[],
     return schedErrors;
 };
 
-const getValidationErrors = (text: string, validators?: ValidatorFn[]) => {
-    if (!validators || validators.length === 0) {
+const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
+    if (!validatorFns || validatorFns.length === 0) {
         return [];
     }
-    return validator(text, ...validators);
+    return validator(text, ...validatorFns);
 };
 
 interface IFindSchedErrorsReducePreviousValue {
@@ -667,7 +667,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
         validationErrors: getValidationErrors(stateProps.isInputActive ?
                                                 stateProps.editorState.getCurrentContent().getPlainText() :
                                                 ownProps.value,
-                                              ownProps.validators),
+                                              ownProps.validatorFns),
     });
 };
 
