@@ -53,7 +53,7 @@ interface IFlexInputContainerProps {
 interface ISchedBlock {
     start: Date;
     end: Date;
-    location: string;
+    location: UErrorLocs;
     locationId: string;
 }
 
@@ -107,8 +107,10 @@ const getComponentErrors = (dayErrors: IErrors[],
      * Passes shown errors to component
      */
     const schedErrors = errorTypesToGet.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ?
-                        getSchedErrors(dayErrors, errorLoc, errorLocId, aircrewRefIds) : [];
-    return [...schedErrors];
+        getSchedErrors(dayErrors, errorLoc, errorLocId, aircrewRefIds) : [];
+    const timeOrderErrors = errorTypesToGet.indexOf(errorTypes.TIME_ORDER) > -1 ?
+        getTimeOrderErrors(dayErrors) : [];
+    return [...schedErrors, ...timeOrderErrors];
 };
 
 const getDayErrors = (errorsById: { [id: string]: IErrors }, currentDay: IDays): IErrors[] => {
@@ -141,17 +143,16 @@ const getSchedErrors = (dayErrors: IErrors[],
     return schedErrors;
 };
 
+const getTimeOrderErrors = (dayErrors: IErrors[]): IErrors[] => {
+    return dayErrors.filter(error => error.type === errorTypes.TIME_ORDER);
+};
+
 const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
     if (!validatorFns || validatorFns.length === 0) {
         return [];
     }
     return validator(text, ...validatorFns);
 };
-
-interface IFindSchedErrorsReducePreviousValue {
-    lastBlock: ISchedBlock;
-    lastTime: Date;
-}
 
 const findSchedErrors = (state: IState): IAddErrorArgs[] => {
     /**
@@ -168,43 +169,58 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
      * state.aircrew.byId
      */
     const activeAircrewRefs = getActiveAircrewRefs(state);
-    const emptyBlock = {
-        start: new Date(0),
-        end: new Date(0),
-        location: '',
-        locationId: '',
+
+    const pushBlockAsError = (errorArray: IAddErrorArgs[], block: ISchedBlock, aircrewId: string): void => {
+        errorArray.push({
+            dayId: state.crewListUI.currentDay,
+            type: errorTypes.SCHEDULE_CONFLICT,
+            location: block.location,
+            locationId: block.locationId,
+            level: errorLevels.WARN,
+            message: `${state.aircrew.byId[aircrewId].callsign} has a schedule conflict.`,
+            meta: {
+                aircrewId,
+            },
+        });
     };
+
     const errors: IAddErrorArgs[] = [];
     Object.keys(activeAircrewRefs).forEach(aircrewId => {
-        activeAircrewRefs[aircrewId].sort((a: ISchedBlock, b: ISchedBlock) => {
-            if (a.start < b.start) { return -1; }
-            if (a.start > b.start) { return 1; }
-            return 0;
-        });
         activeAircrewRefs[aircrewId]
-            .reduce((acc: IFindSchedErrorsReducePreviousValue, schedBlock: ISchedBlock) => {
-            const actualFirst = (schedBlock.start < schedBlock.end) ? schedBlock.start : schedBlock.end;
-            const actualLast = (schedBlock.start < schedBlock.end) ? schedBlock.end : schedBlock.start;
-            if (actualFirst < acc.lastTime) {
-                /** create an error for both locations */
-                [acc.lastBlock, schedBlock].forEach(block => {
-                    errors.push({
-                        dayId: state.crewListUI.currentDay,
-                        type: errorTypes.SCHEDULE_CONFLICT,
-                        location: block.location,
-                        locationId: block.locationId,
-                        level: errorLevels.WARN,
-                        message: `${state.aircrew.byId[aircrewId].callsign} has a schedule conflict.`,
-                        meta: {
-                            aircrewId,
-                        },
-                    });
+            .reduce((schedConflictArray: ISchedBlock[], block: ISchedBlock) => {
+                /**
+                 * for each aircrew that is scheduled, go through each sched block.
+                 * for each block, check schedConflictArray to see if any block conflicts with its time slot.
+                 * if a block conflicts, push an error onto errors for each block.
+                 * - blocks conflict if either:
+                 *   - start time is inside or equal to the schedConflictArray block values
+                 *   - end time is inside or equal to the schedConflictArray block values
+                 *   - schedConflictArray start time is between or equal to the compared block
+                 * if both blocks are snivs, ignore the error.
+                 * add the new sched block to schedConflicArray and repeat for the next block.
+                 *
+                 * Assumes start and end are actually in order ***!
+                 */
+                schedConflictArray.forEach(scblock => {
+                    if (block.start >= scblock.start && block.start <= scblock.end) {
+                        if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
+                            pushBlockAsError(errors, block, aircrewId);
+                            pushBlockAsError(errors, scblock, aircrewId);
+                        }
+                    } else if (block.end >= scblock.start && block.end <= scblock.end) {
+                        if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
+                            pushBlockAsError(errors, block, aircrewId);
+                            pushBlockAsError(errors, scblock, aircrewId);
+                        }
+                    } else if (scblock.start >= block.start && scblock.start <= block.end) {
+                        if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
+                            pushBlockAsError(errors, block, aircrewId);
+                            pushBlockAsError(errors, scblock, aircrewId);
+                        }
+                    }
                 });
-            }
-            acc.lastBlock = schedBlock;
-            acc.lastTime = actualLast;
-            return acc;
-        }, {lastBlock: emptyBlock, lastTime: new Date(0)});
+                return schedConflictArray.concat(block);
+            }, []);
     });
     return errors;
 };
@@ -262,6 +278,11 @@ const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
         location: errorLocs.FLIGHT,
         locationId: flightId,
     };
+    if (schedBlock.start > schedBlock.end) {
+        const tempStart = schedBlock.start;
+        schedBlock.start = schedBlock.end;
+        schedBlock.end = tempStart;
+    }
     activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
         [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
     return activeAircrewRefs;
@@ -282,7 +303,7 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
      * @param {string} aircrewId
      * @param {?boolean} flightNote True if this is a flight note. Default: false.
      * @param {?string} flightId Needed if this is a flight note. Default: ''
-     * @returns {ISchedBlock}
+     * @returns {ISchedObject}
      * if times were specified, uses those. if start time but no end time, uses land time.
      * *** this doesn't check if land time comes after start time!!!!!!!!!
      * If no land time, uses stardard note duration (default 60 min).
@@ -336,6 +357,11 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
                 location: flightNote ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
                 locationId: flightNote ? flightId : state.crewListUI.currentDay,
             };
+            if (schedBlock.start > schedBlock.end) {
+                const tempStart = schedBlock.start;
+                schedBlock.start = schedBlock.end;
+                schedBlock.end = tempStart;
+            }
             activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
                 [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
         }
@@ -440,7 +466,6 @@ interface IGetOnChangeWithNameMatchArgs {
     hasNames: boolean;
     element: UEditables;
     entityId: string;
-    errorTypesToCheck: string[];
     errorConfig: IErrorConfig;
     onChange: (e: any) => any;
 }
@@ -451,7 +476,6 @@ const getOnChangeWithNameMatch = ({
     hasNames,
     element,
     entityId,
-    errorTypesToCheck,
     errorConfig,
     onChange,
 }: IGetOnChangeWithNameMatchArgs): ((editorState: EditorState) => void) => {
@@ -631,7 +655,6 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             hasNames: stateProps.hasNames,
             element: ownProps.element,
             entityId: ownProps.entityId,
-            errorTypesToCheck: ownProps.errorConfig.update,
             errorConfig: ownProps.errorConfig,
             onChange: ownProps.onChange,
         }),

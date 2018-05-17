@@ -10,12 +10,14 @@ const snivsById = (state: {[id: string]: ISnivs} = {}, action: IAction) => {
                 ...state,
                 [action.payload.snivId]: {
                     ...action.payload,
-                    id: action.payload.id || state[action.payload.snivId].id,
+                    id: action.payload.snivId,
                     dateAdded: action.payload.dateAdded || state[action.payload.snivId].dateAdded,
                 },
             };
         case getType(actions.delSniv):
-            return state;
+            const rest = Object.assign({}, state);
+            delete rest[action.payload.snivId];
+            return rest;
         default:
             return state;
     }
@@ -24,9 +26,12 @@ const snivsById = (state: {[id: string]: ISnivs} = {}, action: IAction) => {
 const allSnivs = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateSniv):
-            return state;
+            if (state.indexOf(action.payload.snivId) > -1) {
+                return state;
+            }
+            return state.concat(action.payload.snivId);
         case getType(actions.delSniv):
-            return state;
+            return state.filter(id => id !== action.payload.snivId);
         default:
             return state;
     }

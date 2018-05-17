@@ -1,4 +1,4 @@
-import { INameLocations, IEditables } from './types/WhiteboardTypes';
+import { INameLocations, IEditables, ITimeTypes } from './types/WhiteboardTypes';
 
 export const qualsList =
     ['SL', 'DL', 'MC', 'NSI', 'FAI', 'MDTI', 'WTI', 'FAC(A)', 'FAC(A)I', 'NS', 'ACM', 'LAT', 'PMCF', 'ODO'];
@@ -41,4 +41,10 @@ export const editables: IEditables = {
     BACK_SEAT_SYMBOL: 'BACK_SEAT_SYMBOL',
     LOADOUT: 'LOADOUT',
     AIRSPACE: 'AIRSPACE',
+};
+
+export const timeTypes: ITimeTypes = {
+    BRIEF: 'BRIEF',
+    TAKEOFF: 'TAKEOFF',
+    LAND: 'LAND',
 };

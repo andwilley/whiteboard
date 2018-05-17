@@ -1,5 +1,5 @@
 import * as cuid from 'cuid';
-import { IGenericErrorMeta } from '../types/State';
+import { IGenericErrorMeta, UErrorTypes, UErrorLocs, UErrorLevels } from '../types/State';
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 import { EditorState } from 'draft-js';
@@ -122,16 +122,16 @@ export interface IUpdateAirspace {
 
 export interface IAddErrorArgs {
     dayId: string;
-    type: string;
-    location: string;
+    type: UErrorTypes;
+    location: UErrorLocs;
     locationId: string;
-    level: string;
+    level: UErrorLevels;
     message: string;
     meta: IGenericErrorMeta;
 }
 
 export interface IAddUpdateSnivArgs {
-    id?: string;
+    snivId?: string;
     dayId: string;
     aircrewId: string;
     start: string;
@@ -264,7 +264,7 @@ export const actions = {
         type: UPDATE_FLIGHT_TIME,
         payload: {
             flightId,
-            timeType,
+            timeType: timeType.toLocaleLowerCase(),
             time,
         },
     })),
@@ -480,8 +480,8 @@ export const actions = {
         type: ADD_UPDATE_SNIV,
         payload: {
             ...args,
-            snivId: args.id || cuid(),
-            dateAdded: args.id ? null : new Date(),
+            snivId: args.snivId || cuid(),
+            dateAdded: args.snivId ? null : new Date(),
             lastUpdated: new Date(),
         },
     })),

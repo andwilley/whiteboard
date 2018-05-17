@@ -116,7 +116,7 @@ export interface IAddUpdateAircrewFormValues {
 export interface IErrorTypes {
     FORM_VALIDATION: 'FORM_VALIDATION';
     SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT';
-    FORM_VAL_ERROR: 'FORM_VAL_ERROR';
+    TIME_ORDER: 'TIME_ORDER';
 }
 
 export type UGenericErrorTypes = Exclude<keyof IErrorTypes, IErrorTypes['SCHEDULE_CONFLICT']>;

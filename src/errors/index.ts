@@ -13,7 +13,7 @@ export const errorLevels: IErrorLevels = {
 export const errorTypes: IErrorTypes = {
     FORM_VALIDATION: 'FORM_VALIDATION',
     SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT',
-    FORM_VAL_ERROR: 'FORM_VAL_ERROR',
+    TIME_ORDER: 'TIME_ORDER',
 };
 
 // error messages

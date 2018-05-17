@@ -28,10 +28,15 @@ export interface INameLocations {
 
 export type UNameLocations = INameLocations[keyof INameLocations];
 
-export interface IEditables extends INameLocations {
+export interface ITimeTypes {
     BRIEF: 'BRIEF';
     TAKEOFF: 'TAKEOFF';
     LAND: 'LAND';
+}
+
+export type UTimeTypes = ITimeTypes[keyof ITimeTypes];
+
+export interface IEditables extends INameLocations, ITimeTypes {
     FRONT_SEAT_CODE: 'FRONT_SEAT_CODE';
     FRONT_SEAT_SYMBOL: 'FRONT_SEAT_SYMBOL';
     BACK_SEAT_CODE: 'BACK_SEAT_CODE';

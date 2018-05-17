@@ -3,7 +3,7 @@ import { IFlightTimes } from '../types/State';
 import { errorTypes } from '../errors';
 import { is24HourTime } from '../util/validator';
 import FlexInputContainer from '../containers/FlexInputContainer';
-import { editables } from '../whiteboard-constants';
+import { editables, timeTypes } from '../whiteboard-constants';
 import { restrictToTimeChars } from '../util/restrictor';
 
 interface IFlightTimesProps {
@@ -47,7 +47,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(time: string) => onInputChange('brief', time)}
+                onChange={(time: string) => onInputChange(timeTypes.BRIEF, time)}
                 element={editables.BRIEF}
                 entityId={flightId}
                 validatorFns={[is24HourTime()]}
@@ -62,7 +62,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(time: string) => onInputChange('takeoff', time)}
+                onChange={(time: string) => onInputChange(timeTypes.TAKEOFF, time)}
                 element={editables.TAKEOFF}
                 entityId={flightId}
                 validatorFns={[is24HourTime()]}
@@ -77,7 +77,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: '',
                     errorLocId: ''}}
-                onChange={(time: string) => onInputChange('land', time)}
+                onChange={(time: string) => onInputChange(timeTypes.LAND, time)}
                 element={editables.LAND}
                 entityId={flightId}
                 validatorFns={[is24HourTime()]}
