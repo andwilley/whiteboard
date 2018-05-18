@@ -21,7 +21,7 @@ export const is24HourTime = (args?: IValArgs) => (text: string): IUntrackedError
         null :
         {
             id: cuid(),
-            type: errorTypes.FORM_VAL_ERROR,
+            type: errorTypes.FORM_VALIDATION,
             level: args && args.level ? args.level : errorLevels.CAUT,
             message: args && args.message ? args.message : errorMessages.INVALID_TIME,
         };
@@ -33,7 +33,7 @@ export const trCodeList = (args?: IValArgs) => (text: string): IUntrackedErrors 
         null :
         {
             id: cuid(),
-            type: errorTypes.FORM_VAL_ERROR,
+            type: errorTypes.FORM_VALIDATION,
             level: args && args.level ? args.level : errorLevels.CAUT,
             message: args && args.message ? args.message : errorMessages.INVALID_CODE,
         };

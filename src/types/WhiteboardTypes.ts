@@ -1,4 +1,4 @@
-import { IAircrew, UErrorTypes, UErrorLevels, IErrors } from './State';
+import { IAircrew, UErrorTypes, UErrorLevels, IErrors, ITimeTypes } from './State';
 
 export interface IPucks {
     flight: number;
@@ -27,14 +27,6 @@ export interface INameLocations {
 }
 
 export type UNameLocations = INameLocations[keyof INameLocations];
-
-export interface ITimeTypes {
-    BRIEF: 'BRIEF';
-    TAKEOFF: 'TAKEOFF';
-    LAND: 'LAND';
-}
-
-export type UTimeTypes = ITimeTypes[keyof ITimeTypes];
 
 export interface IEditables extends INameLocations, ITimeTypes {
     FRONT_SEAT_CODE: 'FRONT_SEAT_CODE';

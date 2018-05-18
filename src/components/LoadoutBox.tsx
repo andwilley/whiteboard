@@ -1,6 +1,7 @@
 import * as React from 'react';
 import FlexInputContainer from '../containers/FlexInputContainer';
 import { editables } from '../whiteboard-constants';
+import { errorLocs } from '../errors';
 
 interface ILoadoutBoxProps {
     loadout: string;
@@ -14,7 +15,11 @@ const LoadoutBox: React.SFC<ILoadoutBoxProps> = ({ loadout, sortieId, onChange }
         name="loadout"
         value={loadout}
         onChange={onChange}
-        errorConfig={{show: [], update: [], errorLoc: '', errorLocId: ''}}
+        errorConfig={{
+            show: [],
+            update: [],
+            errorLoc: errorLocs.FLIGHT,
+            errorLocId: ''}}
         element={editables.LOADOUT}
         entityId={sortieId}
     />

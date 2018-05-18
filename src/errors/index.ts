@@ -21,10 +21,14 @@ export const errorMessages = {
     ERR_NO_RESULTS_FOUND: 'No results match your search.',
     INVALID_TIME: 'Please enter a valid 24 hour time.',
     INVALID_CODE: 'Not all the codes you entered are valid.',
+    TIME_ORDER: 'The times you entered are not in order.',
 };
 
 export const errorLocs: IErrorLocs = {
     FLIGHT: 'FLIGHT',
+    BRIEF: 'BRIEF',
+    TAKEOFF: 'TAKEOFF',
+    LAND: 'LAND',
     SORTIE: 'SORTIE',
     DAY: 'DAY',
     DAY_NOTE: 'DAY_NOTE',

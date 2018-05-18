@@ -1,5 +1,5 @@
 import * as cuid from 'cuid';
-import { IGenericErrorMeta, UErrorTypes, UErrorLocs, UErrorLevels } from '../types/State';
+import { UErrorTypes, UErrorLocs, UErrorLevels, ICustomErrorMeta } from '../types/State';
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 import { EditorState } from 'draft-js';
@@ -127,7 +127,7 @@ export interface IAddErrorArgs {
     locationId: string;
     level: UErrorLevels;
     message: string;
-    meta: IGenericErrorMeta;
+    meta?: ICustomErrorMeta;
 }
 
 export interface IAddUpdateSnivArgs {

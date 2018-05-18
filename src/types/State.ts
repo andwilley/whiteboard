@@ -113,18 +113,15 @@ export interface IAddUpdateAircrewFormValues {
     readonly existingAircrewUnchanged: boolean;
 }
 
-export interface IErrorTypes {
-    FORM_VALIDATION: 'FORM_VALIDATION';
-    SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT';
-    TIME_ORDER: 'TIME_ORDER';
+export interface ITimeTypes {
+    BRIEF: 'BRIEF';
+    TAKEOFF: 'TAKEOFF';
+    LAND: 'LAND';
 }
 
-export type UGenericErrorTypes = Exclude<keyof IErrorTypes, IErrorTypes['SCHEDULE_CONFLICT']>;
-export type UErrorTypes = IErrorTypes[keyof IErrorTypes];
+export type UTimeTypes = ITimeTypes[keyof ITimeTypes];
 
-// export type UErrorTypes = IErrorTypes['FORM_VALIDATION'] | IErrorTypes['FORM_VAL_ERROR'];
-
-export interface IErrorLocs {
+export interface IErrorLocs extends ITimeTypes {
     FLIGHT: 'FLIGHT';
     SORTIE: 'SORTIE';
     DAY: 'DAY';
@@ -145,47 +142,66 @@ export interface IErrorLevels {
 
 export type UErrorLevels = IErrorLevels[keyof IErrorLevels];
 
-export interface IGenericErrorMeta {
-    readonly aircrewId?: string;
-    readonly timeHiddenToggled?: Date[];
-    readonly timeInactive?: Date;
+export interface IErrorTypes {
+    FORM_VALIDATION: 'FORM_VALIDATION';
+    SCHEDULE_CONFLICT: 'SCHEDULE_CONFLICT';
+    TIME_ORDER: 'TIME_ORDER';
 }
 
-export interface ISchedErrorMeta {
+export type UGenericErrorTypes = Exclude<keyof IErrorTypes,
+    (IErrorTypes['SCHEDULE_CONFLICT'] | IErrorTypes['TIME_ORDER'])>;
+
+export type UErrorTypes = IErrorTypes[keyof IErrorTypes];
+
+export interface IBaseErrorMeta {
+    // readonly aircrewId?: string;
+    readonly timeHiddenToggled: Date[];
+    readonly timeInactive: Date | null;
+}
+
+export interface ISchedErrorMeta extends IBaseErrorMeta {
     readonly aircrewId: string;
-    readonly timeHiddenToggled?: Date[];
-    readonly timeInactive?: Date;
 }
 
-export interface IGenericErrors {
+export interface ITimeErrorMeta extends IBaseErrorMeta {
+    readonly timeType: UTimeTypes;
+}
+
+/** this is used by the interface for the arguments for the addError action */
+export interface ICustomErrorMeta {
+    readonly aircrewId?: string;
+    readonly timeType?: UTimeTypes;
+}
+
+export interface IBaseErrors {
     readonly id: string;
     readonly time: Date;
     readonly dayId: string;
+    readonly type: UErrorTypes;
+    readonly location: UErrorLocs;
+    readonly locationId: string;
+    readonly level: UErrorLevels;
+    readonly message: string;
+    readonly display: boolean;
+    readonly active: boolean;
+    readonly meta: IBaseErrorMeta;
+}
+
+export interface IGenericErrors extends IBaseErrors {
     readonly type: UGenericErrorTypes;
-    readonly location: UErrorLocs;
-    readonly locationId: string;
-    readonly level: UErrorLevels;
-    readonly message: string;
-    readonly display: boolean;
-    readonly active: boolean;
-    readonly meta: IGenericErrorMeta;
 }
 
-export interface ISchedErrors {
-    readonly id: string;
-    readonly time: Date;
-    readonly dayId: string;
+export interface ISchedErrors extends IBaseErrors {
     readonly type: IErrorTypes['SCHEDULE_CONFLICT'];
-    readonly location: UErrorLocs;
-    readonly locationId: string;
-    readonly level: UErrorLevels;
-    readonly message: string;
-    readonly display: boolean;
-    readonly active: boolean;
     readonly meta: ISchedErrorMeta;
 }
 
-export type IErrors = IGenericErrors | ISchedErrors;
+export interface ITimeErrors extends IBaseErrors {
+    readonly type: IErrorTypes['TIME_ORDER'];
+    readonly meta: ITimeErrorMeta;
+}
+
+export type IErrors = IGenericErrors | ISchedErrors | ITimeErrors;
 
 export interface ISettings {
     readonly minutesBeforeBrief: number;

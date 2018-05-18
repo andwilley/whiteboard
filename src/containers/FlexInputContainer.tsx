@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
+import { getActiveDayErrors } from '../reducers/errorReducer';
 import validator, { ValidatorFn } from '../util/validator';
 import { seats, nameLocation } from '../whiteboard-constants';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
@@ -9,7 +10,6 @@ import { IState,
          IAircrew,
          IEntity,
          IErrors,
-         IDays,
          IElementBeingEdited,
          UErrorTypes,
          UErrorLocs } from '../types/State';
@@ -34,7 +34,7 @@ type IAircrewEntity = IEntity<IAircrew>;
 interface IErrorConfig {
     show: UErrorTypes[];
     update: UErrorTypes[];
-    errorLoc: UErrorLocs | '';
+    errorLoc: UErrorLocs;
     errorLocId: string;
 }
 
@@ -96,7 +96,7 @@ const getAircrewRefList = (state: IState,
 };
 
 const getComponentErrors = (dayErrors: IErrors[],
-                            errorLoc: string,
+                            errorLoc: UErrorLocs,
                             errorLocId: string,
                             errorTypesToGet: string[],
                             aircrewRefIds: string[]
@@ -109,21 +109,12 @@ const getComponentErrors = (dayErrors: IErrors[],
     const schedErrors = errorTypesToGet.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1 ?
         getSchedErrors(dayErrors, errorLoc, errorLocId, aircrewRefIds) : [];
     const timeOrderErrors = errorTypesToGet.indexOf(errorTypes.TIME_ORDER) > -1 ?
-        getTimeOrderErrors(dayErrors) : [];
+        getTimeOrderErrors(dayErrors, errorLoc, errorLocId) : [];
     return [...schedErrors, ...timeOrderErrors];
 };
 
-const getDayErrors = (errorsById: { [id: string]: IErrors }, currentDay: IDays): IErrors[] => {
-    /**
-     * days.byId[currentDay].errors
-     * state.errors.byId
-     */
-    const dayErrors = currentDay.errors.map(errorId => errorsById[errorId]).filter(error => error.display);
-    return dayErrors;
-};
-
 const getSchedErrors = (dayErrors: IErrors[],
-                        errorLoc: string,
+                        errorLoc: UErrorLocs,
                         errorLocId: string,
                         aircrewRefIds: string[]
 ): IErrors[] => {
@@ -143,8 +134,12 @@ const getSchedErrors = (dayErrors: IErrors[],
     return schedErrors;
 };
 
-const getTimeOrderErrors = (dayErrors: IErrors[]): IErrors[] => {
-    return dayErrors.filter(error => error.type === errorTypes.TIME_ORDER);
+const getTimeOrderErrors = (dayErrors: IErrors[], errorLoc: UErrorLocs, errorLocId: string): IErrors[] => {
+    return dayErrors.filter(error => {
+        return (error.type === errorTypes.TIME_ORDER &&
+                error.location === errorLoc &&
+                error.locationId === errorLocId);
+    });
 };
 
 const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
@@ -605,7 +600,7 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
     const hasNames = doesInputHaveNames(ownProps.element);
     const aircrewRefList = hasNames ? getAircrewRefList(state, ownProps.element, ownProps.entityId) : [];
     const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
-    const dayErrors = getDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
+    const dayErrors = getActiveDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
     const componentErrors = getComponentErrors(
         dayErrors,
         ownProps.errorConfig.errorLoc,

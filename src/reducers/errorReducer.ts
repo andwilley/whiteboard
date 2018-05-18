@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
-import { IEntity, IErrors } from '../types/State';
+import { IEntity, IErrors, IDays } from '../types/State';
 import { actions, IAction } from '../actions';
 
 const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
@@ -18,11 +18,14 @@ const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
                     message: action.payload.message,
                     display: true,
                     active: true,
-                    meta: action.meta,
+                    meta: {
+                        ...action.meta,
+                        timeHiddenToggled: [],
+                        timeInactive: null,
+                    },
                 },
             };
         case getType(actions.toggleShowError):
-            const timeHiddenToggled = state[action.payload.errorId].meta.timeHiddenToggled;
             return {
                 ...state,
                 [action.payload.errorId]: {
@@ -30,9 +33,8 @@ const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
                     display: !state[action.payload.errorId].display,
                     meta: {
                         ...state[action.payload.errorId].meta,
-                        timeHiddenToggled: timeHiddenToggled ?
-                            timeHiddenToggled.concat(action.meta.timeHiddenToggled) :
-                            [action.meta.timeHiddenToggled],
+                        timeHiddenToggled: state[action.payload.errorId].meta
+                            .timeHiddenToggled.concat(action.meta.timeHiddenToggled),
                     },
                 },
             };
@@ -107,3 +109,12 @@ export const getEntityErrors = (errorById: {[id: string]: IErrors},
 };
 
 export default errorReducer;
+
+export const getActiveDayErrors = (stateErrorsById: { [id: string]: IErrors }, currentDay: IDays): IErrors[] => {
+    /**
+     * days.byId[currentDay].errors
+     * state.errors.byId
+     */
+    const dayErrors = currentDay.errors.map(errorId => stateErrorsById[errorId]).filter(error => error.display);
+    return dayErrors;
+};
