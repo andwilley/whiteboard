@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { actions, IAddErrorArgs } from '../actions';
-import { errorLocs, errorTypes, errorLevels, errorMessages } from '../errors';
+import { errorTypes, errorLevels, errorMessages } from '../errors';
 import { IState, IFlightTimes, IErrors } from '../types/State';
 import FlightTimes from '../components/FlightTimes';
 import { RGX_24HOUR_TIME } from '../util/regEx';
@@ -39,8 +39,13 @@ const compareTimeOrder = (brief: string, takeoff: string, land: string): UTimeTy
      * This code is poorly written and will probably be confusing or embarassing
      * if someone else sees it.
      */
+    interface ITimeAndTimeType {
+        time: string;
+        timeType: UTimeTypes;
+    }
+
     interface IErrorTimeTypesObject {
-        prevTimes: string[];
+        prevTimes: ITimeAndTimeType[];
         errorTimeTypes: UTimeTypes[];
     }
 
@@ -57,13 +62,16 @@ const compareTimeOrder = (brief: string, takeoff: string, land: string): UTimeTy
         /** compare each to the previous times and add the time name to return array if it's smaller */
         .reduce((errorTimesObject: IErrorTimeTypesObject, time) => {
             errorTimesObject.prevTimes.forEach(prevTime => {
-                if (prevTime >= time.time) {
+                if (prevTime.time >= time.time) {
+                    if (errorTimesObject.errorTimeTypes.indexOf(prevTime.timeType) === -1) {
+                        errorTimesObject.errorTimeTypes.push(prevTime.timeType);
+                    }
                     if (errorTimesObject.errorTimeTypes.indexOf(time.timeType) === -1) {
                         errorTimesObject.errorTimeTypes.push(time.timeType);
                     }
                 }
             });
-            errorTimesObject.prevTimes.push(time.time);
+            errorTimesObject.prevTimes.push(time);
             return errorTimesObject;
         }, {prevTimes: [], errorTimeTypes: []});
     return errorTimeTypes.errorTimeTypes;
@@ -95,7 +103,7 @@ const getTimeErrors = (times: IFlightTimes,
                 return {
                     dayId,
                     type: errorTypes.TIME_ORDER,
-                    location: errorLocs.TAKEOFF,
+                    location: errorTimeType,
                     locationId: flightId,
                     level: errorLevels.CAUT,
                     message: errorMessages.TIME_ORDER,
@@ -109,7 +117,7 @@ const getTimeErrors = (times: IFlightTimes,
                 return {
                     dayId,
                     type: errorTypes.TIME_ORDER,
-                    location: errorLocs.LAND,
+                    location: errorTimeType,
                     locationId: flightId,
                     level: errorLevels.CAUT,
                     message: errorMessages.TIME_ORDER,
