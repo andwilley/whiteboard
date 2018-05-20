@@ -115,8 +115,25 @@ export const INITIAL_STATE: IState = {
         allIds: ['a', 'b'],
     },
     snivs: {
-        byId: {},
-        allIds: [],
+        byId: {
+            a: {
+                id: 'a',
+                dayId: '2018-01-24',
+                aircrewIds: ['a'],
+                start: new Date(2018, 0, 24, 8, 0, 0, 0),
+                end: new Date(2018, 0, 24, 10, 0, 0, 0),
+                message: 'Test Sniv',
+                dateAdded: new Date(2018, 0, 23, 8, 0, 0, 0),
+                lastUpdated: new Date(2018, 0, 23, 8, 0, 0, 0),
+                dates: {
+                    '2018-01-24': {
+                        start: new Date(2018, 0, 24, 8, 0, 0, 0),
+                        end: new Date(2018, 0, 24, 10, 0, 0, 0),
+                    },
+                },
+            },
+        },
+        allIds: ['a'],
     },
     notes: {
         byId: {

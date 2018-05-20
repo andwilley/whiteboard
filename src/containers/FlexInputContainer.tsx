@@ -5,14 +5,15 @@ import { getActiveDayErrors } from '../reducers/errorReducer';
 import validator, { ValidatorFn } from '../util/validator';
 import { seats, nameLocation } from '../whiteboard-constants';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
-import { errorLevels, errorTypes, errorLocs } from '../errors';
+import { errorLevels, errorTypes, errorLocs, errorMessages } from '../errors';
 import { IState,
          IAircrew,
          IEntity,
          IErrors,
          IElementBeingEdited,
          UErrorTypes,
-         UErrorLocs } from '../types/State';
+         UErrorLocs,
+         ISnivs} from '../types/State';
 import { UEditables } from '../types/WhiteboardTypes';
 import { IAddErrorArgs } from '../actions';
 import FlexInput from '../components/FlexInput';
@@ -165,14 +166,29 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
      */
     const activeAircrewRefs = getActiveAircrewRefs(state);
 
-    const pushBlockAsError = (errorArray: IAddErrorArgs[], block: ISchedBlock, aircrewId: string): void => {
+    const pushBlockAsError = (errorArray: IAddErrorArgs[],
+                              block: ISchedBlock,
+                              conflictsWithBlock: ISchedBlock,
+                              aircrewId: string
+    ): void => {
+        let message = '';
+        switch (conflictsWithBlock.location) {
+            case errorLocs.FLIGHT:
+                message = errorMessages.FLIGHT_CONFLICT;
+                break;
+            case errorLocs.SNIVS:
+                message = errorMessages.SNIV_CONFLICT;
+                break;
+            default:
+                break;
+        }
         errorArray.push({
             dayId: state.crewListUI.currentDay,
             type: errorTypes.SCHEDULE_CONFLICT,
             location: block.location,
             locationId: block.locationId,
             level: errorLevels.WARN,
-            message: `${state.aircrew.byId[aircrewId].callsign} has a schedule conflict.`,
+            message: `${state.aircrew.byId[aircrewId].callsign} ${message}`,
             meta: {
                 aircrewId,
             },
@@ -199,18 +215,18 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
                 schedConflictArray.forEach(scblock => {
                     if (block.start >= scblock.start && block.start <= scblock.end) {
                         if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
-                            pushBlockAsError(errors, block, aircrewId);
-                            pushBlockAsError(errors, scblock, aircrewId);
+                            pushBlockAsError(errors, block, scblock, aircrewId);
+                            pushBlockAsError(errors, scblock, block, aircrewId);
                         }
                     } else if (block.end >= scblock.start && block.end <= scblock.end) {
                         if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
-                            pushBlockAsError(errors, block, aircrewId);
-                            pushBlockAsError(errors, scblock, aircrewId);
+                            pushBlockAsError(errors, block, scblock, aircrewId);
+                            pushBlockAsError(errors, scblock, block, aircrewId);
                         }
                     } else if (scblock.start >= block.start && scblock.start <= block.end) {
                         if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
-                            pushBlockAsError(errors, block, aircrewId);
-                            pushBlockAsError(errors, scblock, aircrewId);
+                            pushBlockAsError(errors, block, scblock, aircrewId);
+                            pushBlockAsError(errors, scblock, block, aircrewId);
                         }
                     }
                 });
@@ -364,6 +380,20 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
     return activeAircrewRefs;
 };
 
+const getSchedFromSnivs = (activeAircrewRefs: ISchedObject, sniv: ISnivs, dayId: string): ISchedObject => {
+    sniv.aircrewIds.forEach(aircrewId => {
+        const schedBlock = {
+            start: sniv.dates[dayId].start,
+            end: sniv.dates[dayId].end,
+            location: errorLocs.SNIVS,
+            locationId: sniv.id,
+        };
+        activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+            [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+    });
+    return activeAircrewRefs;
+};
+
 const getActiveAircrewRefs = (state: IState): ISchedObject => {
     /**
      * @param {IState} state The application state (store.getState())
@@ -416,6 +446,13 @@ const getActiveAircrewRefs = (state: IState): ISchedObject => {
             /** Get all the referenced aircrew from day notes in the current day */
             activeAircrewRefs = getSchedFromNotes(activeAircrewRefs, state, noteId, aircrewId);
         });
+    });
+    state.snivs.allIds.forEach(snivId => {
+        if (state.snivs.byId[snivId].dates[state.crewListUI.currentDay]) {
+            activeAircrewRefs = getSchedFromSnivs(activeAircrewRefs,
+                                                  state.snivs.byId[snivId],
+                                                  state.crewListUI.currentDay);
+        }
     });
     return activeAircrewRefs;
 };

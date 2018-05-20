@@ -6,11 +6,12 @@ import { actions, IAction } from '../actions';
 const snivsById = (state: {[id: string]: ISnivs} = {}, action: IAction) => {
     switch (action.type) {
         case getType(actions.addUpdateSniv):
+            const {snivId, ...payload} = action.payload;
             return {
                 ...state,
                 [action.payload.snivId]: {
-                    ...action.payload,
-                    id: action.payload.snivId,
+                    ...payload,
+                    id: snivId,
                     dateAdded: action.payload.dateAdded || state[action.payload.snivId].dateAdded,
                 },
             };

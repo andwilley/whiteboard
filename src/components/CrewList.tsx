@@ -48,7 +48,9 @@ const CrewList: React.SFC<ICrewListProps> = ({
                 ) :
                 (
                 <div>
-                    <AddButton onClick={() => onAddAircrewFormButtonClick()} />
+                    <AddButton onClick={() => onAddAircrewFormButtonClick()}>
+                        Add Aircrew
+                    </AddButton>
                 </div>
                 );
     return (

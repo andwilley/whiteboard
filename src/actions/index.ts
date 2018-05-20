@@ -133,17 +133,41 @@ export interface IAddErrorArgs {
 export interface IAddUpdateSnivArgs {
     snivId?: string;
     dayId: string;
-    aircrewId: string;
-    start: string;
-    end: string;
+    aircrewIds: string[];
+    start: Date;
+    end: Date;
     message: string;
 }
 
-// let crewId = 0;
-// let testFlightId = 0;
-// let cnoteId = 0;
-// let testSortieId = 0;
-// let airspaceId = 0;
+const breakDateRangeIntoDays = (start: Date, end: Date): {[key: string]: {start: Date; end: Date}} => {
+    /** doesn't work if start and end are 23:59:59.999 on the same day. Use can't set ms. Not a factor. */
+    if (start > end) {
+        const temp = start;
+        start = end;
+        end = temp;
+    }
+    let beginningOfCurrentDay = new Date(start.getTime());
+    let endOfCurrentDay = new Date(start.getTime());
+    beginningOfCurrentDay.setDate(beginningOfCurrentDay.getDate() - 1);
+    beginningOfCurrentDay.setHours(0, 0, 0, 0);
+    endOfCurrentDay.setDate(endOfCurrentDay.getDate() - 1);
+    endOfCurrentDay.setHours(23, 59, 59, 999);
+    let dates = {};
+    do {
+        beginningOfCurrentDay = new Date(beginningOfCurrentDay.getTime());
+        endOfCurrentDay = new Date(endOfCurrentDay.getTime());
+        beginningOfCurrentDay.setDate(beginningOfCurrentDay.getDate() + 1);
+        endOfCurrentDay.setDate(endOfCurrentDay.getDate() + 1);
+        dates = {
+            ...dates,
+            [`${endOfCurrentDay.getFullYear()}-${endOfCurrentDay.getMonth() + 1}-${endOfCurrentDay.getDate()}`]: {
+                start: (start >= beginningOfCurrentDay) ? start : beginningOfCurrentDay,
+                end: (end > endOfCurrentDay) ? endOfCurrentDay : end,
+            },
+        };
+    } while (end >= endOfCurrentDay);
+    return dates;
+};
 
 export const actions = {
     addUpdateAircrewFormAddQual: createAction(ADD_UPDATE_AIRCREW_FORM_ADD_QUAL, (qual: string) => ({
@@ -479,13 +503,15 @@ export const actions = {
     addUpdateSniv: createAction(ADD_UPDATE_SNIV, (args: IAddUpdateSnivArgs) => ({
         type: ADD_UPDATE_SNIV,
         payload: {
-            ...args,
             snivId: args.snivId || cuid(),
+            aircrewIds: args.aircrewIds,
             dateAdded: args.snivId ? null : new Date(),
             lastUpdated: new Date(),
+            message: args.message,
+            dates: breakDateRangeIntoDays(args.start, args.end),
         },
     })),
-    delSniv: createAction(DEL_SNIV, (snivId: string, aircrewId: string) => ({
+    delSniv: createAction(DEL_SNIV, (snivId: string, aircrewId: string = '') => ({
         type: DEL_SNIV,
         payload: {
             snivId,

@@ -49,15 +49,23 @@ export interface IFlights {
     readonly notes: string[];
 }
 
+export interface ISnivDates {
+    [key: string]: {
+        start: Date;
+        end: Date;
+    };
+}
+
 export interface ISnivs {
     readonly id: string;
     readonly dayId: string;
-    readonly aircrewId: string;
-    readonly start: string;
-    readonly end: string;
+    readonly aircrewIds: string[];
+    readonly start: Date;
+    readonly end: Date;
     readonly message: string;
     readonly dateAdded: Date;
     readonly lastUpdated: Date;
+    readonly dates: ISnivDates;
 }
 
 export interface INotes {

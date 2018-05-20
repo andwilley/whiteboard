@@ -12,11 +12,13 @@ import airspaceReducer from './airspaceReducer';
 import settingsReducer from './settingsReducer';
 import errorReducer from './errorReducer';
 import editorStateReducer from './editorStateReducer';
+import { snivsReducer } from './snivReducer';
 
 export const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
     days: daysReducer,
     flights: flightsReducer,
+    snivs: snivsReducer,
     sorties: sortiesReducer,
     notes: notesReducer,
     airspace: airspaceReducer,

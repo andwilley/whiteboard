@@ -49,7 +49,8 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     }
     /**
      * set focus once the Editor mounts (this only happens onClick or tabbed from another element).
-     * This is hacky. Probably need to use a React Class and the didComponentMount hook instead of timeout.
+     * This is hacky. Probably need to use a Class, extend React.Component
+     * and the didComponentMount hook instead of timeout.
      */
     if (showEditor && !editorState.getSelection().getHasFocus()) {
         setTimeout(() => {
