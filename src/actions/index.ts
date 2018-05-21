@@ -508,6 +508,8 @@ export const actions = {
             dateAdded: args.snivId ? null : new Date(),
             lastUpdated: new Date(),
             message: args.message,
+            start: args.start,
+            end: args.end,
             dates: breakDateRangeIntoDays(args.start, args.end),
         },
     })),

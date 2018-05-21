@@ -22,8 +22,9 @@ export const errorMessages = {
     INVALID_TIME: 'Please enter a valid 24 hour time.',
     INVALID_CODE: 'Not all the codes you entered are valid.',
     TIME_ORDER: 'The times you entered are not in order.',
-    FLIGHT_CONFLICT: 'has a flight or a sim during this time.',
+    FLIGHT_CONFLICT: 'has a flight or a sim (or is in the notes for one) during this time.',
     SNIV_CONFLICT: 'is snived during this time.',
+    NOTE_CONFLICT: 'is scheduled in the notes during this time.',
 };
 
 export const errorLocs: IErrorLocs = {

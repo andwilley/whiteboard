@@ -179,6 +179,9 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
             case errorLocs.SNIVS:
                 message = errorMessages.SNIV_CONFLICT;
                 break;
+            case errorLocs.DAY_NOTE:
+                message = errorMessages.NOTE_CONFLICT;
+                break;
             default:
                 break;
         }
