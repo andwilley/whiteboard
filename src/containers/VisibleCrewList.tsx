@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { blankAddUpdateAircrewForm, seats } from '../whiteboard-constants';
 import { actions } from '../actions';
-import { IEntity, IState, IAircrew, IFilters } from '../types/State';
+import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
 import CrewList from '../components/CrewList';
 const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
@@ -154,9 +154,29 @@ const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
   return state.crewListUI.addUpdateAircrewFormDisplay;
 };
 
+const getDaySnivs = (state: IState): ISnivs[] => {
+  return state.snivs.allIds.reduce((filteredIds: ISnivs[], currId) => {
+    if (state.snivs.byId[currId].dates[state.crewListUI.currentDay]) {
+      filteredIds = filteredIds.concat(state.snivs.byId[currId]);
+    }
+    return filteredIds;
+  }, []);
+};
+
+const getShowSnivs = (state: IState): boolean => {
+  return state.crewListUI.showSnivs;
+};
+
+const getDayId = (state: IState): string => {
+  return state.crewListUI.currentDay;
+};
+
 const mapStateToProps = (state: IState) => {
   return {
     aircrewList: getAircrewList(state),
+    daySnivs: getDaySnivs(state),
+    showSnivs: getShowSnivs(state),
+    dayId: getDayId(state),
     addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
   };
 };

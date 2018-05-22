@@ -4,7 +4,7 @@ import SnivList from '../components/SnivList';
 
 const mapStateToProps = (state: IState) => {
     return {
-        snivs: ['sniv 1', 'sniv 2', 'sniv 3'],
+        snivs: state.snivs.allIds.map(snivId => state.snivs.byId[snivId]),
     };
 };
 

@@ -108,6 +108,7 @@ export interface ICrewListUI {
     readonly qualsList: string[];
     readonly addUpdateAircrewFormDisplay: boolean;
     readonly filters: IFilters;
+    readonly showSnivs: boolean;
 }
 
 export interface IAddUpdateAircrewFormValues {

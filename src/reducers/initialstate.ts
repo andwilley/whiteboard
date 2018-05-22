@@ -153,6 +153,7 @@ export const INITIAL_STATE: IState = {
     crewListUI: {
         currentDay: '2018-01-24',
         qualsList,
+        showSnivs: true,
         addUpdateAircrewFormDisplay: false,
         filters: {
             crewSearchInput: '',

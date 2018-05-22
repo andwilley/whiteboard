@@ -6,6 +6,7 @@ import { ICrewListUI } from '../types/State';
 const crewListUIReducer = (state: ICrewListUI = { qualsList,
                                                   addUpdateAircrewFormDisplay: false,
                                                   currentDay: '',
+                                                  showSnivs: true,
                                                   filters: {
                                                       crewSearchInput: '',
                                                       showAvailable: false,

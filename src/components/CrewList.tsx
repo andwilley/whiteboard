@@ -5,10 +5,14 @@ import DelButton from '../components/DelButton';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import { errorMessages } from '../errors';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
+import { ISnivs } from '../types/State';
 
 interface ICrewListProps {
     aircrewList: IAircrewWithPucks[];
     addUpdateAircrewFormDisplay: boolean;
+    daySnivs: ISnivs[];
+    showSnivs: boolean;
+    dayId: string;
     onAircrewClick: (crew: IAircrewWithPucks) => any;
     onXClick: (id: string) => any;
     onEditClick: (crew: IAircrewWithPucks) => any;
@@ -18,6 +22,9 @@ interface ICrewListProps {
 
 const CrewList: React.SFC<ICrewListProps> = ({
     aircrewList,
+    daySnivs,
+    showSnivs,
+    dayId,
     addUpdateAircrewFormDisplay,
     onAircrewClick,
     onXClick,
@@ -32,6 +39,9 @@ const CrewList: React.SFC<ICrewListProps> = ({
             <Aircrew
                 key={aircrew.id}
                 aircrew={aircrew}
+                snivs={daySnivs.filter(sniv => sniv.aircrewIds.indexOf(aircrew.id) > -1)}
+                showSnivs={showSnivs}
+                dayId={dayId}
                 onAircrewClick={() => onAircrewClick(aircrew)}
                 onXClick={() => onXClick(aircrew.id)}
                 onEditClick={() => onEditClick(aircrew)}
