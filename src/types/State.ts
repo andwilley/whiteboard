@@ -107,6 +107,7 @@ export interface ICrewListUI {
     readonly currentDay: string;
     readonly qualsList: string[];
     readonly addUpdateAircrewFormDisplay: boolean;
+    readonly addSnivFormDisplay: boolean;
     readonly filters: IFilters;
     readonly showSnivs: boolean;
 }
@@ -120,6 +121,15 @@ export interface IAddUpdateAircrewFormValues {
     readonly seat: string;
     readonly quals: string[];
     readonly existingAircrewUnchanged: boolean;
+}
+
+export interface IAddSnivFormValues {
+    readonly snivId: string;
+    readonly aircrew: string;
+    readonly aircrewRefIds: string[];
+    readonly start: string;
+    readonly end: string;
+    readonly message: string;
 }
 
 export interface ITimeTypes {
@@ -241,6 +251,7 @@ export interface IState {
     readonly airspace: IEntity<IAirspace>;
     readonly crewListUI: ICrewListUI;
     readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
+    readonly addSnivFormValues: IAddSnivFormValues;
     readonly settings: ISettings;
     readonly errors: IEntityWithActive<IErrors>;
     readonly editor: IEditor;

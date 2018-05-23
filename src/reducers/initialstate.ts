@@ -155,6 +155,7 @@ export const INITIAL_STATE: IState = {
         qualsList,
         showSnivs: true,
         addUpdateAircrewFormDisplay: false,
+        addSnivFormDisplay: false,
         filters: {
             crewSearchInput: '',
             showAvailable: false,
@@ -253,6 +254,14 @@ export const INITIAL_STATE: IState = {
         seat: 'pilot',
         quals: [],
         existingAircrewUnchanged: false,
+    },
+    addSnivFormValues: {
+        snivId: '',
+        aircrew: '',
+        aircrewRefIds: [],
+        start: '',
+        end: '',
+        message: '',
     },
     settings: {
         minutesAfterLand: 60,

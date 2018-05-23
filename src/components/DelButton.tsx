@@ -4,9 +4,9 @@ interface IDelButtonProps {
     onClick: () => any;
 }
 
-const DelButton: React.SFC<IDelButtonProps> = ({onClick}) => {
+const DelButton: React.SFC<IDelButtonProps> = ({children, onClick}) => {
     return (
-        <span onClick={onClick}>[-]</span>
+        <span onClick={onClick}>[- {children}]</span>
     );
 };
 

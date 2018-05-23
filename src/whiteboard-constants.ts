@@ -29,6 +29,7 @@ export const nameLocation: INameLocations = {
     FRONT_SEAT_NAME: 'FRONT_SEAT_NAME',
     BACK_SEAT_NAME: 'BACK_SEAT_NAME',
     NOTE: 'NOTE',
+    SNIV_FORM: 'SNIV_FORM',
 };
 
 export const timeTypes: ITimeTypes = {

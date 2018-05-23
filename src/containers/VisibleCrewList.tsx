@@ -1,9 +1,10 @@
 import { connect } from 'react-redux';
-import { blankAddUpdateAircrewForm, seats } from '../whiteboard-constants';
 import { actions } from '../actions';
+import CrewList from '../components/CrewList';
+import { getShowSnivs } from '../reducers/crewListUIReducer';
+import { blankAddUpdateAircrewForm, seats } from '../whiteboard-constants';
 import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
-import CrewList from '../components/CrewList';
 const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
 type IAircrewEntity = IEntity<IAircrew>;
 
@@ -161,10 +162,6 @@ const getDaySnivs = (state: IState): ISnivs[] => {
     }
     return filteredIds;
   }, []);
-};
-
-const getShowSnivs = (state: IState): boolean => {
-  return state.crewListUI.showSnivs;
 };
 
 const getDayId = (state: IState): string => {

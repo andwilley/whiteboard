@@ -1,7 +1,7 @@
 import { qualsList } from '../whiteboard-constants';
 import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
-import { ICrewListUI } from '../types/State';
+import { ICrewListUI, IState } from '../types/State';
 
 const crewListUIReducer = (state: ICrewListUI = { qualsList,
                                                   addUpdateAircrewFormDisplay: false,
@@ -50,9 +50,18 @@ const crewListUIReducer = (state: ICrewListUI = { qualsList,
                     qualFilter: state.filters.qualFilter.filter(qual => qual !== action.payload.qual),
                 },
             };
+        case getType(actions.toggleShowSnivs):
+            return {
+                ...state,
+                showSnivs: !state.showSnivs,
+            };
         default:
             return state;
     }
 };
 
 export default crewListUIReducer;
+
+export const getShowSnivs = (state: IState): boolean => {
+    return state.crewListUI.showSnivs;
+};

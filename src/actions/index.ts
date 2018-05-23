@@ -16,6 +16,7 @@ export const SET_AIRCREW_SEARCH_FORM = 'SET_AIRCREW_SEARCH_FORM';
 export const ADD_QUAL_FILTER = 'ADD_QUAL_FILTER';
 export const DEL_QUAL_FILTER = 'DEL_QUAL_FILTER';
 export const SET_CURRENT_DAY = 'SET_CURRENT_DAY';
+export const TOGGLE_SHOW_SNIVS = 'TOGGLE_SHOW_SNIVS';
 export const ADD_UPDATE_AIRCREW_FORM_DISPLAY = 'ADD_UPDATE_AIRCREW_FORM_DISPLAY';
 export const ADD_DAY = 'ADD_DAY';
 export const ADD_FLIGHT = 'ADD_FLIGHT';
@@ -233,6 +234,7 @@ export const actions = {
             day,
         },
     })),
+    toggleShowSnivs: createAction(TOGGLE_SHOW_SNIVS),
     addUpdateAircrewFormDisplay: createAction(ADD_UPDATE_AIRCREW_FORM_DISPLAY, (display: boolean) => ({
         type: ADD_UPDATE_AIRCREW_FORM_DISPLAY,
         payload: {

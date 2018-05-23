@@ -6,6 +6,7 @@ import { IFilters } from '../types/State';
 interface ISearchBoxProps {
     qualsList: string[];
     filters: IFilters;
+    showSnivs: boolean;
     onInputChange: () => any;
     onClearButtonClick: () => any;
 }
@@ -13,6 +14,7 @@ interface ISearchBoxProps {
 const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
         qualsList,
         filters,
+        showSnivs,
         onInputChange,
         onClearButtonClick }) => {
     const onClearButtonClicked = (e: any) => {
@@ -32,6 +34,13 @@ const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
                 checked={filters.showAvailable ? true : false}
                 onChange={onInputChange}
             />Show Only Available Aircrew<br />
+            <input
+                type="checkbox"
+                name="showSnivs"
+                value={showSnivs ? 'false' : 'true'}
+                checked={showSnivs ? true : false}
+                onChange={onInputChange}
+            />Show Snivs<br />
             <QualBox
                 qualsList={qualsList}
                 onInputChange={onInputChange}

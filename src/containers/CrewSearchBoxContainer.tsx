@@ -2,9 +2,11 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { IState, IFilters } from '../types/State';
 import CrewSearchBox from '../components/CrewSearchBox';
+import { getShowSnivs } from '../reducers/crewListUIReducer';
 const { setAircrewSearchForm,
         addQualFilter,
-        delQualFilter } = actions;
+        delQualFilter,
+        toggleShowSnivs } = actions;
 
 const getQualsList = (state: IState): string[] => {
     return state.crewListUI.qualsList;
@@ -20,6 +22,7 @@ const mapStateToProps = (state: IState) => {
     return {
         qualsList: getQualsList(state),
         filters: getFilters(state),
+        showSnivs: getShowSnivs(state),
     };
 };
 
@@ -35,6 +38,9 @@ const mapDispatchToProps = (dispatch: any) => {
                     break;
                 case 'showAvailable':
                     dispatch(setAircrewSearchForm({showAvailable: value === 'true' ? true : false}));
+                    break;
+                case 'showSnivs':
+                    dispatch(toggleShowSnivs());
                     break;
                 default:
                     dispatch(setAircrewSearchForm({crewSearchInput: value}));

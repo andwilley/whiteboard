@@ -1,15 +1,17 @@
 import * as React from 'react';
 import Aircrew from './Aircrew';
-import AddButton from '../components/AddButton';
-import DelButton from '../components/DelButton';
-import { IAircrewWithPucks } from '../types/WhiteboardTypes';
-import { errorMessages } from '../errors';
-import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 import { ISnivs } from '../types/State';
+import { errorMessages } from '../errors';
+import AddButton from './AddButton';
+import DelButton from './DelButton';
+import AddSnivFormContainer from '../containers/AddSnivFormContainer';
+import { IAircrewWithPucks } from '../types/WhiteboardTypes';
+import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 
 interface ICrewListProps {
     aircrewList: IAircrewWithPucks[];
     addUpdateAircrewFormDisplay: boolean;
+    snivFormDisplay: boolean;
     daySnivs: ISnivs[];
     showSnivs: boolean;
     dayId: string;
@@ -18,6 +20,8 @@ interface ICrewListProps {
     onEditClick: (crew: IAircrewWithPucks) => any;
     onAddAircrewFormButtonClick: () => any;
     onDelAircrewFormButtonClick: () => any;
+    onSnivFormAddButtonClick: () => void;
+    onSnivFormDelButtonClick: () => void;
 }
 
 const CrewList: React.SFC<ICrewListProps> = ({
@@ -26,11 +30,14 @@ const CrewList: React.SFC<ICrewListProps> = ({
     showSnivs,
     dayId,
     addUpdateAircrewFormDisplay,
+    snivFormDisplay,
     onAircrewClick,
     onXClick,
     onEditClick,
     onAddAircrewFormButtonClick,
     onDelAircrewFormButtonClick,
+    onSnivFormAddButtonClick,
+    onSnivFormDelButtonClick,
     }) => {
     const pilotList: JSX.Element[] = [];
     const wsoList: JSX.Element[] = [];
@@ -49,20 +56,38 @@ const CrewList: React.SFC<ICrewListProps> = ({
         );
         aircrew.seat === 'pilot' ? pilotList.push(aircrewComponent) : wsoList.push(aircrewComponent);
     });
-    const formDisplayButton = addUpdateAircrewFormDisplay ?
-                (
-                <div>
-                    <DelButton onClick={() => onDelAircrewFormButtonClick()} />
-                    <AddUpdateAircrewFormContainer />
-                </div>
-                ) :
-                (
-                <div>
-                    <AddButton onClick={() => onAddAircrewFormButtonClick()}>
-                        Add Aircrew
-                    </AddButton>
-                </div>
-                );
+    const addUpdateAircrewFormDisplayButton = addUpdateAircrewFormDisplay ?
+        (
+        <div>
+            <DelButton onClick={() => onDelAircrewFormButtonClick()}>
+                Close This Form
+            </DelButton>
+            <AddUpdateAircrewFormContainer />
+        </div>
+        ) :
+        (
+        <div>
+            <AddButton onClick={() => onAddAircrewFormButtonClick()}>
+                Add Aircrew
+            </AddButton>
+        </div>
+        );
+    const snivFormDisplayButton = snivFormDisplay ?
+        (
+            <div>
+                <AddButton onClick={onSnivFormAddButtonClick}>
+                    Add sniv
+                </AddButton>
+            </div>
+        ) :
+        (
+            <div>
+                <DelButton onClick={onSnivFormDelButtonClick}>
+                    Close This Form
+                </DelButton>
+                <AddSnivFormContainer />
+            </div>
+        );
     return (
         <div>
             <h3>Pilots</h3>
@@ -73,7 +98,8 @@ const CrewList: React.SFC<ICrewListProps> = ({
             <ul>
                 {wsoList.length > 0 ? wsoList : errorMessages.ERR_NO_RESULTS_FOUND}
             </ul>
-            {formDisplayButton}
+            {addUpdateAircrewFormDisplayButton}
+            {snivFormDisplayButton}
         </div>
     );
 };
