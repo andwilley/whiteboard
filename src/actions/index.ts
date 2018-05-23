@@ -1,5 +1,5 @@
 import * as cuid from 'cuid';
-import { UErrorTypes, UErrorLocs, UErrorLevels, ICustomErrorMeta } from '../types/State';
+import { UErrorTypes, UErrorLocs, UErrorLevels, ICustomErrorMeta, IAddUpdateSnivFormValues } from '../types/State';
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 import { EditorState } from 'draft-js';
@@ -44,6 +44,9 @@ export const SET_EDITOR_STATE = 'SET_EDITOR_STATE';
 export const SET_EDITED_ELEMENT = 'SET_EDITED_ELEMENT';
 export const ADD_UPDATE_SNIV = 'ADD_UPDATE_SNIV';
 export const DEL_SNIV = 'DEL_SNIV';
+export const SET_SNIV_FORM = 'SET_SNIV_FORM';
+export const ADD_AIRCREW_REF_TO_SNIV_FORM = 'ADD_AIRCREW_REF_TO_SNIV_FORM';
+export const DEL_AIRCREW_REF_FROM_SNIV_FORM = 'DEL_AIRCREW_REF_FROM_SNIV_FORM';
 
 // const makeActionCreator = (type, ...payloadNames) => {
 //     return (...payloadValues) => {
@@ -139,6 +142,10 @@ export interface IAddUpdateSnivArgs {
     end: Date;
     message: string;
 }
+
+export type ISetSnivFormArgs = {
+    [P in keyof IAddUpdateSnivFormValues]?: IAddUpdateSnivFormValues[P];
+};
 
 const breakDateRangeIntoDays = (start: Date, end: Date): {[key: string]: {start: Date; end: Date}} => {
     /** doesn't work if start and end are 23:59:59.999 on the same day. Use can't set ms. Not a factor. */
@@ -519,6 +526,24 @@ export const actions = {
         type: DEL_SNIV,
         payload: {
             snivId,
+            aircrewId,
+        },
+    })),
+    setSnivForm: createAction(SET_SNIV_FORM, (args: ISetSnivFormArgs) => ({
+        type: SET_SNIV_FORM,
+        payload: {
+            ...args,
+        },
+    })),
+    addAircrewRefToSnivForm: createAction(ADD_AIRCREW_REF_TO_SNIV_FORM, (aircrewId: string) => ({
+        type: ADD_AIRCREW_REF_TO_SNIV_FORM,
+        payload: {
+            aircrewId,
+        },
+    })),
+    delAircrewRefFromSnivForm: createAction(DEL_AIRCREW_REF_FROM_SNIV_FORM, (aircrewId: string) => ({
+        type: DEL_AIRCREW_REF_FROM_SNIV_FORM,
+        payload: {
             aircrewId,
         },
     })),

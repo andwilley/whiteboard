@@ -155,7 +155,7 @@ export const INITIAL_STATE: IState = {
         qualsList,
         showSnivs: true,
         addUpdateAircrewFormDisplay: false,
-        addSnivFormDisplay: false,
+        addUpdateSnivFormDisplay: false,
         filters: {
             crewSearchInput: '',
             showAvailable: false,
@@ -255,7 +255,7 @@ export const INITIAL_STATE: IState = {
         quals: [],
         existingAircrewUnchanged: false,
     },
-    addSnivFormValues: {
+    addUpdateSnivFormValues: {
         snivId: '',
         aircrew: '',
         aircrewRefIds: [],

@@ -544,6 +544,11 @@ const getOnChangeWithNameMatch = ({
                     dispatch(actions.updateNoteCrewRefs(entityId, matchedAircrewIds));
                 };
                 break;
+            case nameLocation.SNIV_FORM:
+                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
+                    dispatch(actions.setSnivForm({aircrewRefIds: matchedAircrewIds}));
+                };
+                break;
             default:
                 aircrewRefIdDispatch = (matchedAircrewIds: string[]) => { return; };
                 break;

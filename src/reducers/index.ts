@@ -12,7 +12,8 @@ import airspaceReducer from './airspaceReducer';
 import settingsReducer from './settingsReducer';
 import errorReducer from './errorReducer';
 import editorStateReducer from './editorStateReducer';
-import { snivsReducer } from './snivReducer';
+import snivsReducer from './snivReducer';
+import addUpdateSnivFormValuesReducer from './addUpdateSnivFormValuesReducer';
 
 export const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
@@ -24,6 +25,7 @@ export const whiteboardApp = combineReducers<IState>({
     airspace: airspaceReducer,
     crewListUI: crewListUIReducer,
     addUpdateAircrewFormValues: addUpdateAircrewFormValuesReducer,
+    addUpdateSnivFormValues: addUpdateSnivFormValuesReducer,
     settings: settingsReducer,
     errors: errorReducer,
     editor: editorStateReducer,

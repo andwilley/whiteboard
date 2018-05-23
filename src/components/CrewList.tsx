@@ -11,7 +11,7 @@ import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormCon
 interface ICrewListProps {
     aircrewList: IAircrewWithPucks[];
     addUpdateAircrewFormDisplay: boolean;
-    snivFormDisplay: boolean;
+    addUpdateSnivFormDisplay: boolean;
     daySnivs: ISnivs[];
     showSnivs: boolean;
     dayId: string;
@@ -30,7 +30,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
     showSnivs,
     dayId,
     addUpdateAircrewFormDisplay,
-    snivFormDisplay,
+    addUpdateSnivFormDisplay,
     onAircrewClick,
     onXClick,
     onEditClick,
@@ -72,7 +72,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
             </AddButton>
         </div>
         );
-    const snivFormDisplayButton = snivFormDisplay ?
+    const snivFormDisplayButton = addUpdateSnivFormDisplay ?
         (
             <div>
                 <AddButton onClick={onSnivFormAddButtonClick}>

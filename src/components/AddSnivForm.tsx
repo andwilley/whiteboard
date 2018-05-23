@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { IAddSnivFormValues } from '../types/State';
+import { IAddUpdateSnivFormValues } from '../types/State';
 import FlexInputContainer from '../containers/FlexInputContainer';
 import { editables } from '../whiteboard-constants';
 import { errorLocs } from '../errors';
 
 interface IAddSnivFormProps {
-    formValues: IAddSnivFormValues;
+    formValues: IAddUpdateSnivFormValues;
     onSubmit: () => void;
     onInputChange: () => void;
     onAircrewInputChange: () => void;

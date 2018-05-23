@@ -1,27 +1,29 @@
 import { connect } from 'react-redux';
-import { IState, IAddSnivFormValues } from '../types/State';
 import AddSnivForm from '../components/AddSnivForm';
+import { IState, IAddUpdateSnivFormValues } from '../types/State';
+import { actions } from '../actions';
+const { setSnivForm } = actions;
 
-const getAddSnivFormValues = (state: IState): IAddSnivFormValues => {
-    return state.addSnivFormValues;
+const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => {
+    return state.addUpdateSnivFormValues;
 };
 
 const mapStateToProps = (state: IState) => {
     return {
-        formValues: getAddSnivFormValues(state),
+        formValues: getAddUpdateSnivFormValues(state),
     };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
         onSubmit: () => {
-            dispatch();
+            dispatch({type: ''});
         },
-        onInputChange: () => {
-            dispatch();
+        onAircrewInputChange: (input: string) => {
+            dispatch(setSnivForm({aircrew: input}));
         },
-        onAircrewInputChange: () => {
-            dispatch();
+        onInputChange: (e: any) => {
+            dispatch(setSnivForm({[e.target.name]: e.target.value}));
         },
     };
 };

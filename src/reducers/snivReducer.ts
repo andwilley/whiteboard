@@ -38,7 +38,9 @@ const allSnivs = (state: string[] = [], action: IAction) => {
     }
 };
 
-export const snivsReducer = combineReducers<IEntity<ISnivs>>({
+const snivsReducer = combineReducers<IEntity<ISnivs>>({
     byId: snivsById,
     allIds: allSnivs,
 });
+
+export default snivsReducer;

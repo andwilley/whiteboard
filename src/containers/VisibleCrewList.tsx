@@ -168,6 +168,10 @@ const getDayId = (state: IState): string => {
   return state.crewListUI.currentDay;
 };
 
+const getAddUpdateSnivFormDisplay = (state: IState): boolean => {
+  return state.crewListUI.addUpdateSnivFormDisplay;
+};
+
 const mapStateToProps = (state: IState) => {
   return {
     aircrewList: getAircrewList(state),
@@ -175,6 +179,7 @@ const mapStateToProps = (state: IState) => {
     showSnivs: getShowSnivs(state),
     dayId: getDayId(state),
     addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
+    addUpdateSnivFormDisplay: getAddUpdateSnivFormDisplay(state),
   };
 };
 
@@ -199,6 +204,12 @@ const mapDispatchToProps = (dispatch: any) => {
     onDelAircrewFormButtonClick: () => {
       dispatch(setAircrewForm(blankAddUpdateAircrewForm));
       dispatch(addUpdateAircrewFormDisplay(false));
+    },
+    onSnivFormAddButtonClick: () => {
+      dispatch({type: ''});
+    },
+    onSnivFormDelButtonClick: () => {
+      dispatch({type: ''});
     },
     // need something to validate unique callsigns from server async.
   };
