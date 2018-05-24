@@ -91,6 +91,8 @@ const getAircrewRefList = (state: IState,
             return state.sorties.byId[entityId].back.aircrewRefIds.map(id => state.aircrew.byId[id]);
         case nameLocation.NOTE:
             return state.notes.byId[entityId].aircrewRefIds.map(id => state.aircrew.byId[id]);
+        case nameLocation.SNIV_FORM:
+            return state.addUpdateSnivFormValues.aircrewRefIds.map(id => state.aircrew.byId[id]);
         default:
             return [];
     }

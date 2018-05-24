@@ -31,6 +31,11 @@ const addUpdateSnivFormValuesReducer = (state: IAddUpdateSnivFormValues = {
                 ...state,
                 aircrewRefIds: state.aircrewRefIds.filter(id => id !== action.payload.aircrewId),
             };
+        case getType(actions.delAircrew):
+            return {
+                ...state,
+                aircrewRefIds: state.aircrewRefIds.filter(id => id !== action.payload.id),
+            };
         default:
             return state;
     }
