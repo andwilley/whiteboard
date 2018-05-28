@@ -39,21 +39,21 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 name="start"
                 value={formValues.start}
                 onChange={onInputChange}
-            />
+            /><br />
             <input
                 type="text"
                 placeholder="End"
                 name="end"
                 value={formValues.end}
                 onChange={onInputChange}
-            />
+            /><br />
             <input
                 type="text"
                 placeholder="Message"
                 name="message"
                 value={formValues.message}
                 onChange={onInputChange}
-            />
+            /><br />
         </form>
     );
 };
