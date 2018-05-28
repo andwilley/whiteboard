@@ -5,8 +5,10 @@
   "dependencies": {
     "cuid": "^2.1.0",
     "draft-js": "^0.10.5",
-    "npm": "^5.8.0",
+    "moment": "^2.22.1",
+    "npm": "^5.10.0",
     "react": "^16.3.2",
+    "react-datetime": "^2.14.0",
     "react-dom": "^16.3.2",
     "react-redux": "^5.0.6",
     "react-scripts-ts": "2.13.0",
