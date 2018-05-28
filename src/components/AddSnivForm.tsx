@@ -1,8 +1,9 @@
 import * as React from 'react';
+import * as Datetime from 'react-datetime';
+import { errorLocs } from '../errors';
+import { editables } from '../whiteboard-constants';
 import { IAddUpdateSnivFormValues } from '../types/State';
 import FlexInputContainer from '../containers/FlexInputContainer';
-import { editables } from '../whiteboard-constants';
-import { errorLocs } from '../errors';
 
 interface IAddSnivFormProps {
     formValues: IAddUpdateSnivFormValues;
@@ -33,10 +34,10 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 entityId={''}
 
             />
-            <input
-                type="text"
-                placeholder="Start"
-                name="start"
+            Start:
+            <Datetime
+                timeFormat={'HHMM'}
+                input={false}
                 value={formValues.start}
                 onChange={onInputChange}
             /><br />
