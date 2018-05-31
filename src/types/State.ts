@@ -1,5 +1,6 @@
 import { EditorState } from 'draft-js';
 import { UEditables, NullForAll } from './WhiteboardTypes';
+import { Moment } from 'moment';
 
 export interface IEntity<E> {
     readonly byId: { readonly [id: string]: E };
@@ -127,8 +128,8 @@ export interface IAddUpdateSnivFormValues {
     readonly snivId: string;
     readonly aircrew: string;
     readonly aircrewRefIds: string[];
-    readonly start: string;
-    readonly end: string;
+    readonly start: Moment | '';
+    readonly end: Moment | '';
     readonly message: string;
 }
 

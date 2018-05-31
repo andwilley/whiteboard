@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
+import './style/react-datetime.css';
 import App from './components/App';
 import { whiteboardApp } from './reducers/index';
 import { Provider } from 'react-redux';
