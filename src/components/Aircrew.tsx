@@ -29,8 +29,8 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
     const snivComponentList = snivs.map(sniv => {
         return (
             <li key={sniv.id}>
-                <span>{sniv.dates[dayId].start.toLocaleTimeString('en-US', {hour12: false}).slice(0, 5)}</span>-
-                <span>{sniv.dates[dayId].end.toLocaleTimeString('en-US', {hour12: false}).slice(0, 5)}</span>{': '}
+                <span>{sniv.dates[dayId].start.format('HHmm')}</span>-
+                <span>{sniv.dates[dayId].end.format('HHmm')}</span>{': '}
                 <span>{sniv.message}</span>
             </li>
         );

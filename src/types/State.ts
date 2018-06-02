@@ -52,17 +52,16 @@ export interface IFlights {
 
 export interface ISnivDates {
     [key: string]: {
-        start: Date;
-        end: Date;
+        start: Moment;
+        end: Moment;
     };
 }
 
 export interface ISnivs {
     readonly id: string;
-    readonly dayId: string;
     readonly aircrewIds: string[];
-    readonly start: Date;
-    readonly end: Date;
+    readonly start: Moment;
+    readonly end: Moment;
     readonly message: string;
     readonly dateAdded: Date;
     readonly lastUpdated: Date;

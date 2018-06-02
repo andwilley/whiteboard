@@ -1,5 +1,6 @@
 import { qualsList } from '../whiteboard-constants';
 import { EditorState } from 'draft-js';
+import * as moment from 'moment';
 import { IState } from '../types/State';
 
 export const INITIAL_STATE: IState = {
@@ -118,17 +119,16 @@ export const INITIAL_STATE: IState = {
         byId: {
             a: {
                 id: 'a',
-                dayId: '2018-01-24',
                 aircrewIds: ['a'],
-                start: new Date(2018, 0, 24, 8, 0, 0, 0),
-                end: new Date(2018, 0, 24, 10, 0, 0, 0),
+                start: moment('2018-01-24T08:00:00.000'),
+                end: moment('2018-01-24T10:00:00.000'),
                 message: 'Test Sniv',
                 dateAdded: new Date(2018, 0, 23, 8, 0, 0, 0),
                 lastUpdated: new Date(2018, 0, 23, 8, 0, 0, 0),
                 dates: {
                     '2018-01-24': {
-                        start: new Date(2018, 0, 24, 8, 0, 0, 0),
-                        end: new Date(2018, 0, 24, 10, 0, 0, 0),
+                        start: moment('2018-01-24T08:00:00.000'),
+                        end: moment('2018-01-24T10:00:00.000'),
                     },
                 },
             },

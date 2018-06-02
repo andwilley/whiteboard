@@ -5,13 +5,14 @@ import { Moment } from 'moment';
 import { editables } from '../whiteboard-constants';
 import { IAddUpdateSnivFormValues } from '../types/State';
 import FlexInputContainer from '../containers/FlexInputContainer';
+import { IAddUpdateSnivArgs } from '../actions';
 
 interface IAddSnivFormProps {
     formValues: IAddUpdateSnivFormValues;
     dateIsSelectable: (beforeOrAfter: 'before' | 'after',
                        referenceDate: Moment | '') => (currentDate: Moment,
                                                        selectedDate: Moment) => boolean;
-    onSubmit: () => void;
+    onSnivSubmit: (obj: IAddUpdateSnivArgs) => (e: any) => void;
     onInputChange: () => void;
     onStartChange: () => void;
     onEndChange: () => void;
@@ -20,13 +21,20 @@ interface IAddSnivFormProps {
 
 const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                                                     dateIsSelectable,
-                                                    onSubmit,
+                                                    onSnivSubmit,
                                                     onInputChange,
                                                     onStartChange,
                                                     onEndChange,
                                                     onAircrewInputChange,
 }) => {
     const timeFormat = 'HHmm';
+    const onSubmit = onSnivSubmit({
+        snivId: '',
+        aircrewIds: formValues.aircrewRefIds,
+        start: formValues.start,
+        end: formValues.end,
+        message: formValues.message,
+    });
     return (
         <form onSubmit={onSubmit}>
             <FlexInputContainer
@@ -43,21 +51,21 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 element={editables.SNIV_FORM}
                 entityId={''}
             />
-            Start:
             <Datetime
                 timeFormat={timeFormat}
                 inputProps={{
                     name: 'start',
+                    placeholder: 'Start',
                 }}
                 isValidDate={dateIsSelectable('before', formValues.end)}
                 value={formValues.start}
                 onChange={onStartChange}
             />
-            End:
             <Datetime
                 timeFormat={timeFormat}
                 inputProps={{
                     name: 'end',
+                    placeholder: 'End',
                 }}
                 isValidDate={dateIsSelectable('after', formValues.start)}
                 value={formValues.end}
@@ -70,6 +78,14 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 value={formValues.message}
                 onChange={onInputChange}
             /><br />
+            <input
+                type="hidden"
+                name="snivId"
+                value=""
+            />
+            <button type="submit">
+            Submit
+            </button>
         </form>
     );
 };
