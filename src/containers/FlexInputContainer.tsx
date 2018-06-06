@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as moment from 'moment';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { getActiveDayErrors } from '../reducers/errorReducer';
@@ -52,8 +53,8 @@ interface IFlexInputContainerProps {
 }
 
 interface ISchedBlock {
-    start: Date;
-    end: Date;
+    start: moment.Moment;
+    end: moment.Moment;
     location: UErrorLocs;
     locationId: string;
 }
@@ -286,11 +287,13 @@ const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
         endTimeMn = '59';
         endOffset = 0;
     }
-    const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000`);
-    const endDate = new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000`);
+    const startDate = moment(`${state.crewListUI.currentDay} ${startTimeHr}:${startTimeMn}:00.000`,
+                             'YYYY-MM-DD HH:mm:ss.SSS');
+    const endDate = moment(`${state.crewListUI.currentDay} ${endTimeHr}:${endTimeMn}:00.000`,
+                             'YYYY-MM-DD HH:mm:ss.SSS');
     const schedBlock = {
-        start: new Date(startDate.getTime() - startOffset),
-        end: new Date(endDate.getTime() + endOffset),
+        start: moment(startDate.valueOf() - startOffset),
+        end: moment(endDate.valueOf() + endOffset),
         location: errorLocs.FLIGHT,
         locationId: flightId,
     };
@@ -351,16 +354,24 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
         } else {
             endOffset = state.settings.minutesNoteDuration * 60000;
         }
-        const startDate = new Date(`${state.crewListUI.currentDay}T${startTimeHr}:${startTimeMn}:00.000`);
+        const startDate = moment(`${state.crewListUI.currentDay} ${startTimeHr}:${startTimeMn}:00.000`,
+                                 'YYYY-MM-DD HH:mm:ss.SSS');
         const endDate = endOffset === 0 ?
-            new Date(`${state.crewListUI.currentDay}T${endTimeHr}:${endTimeMn}:00.000`) :
-            new Date(startDate.getTime() + endOffset);
+            /** use 00 seconds to be able to compare this time to the actual end of the day */
+            moment(`${state.crewListUI.currentDay} ${endTimeHr}:${endTimeMn}:00.000`,
+                   'YYYY-MM-DD HH:mm:ss.SSS') :
+            moment(startDate.valueOf() + endOffset);
         const schedBlock = {
             start: startDate,
             end: endDate,
             location: flightNote ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
             locationId: flightNote ? flightId : state.crewListUI.currentDay,
         };
+        if (schedBlock.start > schedBlock.end) {
+            const tempStart = schedBlock.start;
+            schedBlock.start = schedBlock.end;
+            schedBlock.end = tempStart;
+        }
         activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
             [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
     } else {
@@ -368,8 +379,11 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
             activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
         } else {
             const schedBlock = {
-                start: new Date(`${state.crewListUI.currentDay}T00:00:00.000`),
-                end: new Date(`${state.crewListUI.currentDay}T23:59:00.000`),
+                start: moment(`${state.crewListUI.currentDay} 00:00:00.000`,
+                              'YYYY-MM-DD HH:mm:ss.SSS'),
+                /** use 00 seconds to be able to compare this time to the actual end of the day */
+                end: moment(`${state.crewListUI.currentDay} 23:59:00.000`,
+                            'YYYY-MM-DD HH:mm:ss.SSS'),
                 location: flightNote ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
                 locationId: flightNote ? flightId : state.crewListUI.currentDay,
             };
