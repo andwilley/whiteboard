@@ -56,6 +56,11 @@ const crewListUIReducer = (state: ICrewListUI = { qualsList,
                 ...state,
                 showSnivs: !state.showSnivs,
             };
+        case getType(actions.addUpdateSnivFormDisplay):
+            return {
+                ...state,
+                addUpdateSnivFormDisplay: action.payload.display,
+            };
         default:
             return state;
     }

@@ -19,9 +19,9 @@ const mapStateToProps = (state: IState) => {
                 return true;
             }
             if (beforeOrAfter === 'before') {
-                return currentDate.isBefore(referenceDate);
+                return currentDate.isSameOrBefore(referenceDate);
             }
-            return currentDate.isAfter(referenceDate);
+            return currentDate.isSameOrAfter(referenceDate);
         },
     };
 };

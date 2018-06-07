@@ -60,6 +60,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 isValidDate={dateIsSelectable('before', formValues.end)}
                 value={formValues.start}
                 onChange={onStartChange}
+                timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
             <Datetime
                 timeFormat={timeFormat}
@@ -70,6 +71,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 isValidDate={dateIsSelectable('after', formValues.start)}
                 value={formValues.end}
                 onChange={onEndChange}
+                timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
             <input
                 type="text"

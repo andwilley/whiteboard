@@ -48,6 +48,7 @@ export const DEL_SNIV = 'DEL_SNIV';
 export const SET_SNIV_FORM = 'SET_SNIV_FORM';
 export const ADD_AIRCREW_REF_TO_SNIV_FORM = 'ADD_AIRCREW_REF_TO_SNIV_FORM';
 export const DEL_AIRCREW_REF_FROM_SNIV_FORM = 'DEL_AIRCREW_REF_FROM_SNIV_FORM';
+export const ADD_UPDATE_SNIV_FORM_DISPLAY = 'ADD_UPDATE_SNIV_FORM_DISPLAY';
 
 // const makeActionCreator = (type, ...payloadNames) => {
 //     return (...payloadValues) => {
@@ -153,11 +154,12 @@ const breakDateRangeIntoDays = (start: moment.Moment | '',
     /**
      * doesn't work if start and end are 23:59:59.999 on the same day.
      * Use can't set ms. Not a factor, but it is a bug
+     * Moments are mutable!! watch the references.
      */
     if (start === '' || end === '') {
         return {};
     }
-    if (start > end) {
+    if (start.isAfter(end)) {
         const temp = start;
         start = end;
         end = temp;
@@ -179,11 +181,11 @@ const breakDateRangeIntoDays = (start: moment.Moment | '',
         dates = {
             ...dates,
             [`${endOfCurrentDay.year()}-${endOfCurrentDay.format('MM')}-${endOfCurrentDay.format('DD')}`]: {
-                start: (start >= beginningOfCurrentDay) ? start : beginningOfCurrentDay,
-                end: (end > endOfCurrentDay) ? endOfCurrentDay : end,
+                start: start.isSameOrAfter(beginningOfCurrentDay) ? start : beginningOfCurrentDay.clone(),
+                end: end.isAfter(endOfCurrentDay) ? endOfCurrentDay.clone() : end,
             },
         };
-    } while (end >= endOfCurrentDay);
+    } while (end.isSameOrAfter(endOfCurrentDay));
     return dates;
 };
 
@@ -222,6 +224,12 @@ export const actions = {
         };
     }),
     delAircrew: createAction(DEL_AIRCREW, (id: string) => ({
+        /**
+         * removes aircrew object and removes references from:
+         * -sorties
+         * -notes
+         * -snivs*
+         */
         type: DEL_AIRCREW,
         payload: {
             id,
@@ -555,6 +563,12 @@ export const actions = {
         type: DEL_AIRCREW_REF_FROM_SNIV_FORM,
         payload: {
             aircrewId,
+        },
+    })),
+    addUpdateSnivFormDisplay: createAction(ADD_UPDATE_SNIV_FORM_DISPLAY, (display: boolean) => ({
+        type: ADD_UPDATE_SNIV_FORM_DISPLAY,
+        payload: {
+            display,
         },
     })),
 };
