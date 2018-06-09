@@ -5,7 +5,7 @@ import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { blankAddUpdateAircrewForm, seats } from '../whiteboard-constants';
 import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
-const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
+const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay, addUpdateSnivFormDisplay } = actions;
 type IAircrewEntity = IEntity<IAircrew>;
 
 const newPuck = {
@@ -206,10 +206,10 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(addUpdateAircrewFormDisplay(false));
     },
     onSnivFormAddButtonClick: () => {
-      dispatch({type: ''});
+      dispatch(addUpdateSnivFormDisplay(true));
     },
     onSnivFormDelButtonClick: () => {
-      dispatch({type: ''});
+      dispatch(addUpdateSnivFormDisplay(false));
     },
     // need something to validate unique callsigns from server async.
   };

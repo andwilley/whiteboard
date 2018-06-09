@@ -75,17 +75,17 @@ const CrewList: React.SFC<ICrewListProps> = ({
     const snivFormDisplayButton = addUpdateSnivFormDisplay ?
         (
             <div>
-                <AddButton onClick={onSnivFormAddButtonClick}>
-                    Add sniv
-                </AddButton>
-            </div>
-        ) :
-        (
-            <div>
                 <DelButton onClick={onSnivFormDelButtonClick}>
                     Close This Form
                 </DelButton>
                 <AddSnivFormContainer />
+            </div>
+        ) :
+        (
+            <div>
+                <AddButton onClick={onSnivFormAddButtonClick}>
+                    Add Sniv
+                </AddButton>
             </div>
         );
     return (
