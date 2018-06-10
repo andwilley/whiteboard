@@ -60,8 +60,8 @@ export interface ISnivDates {
 export interface ISnivs {
     readonly id: string;
     readonly aircrewIds: string[];
-    readonly start: Moment;
-    readonly end: Moment;
+    readonly start: Moment | '';
+    readonly end: Moment | '';
     readonly message: string;
     readonly dateAdded: Date;
     readonly lastUpdated: Date;

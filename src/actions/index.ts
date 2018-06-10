@@ -540,7 +540,7 @@ export const actions = {
             dates: breakDateRangeIntoDays(args.start, args.end),
         },
     })),
-    delSniv: createAction(DEL_SNIV, (snivId: string, aircrewId: string = '') => ({
+    delSniv: createAction(DEL_SNIV, (snivId: string, aircrewId?: string) => ({
         type: DEL_SNIV,
         payload: {
             snivId,

@@ -47,6 +47,7 @@ const mapDispatchToProps = (dispatch: any) => {
                 message: sniv.message,
             }));
             dispatch(setSnivForm(blankSnivForm));
+            dispatch(addUpdateSnivFormDisplay(false));
         },
         onAircrewInputChange: (input: string) => {
             dispatch(setSnivForm({aircrew: input}));

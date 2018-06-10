@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
-import { actions } from '../actions';
 import CrewList from '../components/CrewList';
-import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { seats } from '../whiteboard-constants';
+import { actions, IAddUpdateSnivArgs } from '../actions';
+import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
-const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
+const { delAircrew, delSniv, setAircrewForm, setSnivForm, addUpdateAircrewFormDisplay } = actions;
 type IAircrewEntity = IEntity<IAircrew>;
 
 const newPuck = {
@@ -179,13 +179,21 @@ const mapDispatchToProps = (dispatch: any) => {
       // dispatch(something(id)); not sure I'm going to need this. below is for test.
       alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));
     },
-    onXClick: (id: string) => {
+    onAircrewXClick: (id: string) => {
       dispatch(delAircrew(id));
       dispatch(setAircrewForm({id: ''}));
     },
-    onEditClick: (aircrew: IAircrewWithPucks) => {
+    onAircrewEditClick: (aircrew: IAircrewWithPucks) => {
       dispatch(setAircrewForm({existingAircrewUnchanged: true}));
       dispatch(setAircrewForm(aircrew));
+      dispatch(addUpdateAircrewFormDisplay(true));
+    },
+    onSnivXClick: (snivId: string, aircrewId?: string) => (e: any) => {
+      dispatch(delSniv(snivId, aircrewId));
+      dispatch(setSnivForm({snivId: ''}));
+    },
+    onSnivEditClick: (sniv: IAddUpdateSnivArgs) => (e: any) => {
+      dispatch(setSnivForm(sniv));
       dispatch(addUpdateAircrewFormDisplay(true));
     },
     // need something to validate unique callsigns from server async.

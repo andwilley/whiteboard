@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import { ISnivs } from '../types/State';
+import { IAddUpdateSnivArgs } from '../actions';
+import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 
 interface IAircrewProps {
     aircrew: IAircrewWithPucks;
@@ -8,8 +9,10 @@ interface IAircrewProps {
     showSnivs: boolean;
     dayId: string;
     onAircrewClick: () => any;
-    onXClick: () => any;
-    onEditClick: () => any;
+    onAircrewXClick: () => any;
+    onAircrewEditClick: () => any;
+    onSnivXClick: (snivId: string, aircrewId?: string) => any;
+    onSnivEditClick: (sniv: IAddUpdateSnivArgs) => any;
 }
 
 const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
@@ -17,8 +20,11 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                                              showSnivs,
                                              dayId,
                                              onAircrewClick,
-                                             onXClick,
-                                             onEditClick }) => {
+                                             onAircrewXClick,
+                                             onAircrewEditClick,
+                                             onSnivXClick,
+                                             onSnivEditClick,
+}) => {
     const totalPucks = aircrew.pucks ? (aircrew.pucks.flight +
                                           aircrew.pucks.sim +
                                           aircrew.pucks.flightNote +
@@ -27,11 +33,25 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
     const aircrewStyle: React.CSSProperties = { cursor: 'pointer',
                                                 textDecoration: totalPucks === 0 ? '' : 'line-through' };
     const snivComponentList = snivs.map(sniv => {
+        const delSnivButtons = sniv.aircrewIds.length > 1 ?
+        (
+            <span>
+                <span onClick={onSnivXClick(sniv.id, aircrew.id)}>[X]</span>
+                <span onClick={onSnivXClick(sniv.id)}>[XX]</span>
+            </span>
+        ) :
+        (
+            <span>
+                <span onClick={onSnivXClick(sniv.id)}>[X]</span>
+            </span>
+        );
         return (
             <li key={sniv.id}>
                 <span>{sniv.dates[dayId].start.format('HHmm')}</span>-
                 <span>{sniv.dates[dayId].end.format('HHmm')}</span>{': '}
                 <span>{sniv.message}</span>
+                <span onClick={onSnivEditClick(sniv)}>[Edit]</span>
+                {delSnivButtons}
             </li>
         );
     });
@@ -49,8 +69,8 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                 <span> S({aircrew.pucks.sim}) </span>}
             {(aircrew.pucks.flightNote + aircrew.pucks.dayNote) > 0 &&
                 <span> N({aircrew.pucks.flightNote + aircrew.pucks.dayNote}) </span>}
-            <span style={{cursor: 'pointer'}} onClick={onEditClick}> [EDIT] </span>
-            <span style={{cursor: 'pointer'}} onClick={onXClick}> {'[X]'} </span>
+            <span style={{cursor: 'pointer'}} onClick={onAircrewEditClick}> [EDIT] </span>
+            <span style={{cursor: 'pointer'}} onClick={onAircrewXClick}> {'[X]'} </span>
             {showSnivs && <ul>{snivComponentList}</ul>}
         </li>
     );

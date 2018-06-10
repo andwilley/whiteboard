@@ -2,6 +2,7 @@ import * as React from 'react';
 import Aircrew from './Aircrew';
 import { ISnivs } from '../types/State';
 import { errorMessages } from '../errors';
+import { IAddUpdateSnivArgs } from '../actions';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import AddSnivFormContainer from '../containers/AddSnivFormContainer';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
@@ -12,8 +13,10 @@ interface ICrewListProps {
     showSnivs: boolean;
     dayId: string;
     onAircrewClick: (crew: IAircrewWithPucks) => any;
-    onXClick: (id: string) => any;
-    onEditClick: (crew: IAircrewWithPucks) => any;
+    onAircrewXClick: (id: string) => any;
+    onAircrewEditClick: (crew: IAircrewWithPucks) => any;
+    onSnivXClick: (id: string) => any;
+    onSnivEditClick: (sniv: IAddUpdateSnivArgs) => any;
 }
 
 const CrewList: React.SFC<ICrewListProps> = ({
@@ -22,8 +25,10 @@ const CrewList: React.SFC<ICrewListProps> = ({
     showSnivs,
     dayId,
     onAircrewClick,
-    onXClick,
-    onEditClick,
+    onAircrewXClick,
+    onAircrewEditClick,
+    onSnivXClick,
+    onSnivEditClick,
     }) => {
     const pilotList: JSX.Element[] = [];
     const wsoList: JSX.Element[] = [];
@@ -36,8 +41,10 @@ const CrewList: React.SFC<ICrewListProps> = ({
                 showSnivs={showSnivs}
                 dayId={dayId}
                 onAircrewClick={() => onAircrewClick(aircrew)}
-                onXClick={() => onXClick(aircrew.id)}
-                onEditClick={() => onEditClick(aircrew)}
+                onAircrewXClick={() => onAircrewXClick(aircrew.id)}
+                onAircrewEditClick={() => onAircrewEditClick(aircrew)}
+                onSnivXClick={onSnivXClick}
+                onSnivEditClick={onSnivEditClick}
             />
         );
         aircrew.seat === 'pilot' ? pilotList.push(aircrewComponent) : wsoList.push(aircrewComponent);
