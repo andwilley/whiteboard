@@ -1,17 +1,23 @@
+import * as Moment from 'moment';
 import { connect } from 'react-redux';
 import AddSnivForm from '../components/AddSnivForm';
-import * as Moment from 'moment';
-import { IState, IAddUpdateSnivFormValues } from '../types/State';
+import { blankSnivForm } from '../whiteboard-constants';
 import { actions, IAddUpdateSnivArgs } from '../actions';
-const { setSnivForm, addUpdateSniv } = actions;
+import { IState, IAddUpdateSnivFormValues } from '../types/State';
+const { setSnivForm, addUpdateSniv, addUpdateSnivFormDisplay } = actions;
 
 const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => {
     return state.addUpdateSnivFormValues;
 };
 
+const getAddUpdateSnivFormDisplay = (state: IState): boolean => {
+    return state.crewListUI.addUpdateSnivFormDisplay;
+  };
+
 const mapStateToProps = (state: IState) => {
     return {
         formValues: getAddUpdateSnivFormValues(state),
+        addUpdateSnivFormDisplay: getAddUpdateSnivFormDisplay(state),
         dateIsSelectable: (beforeOrAfter: 'before' | 'after',
                            referenceDate: Moment.Moment | '') => (currentDate: Moment.Moment,
                                                                   selectedDate: Moment.Moment): boolean => {
@@ -30,10 +36,9 @@ const mapDispatchToProps = (dispatch: any) => {
     return {
         onSnivSubmit: (sniv: IAddUpdateSnivArgs) => (e: any) => {
             e.preventDefault();
-            if (sniv.start === '' || sniv.end === '') {
+            if (sniv.start === '' || sniv.end === '' || sniv.aircrewIds.length === 0) {
                 return;
             }
-            console.log(sniv);
             dispatch(addUpdateSniv({
                 snivId: sniv.snivId,
                 aircrewIds: sniv.aircrewIds,
@@ -41,6 +46,7 @@ const mapDispatchToProps = (dispatch: any) => {
                 end: sniv.end,
                 message: sniv.message,
             }));
+            dispatch(setSnivForm(blankSnivForm));
         },
         onAircrewInputChange: (input: string) => {
             dispatch(setSnivForm({aircrew: input}));
@@ -57,6 +63,13 @@ const mapDispatchToProps = (dispatch: any) => {
         },
         onInputChange: (e: any) => {
             dispatch(setSnivForm({[e.target.name]: e.target.value}));
+        },
+        onSnivFormAddButtonClick: () => {
+            dispatch(addUpdateSnivFormDisplay(true));
+        },
+        onSnivFormDelButtonClick: () => {
+            dispatch(setSnivForm(blankSnivForm));
+            dispatch(addUpdateSnivFormDisplay(false));
         },
     };
 };

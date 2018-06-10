@@ -1,4 +1,6 @@
 import * as React from 'react';
+import AddButton from './AddButton';
+import DelButton from './DelButton';
 import { IAddUpdateAircrewFormValues } from '../types/State';
 
 const parseRank = (rank: string | number): number => {
@@ -89,12 +91,19 @@ interface IAddUpdateAircrewFormProps {
     onAddUpdateAircrewSubmit: (crew: IAddUpdateAircrewFormValues) => any;
     addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
     qualsList: string[];
+    addUpdateAircrewFormDisplay: boolean;
+    onAddAircrewFormButtonClick: () => void;
+    onDelAircrewFormButtonClick: () => void;
 }
 
 const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputChange,
                                                                        onAddUpdateAircrewSubmit,
                                                                        addUpdateAircrewFormValues,
-                                                                       qualsList }) => {
+                                                                       qualsList,
+                                                                       addUpdateAircrewFormDisplay,
+                                                                       onAddAircrewFormButtonClick,
+                                                                       onDelAircrewFormButtonClick,
+}) => {
     const rankIsValid = addUpdateAircrewFormValues.rank === 0 ? true : parseRank(addUpdateAircrewFormValues.rank);
     const onSubmit = (e: any) => {
         e.preventDefault();
@@ -121,7 +130,23 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
             {qual}
         </label>
     ));
-    return (
+    const addUpdateAircrewFormDisplayButton = addUpdateAircrewFormDisplay ?
+        (
+        <div>
+            <DelButton onClick={() => onDelAircrewFormButtonClick()}>
+                Close This Form
+            </DelButton>
+        </div>
+        ) :
+        (
+        <div>
+            <AddButton onClick={() => onAddAircrewFormButtonClick()}>
+                Add Aircrew
+            </AddButton>
+        </div>
+        );
+    const addAircrewForm = addUpdateAircrewFormDisplay ?
+        (
         <form onSubmit={e => onSubmit(e)}>
             {addUpdateAircrewFormValues.id === '' ? 'Add' : 'Update'} Aircrew:<br />
             <input
@@ -176,6 +201,12 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
                 {addUpdateAircrewFormValues.existingAircrewUnchanged ? 'Clear' : 'Submit'}
             </button>
         </form>
+    ) : null;
+    return (
+        <div>
+            {addUpdateAircrewFormDisplayButton}
+            {addAircrewForm}
+        </div>
     );
 };
 

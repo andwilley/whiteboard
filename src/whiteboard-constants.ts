@@ -1,5 +1,5 @@
 import { INameLocations, IEditables } from './types/WhiteboardTypes';
-import { ITimeTypes } from './types/State';
+import { ITimeTypes, IAddUpdateSnivFormValues } from './types/State';
 
 export const qualsList =
     ['SL', 'DL', 'MC', 'NSI', 'FAI', 'MDTI', 'WTI', 'FAC(A)', 'FAC(A)I', 'NS', 'ACM', 'LAT', 'PMCF', 'ODO'];
@@ -14,6 +14,15 @@ export const blankAddUpdateAircrewForm = {
     quals: [],
     existingAircrewUnchanged: false,
     display: false,
+};
+
+export const blankSnivForm: IAddUpdateSnivFormValues = {
+    snivId: '',
+    aircrew: '',
+    aircrewRefIds: [],
+    start: '',
+    end: '',
+    message: '',
 };
 
 export const seats = ['front', 'back'];

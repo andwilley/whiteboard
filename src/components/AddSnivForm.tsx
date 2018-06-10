@@ -1,7 +1,9 @@
 import * as React from 'react';
+import { Moment } from 'moment';
+import AddButton from './AddButton';
+import DelButton from './DelButton';
 import { errorLocs } from '../errors';
 import * as Datetime from 'react-datetime';
-import { Moment } from 'moment';
 import { editables } from '../whiteboard-constants';
 import { IAddUpdateSnivFormValues } from '../types/State';
 import FlexInputContainer from '../containers/FlexInputContainer';
@@ -9,6 +11,7 @@ import { IAddUpdateSnivArgs } from '../actions';
 
 interface IAddSnivFormProps {
     formValues: IAddUpdateSnivFormValues;
+    addUpdateSnivFormDisplay: boolean;
     dateIsSelectable: (beforeOrAfter: 'before' | 'after',
                        referenceDate: Moment | '') => (currentDate: Moment,
                                                        selectedDate: Moment) => boolean;
@@ -17,15 +20,20 @@ interface IAddSnivFormProps {
     onStartChange: () => void;
     onEndChange: () => void;
     onAircrewInputChange: () => void;
+    onSnivFormAddButtonClick: () => void;
+    onSnivFormDelButtonClick: () => void;
 }
 
 const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
+                                                    addUpdateSnivFormDisplay,
                                                     dateIsSelectable,
                                                     onSnivSubmit,
                                                     onInputChange,
                                                     onStartChange,
                                                     onEndChange,
                                                     onAircrewInputChange,
+                                                    onSnivFormAddButtonClick,
+                                                    onSnivFormDelButtonClick,
 }) => {
     const timeFormat = 'HHmm';
     const onSubmit = onSnivSubmit({
@@ -35,7 +43,23 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
         end: formValues.end,
         message: formValues.message,
     });
-    return (
+    const snivFormDisplayButton = addUpdateSnivFormDisplay ?
+        (
+        <div>
+            <DelButton onClick={onSnivFormDelButtonClick}>
+                Close This Form
+            </DelButton>
+        </div>
+        ) :
+        (
+        <div>
+            <AddButton onClick={onSnivFormAddButtonClick}>
+                Add Sniv
+            </AddButton>
+        </div>
+        );
+    const snivForm = addUpdateSnivFormDisplay ?
+        (
         <form onSubmit={onSubmit}>
             <FlexInputContainer
                 placeHolder="Aircrew"
@@ -89,6 +113,12 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
             Submit
             </button>
         </form>
+    ) : null;
+    return (
+        <div>
+            {snivFormDisplayButton}
+            {snivForm}
+        </div>
     );
 };
 

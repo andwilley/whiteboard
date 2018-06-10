@@ -17,11 +17,16 @@ const getQualsList = (state: IState): string[] => {
   return state.crewListUI.qualsList;
 };
 
+const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
+  return state.crewListUI.addUpdateAircrewFormDisplay;
+};
+
 const mapStateToProps = (state: IState) => {
   return {
     // need something to validate unique callsigns from server.
     addUpdateAircrewFormValues: getAddUpdateAircrewFormValues(state),
     qualsList: getQualsList(state),
+    addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
   };
 };
 
@@ -51,6 +56,13 @@ const mapDispatchToProps = (dispatch: any) => {
           break;
       }
       dispatch(setAircrewForm({existingAircrewUnchanged: false}));
+    },
+    onAddAircrewFormButtonClick: () => {
+      dispatch(addUpdateAircrewFormDisplay(true));
+    },
+    onDelAircrewFormButtonClick: () => {
+      dispatch(setAircrewForm(blankAddUpdateAircrewForm));
+      dispatch(addUpdateAircrewFormDisplay(false));
     },
   };
 };

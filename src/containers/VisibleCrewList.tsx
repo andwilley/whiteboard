@@ -2,10 +2,10 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import CrewList from '../components/CrewList';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
-import { blankAddUpdateAircrewForm, seats } from '../whiteboard-constants';
+import { seats } from '../whiteboard-constants';
 import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
-const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay, addUpdateSnivFormDisplay } = actions;
+const { delAircrew, setAircrewForm, addUpdateAircrewFormDisplay } = actions;
 type IAircrewEntity = IEntity<IAircrew>;
 
 const newPuck = {
@@ -151,10 +151,6 @@ const getAircrewList = (state: IState): IAircrewWithPucks[] => {
   });
 };
 
-const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {
-  return state.crewListUI.addUpdateAircrewFormDisplay;
-};
-
 const getDaySnivs = (state: IState): ISnivs[] => {
   return state.snivs.allIds.reduce((filteredIds: ISnivs[], currId) => {
     if (state.snivs.byId[currId].dates[state.crewListUI.currentDay]) {
@@ -168,18 +164,12 @@ const getDayId = (state: IState): string => {
   return state.crewListUI.currentDay;
 };
 
-const getAddUpdateSnivFormDisplay = (state: IState): boolean => {
-  return state.crewListUI.addUpdateSnivFormDisplay;
-};
-
 const mapStateToProps = (state: IState) => {
   return {
     aircrewList: getAircrewList(state),
     daySnivs: getDaySnivs(state),
     showSnivs: getShowSnivs(state),
     dayId: getDayId(state),
-    addUpdateAircrewFormDisplay: getAddUpdateAircrewFormDisplay(state),
-    addUpdateSnivFormDisplay: getAddUpdateSnivFormDisplay(state),
   };
 };
 
@@ -197,19 +187,6 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(setAircrewForm({existingAircrewUnchanged: true}));
       dispatch(setAircrewForm(aircrew));
       dispatch(addUpdateAircrewFormDisplay(true));
-    },
-    onAddAircrewFormButtonClick: () => {
-      dispatch(addUpdateAircrewFormDisplay(true));
-    },
-    onDelAircrewFormButtonClick: () => {
-      dispatch(setAircrewForm(blankAddUpdateAircrewForm));
-      dispatch(addUpdateAircrewFormDisplay(false));
-    },
-    onSnivFormAddButtonClick: () => {
-      dispatch(addUpdateSnivFormDisplay(true));
-    },
-    onSnivFormDelButtonClick: () => {
-      dispatch(addUpdateSnivFormDisplay(false));
     },
     // need something to validate unique callsigns from server async.
   };
