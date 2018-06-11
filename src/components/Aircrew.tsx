@@ -36,7 +36,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
         const delSnivButtons = sniv.aircrewIds.length > 1 ?
         (
             <span>
-                <span onClick={onSnivXClick(sniv.id, aircrew.id)}>[X]</span>
+                <span onClick={onSnivXClick(sniv.id, aircrew.id)}>[X] </span>
                 <span onClick={onSnivXClick(sniv.id)}>[XX]</span>
             </span>
         ) :
@@ -49,8 +49,8 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
             <li key={sniv.id}>
                 <span>{sniv.dates[dayId].start.format('HHmm')}</span>-
                 <span>{sniv.dates[dayId].end.format('HHmm')}</span>{': '}
-                <span>{sniv.message}</span>
-                <span onClick={onSnivEditClick(sniv)}>[Edit]</span>
+                <span>{sniv.message} </span>
+                <span onClick={onSnivEditClick(sniv)}>[Edit] </span>
                 {delSnivButtons}
             </li>
         );

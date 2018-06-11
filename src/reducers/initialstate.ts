@@ -120,15 +120,15 @@ export const INITIAL_STATE: IState = {
             a: {
                 id: 'a',
                 aircrewIds: ['a'],
-                start: moment('2018-01-24T08:00:00.000'),
-                end: moment('2018-01-24T10:00:00.000'),
+                start: moment('2018-01-24T08:00:00.000', moment.ISO_8601),
+                end: moment('2018-01-24T10:00:00.000', moment.ISO_8601),
                 message: 'Test Sniv',
-                dateAdded: new Date(2018, 0, 23, 8, 0, 0, 0),
-                lastUpdated: new Date(2018, 0, 23, 8, 0, 0, 0),
+                dateAdded: moment('2018-01-23T08:00:00.000', moment.ISO_8601),
+                lastUpdated: moment('2018-01-23T08:00:00.000', moment.ISO_8601),
                 dates: {
                     '2018-01-24': {
-                        start: moment('2018-01-24T08:00:00.000'),
-                        end: moment('2018-01-24T10:00:00.000'),
+                        start: moment('2018-01-24T08:00:00.000', moment.ISO_8601),
+                        end: moment('2018-01-24T10:00:00.000', moment.ISO_8601),
                     },
                 },
             },

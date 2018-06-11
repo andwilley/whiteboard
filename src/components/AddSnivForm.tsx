@@ -37,7 +37,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
 }) => {
     const timeFormat = 'HHmm';
     const onSubmit = onSnivSubmit({
-        snivId: '',
+        snivId: formValues.snivId,
         aircrewIds: formValues.aircrewRefIds,
         start: formValues.start,
         end: formValues.end,
@@ -107,7 +107,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
             <input
                 type="hidden"
                 name="snivId"
-                value=""
+                value={formValues.snivId}
             />
             <button type="submit">
             Submit

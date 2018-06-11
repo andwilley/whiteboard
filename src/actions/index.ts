@@ -532,8 +532,8 @@ export const actions = {
         payload: {
             snivId: args.snivId || cuid(),
             aircrewIds: args.aircrewIds,
-            dateAdded: args.snivId ? null : new Date(),
-            lastUpdated: new Date(),
+            dateAdded: args.snivId ? null : moment(),
+            lastUpdated: moment(),
             message: args.message,
             start: args.start,
             end: args.end,

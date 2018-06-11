@@ -1,11 +1,16 @@
 import { connect } from 'react-redux';
 import CrewList from '../components/CrewList';
 import { seats } from '../whiteboard-constants';
-import { actions, IAddUpdateSnivArgs } from '../actions';
+import { actions } from '../actions';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
-const { delAircrew, delSniv, setAircrewForm, setSnivForm, addUpdateAircrewFormDisplay } = actions;
+const { delAircrew,
+        delSniv,
+        setAircrewForm,
+        setSnivForm,
+        addUpdateAircrewFormDisplay,
+        addUpdateSnivFormDisplay} = actions;
 type IAircrewEntity = IEntity<IAircrew>;
 
 const newPuck = {
@@ -192,9 +197,16 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(delSniv(snivId, aircrewId));
       dispatch(setSnivForm({snivId: ''}));
     },
-    onSnivEditClick: (sniv: IAddUpdateSnivArgs) => (e: any) => {
-      dispatch(setSnivForm(sniv));
-      dispatch(addUpdateAircrewFormDisplay(true));
+    onSnivEditClick: (sniv: ISnivs) => (e: any) => {
+      dispatch(setSnivForm({
+        snivId: sniv.id,
+        aircrew: 'I think I need state here. Merge props to the rescue.',
+        aircrewRefIds: sniv.aircrewIds,
+        start: sniv.start,
+        end: sniv.end,
+        message: sniv.message,
+      }));
+      dispatch(addUpdateSnivFormDisplay(true));
     },
     // need something to validate unique callsigns from server async.
   };

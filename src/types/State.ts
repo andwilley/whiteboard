@@ -63,8 +63,8 @@ export interface ISnivs {
     readonly start: Moment | '';
     readonly end: Moment | '';
     readonly message: string;
-    readonly dateAdded: Date;
-    readonly lastUpdated: Date;
+    readonly dateAdded: Moment;
+    readonly lastUpdated: Moment;
     readonly dates: ISnivDates;
 }
 
