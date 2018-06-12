@@ -21,6 +21,8 @@ export const errorMessages = {
     ERR_NO_RESULTS_FOUND: 'No results match your search.',
     INVALID_TIME: 'Please enter a valid 24 hour time.',
     INVALID_CODE: 'Not all the codes you entered are valid.',
+    INVALID_DATE: 'Please enter an actual date.',
+    INVALID_DATE_ORDER: 'Your end date is prior to you start date.',
     TIME_ORDER: 'The times you entered are not in order.',
     FLIGHT_CONFLICT: 'has a flight or a sim (or is in the notes for one) during this time.',
     SNIV_CONFLICT: 'is snived during this time.',

@@ -12,7 +12,7 @@ const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => 
 
 const getAddUpdateSnivFormDisplay = (state: IState): boolean => {
     return state.crewListUI.addUpdateSnivFormDisplay;
-  };
+};
 
 const mapStateToProps = (state: IState) => {
     return {
@@ -25,9 +25,9 @@ const mapStateToProps = (state: IState) => {
                 return true;
             }
             if (beforeOrAfter === 'before') {
-                return currentDate.isSameOrBefore(referenceDate);
+                return currentDate.isSameOrBefore(referenceDate, 'day');
             }
-            return currentDate.isSameOrAfter(referenceDate);
+            return currentDate.isSameOrAfter(referenceDate, 'day');
         },
     };
 };

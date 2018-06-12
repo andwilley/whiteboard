@@ -93,7 +93,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                     placeholder: 'End',
                 }}
                 isValidDate={dateIsSelectable('after', formValues.start)}
-                value={formValues.end}
+                value={formValues.end || formValues.start}
                 onChange={onEndChange}
                 timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
