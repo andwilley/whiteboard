@@ -38,6 +38,7 @@ const compareTimeOrder = (brief: string, takeoff: string, land: string): UTimeTy
      * should use Dates, not strings for comparison.
      * This code is poorly written and will probably be confusing or embarassing
      * if someone else sees it.
+     * Update this to use moments!
      */
     interface ITimeAndTimeType {
         time: string;

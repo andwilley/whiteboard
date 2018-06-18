@@ -140,6 +140,13 @@ export interface ITimeTypes {
 
 export type UTimeTypes = ITimeTypes[keyof ITimeTypes];
 
+export interface ISnivTimeTypes {
+    SNIV_START: 'SNIV_START';
+    SNIV_END: 'SNIV_END';
+}
+
+export type USnivTimeTypes = ISnivTimeTypes[keyof ISnivTimeTypes];
+
 export interface IErrorLocs extends ITimeTypes {
     FLIGHT: 'FLIGHT';
     SORTIE: 'SORTIE';
@@ -147,6 +154,7 @@ export interface IErrorLocs extends ITimeTypes {
     DAY_NOTE: 'DAY_NOTE';
     CREWLIST: 'CREWLIST';
     SNIVS: 'SNIVS';
+    SNIV_FORM: 'SNIV_FORM';
     APP: 'APP';
 }
 
@@ -183,13 +191,13 @@ export interface ISchedErrorMeta extends IBaseErrorMeta {
 }
 
 export interface ITimeErrorMeta extends IBaseErrorMeta {
-    readonly timeType: UTimeTypes;
+    readonly timeType: UTimeTypes | USnivTimeTypes;
 }
 
 /** this is used by the interface for the arguments for the addError action */
 export interface ICustomErrorMeta {
     readonly aircrewId?: string;
-    readonly timeType?: UTimeTypes;
+    readonly timeType?: UTimeTypes | USnivTimeTypes;
 }
 
 export interface IBaseErrors {

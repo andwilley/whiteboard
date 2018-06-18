@@ -1,11 +1,11 @@
 import * as cuid from 'cuid';
-import { errorLevels } from '../errors';
+import { isMoment } from 'moment';
 import { errorTypes } from '../errors';
+import { errorLevels } from '../errors';
 import { errorMessages } from '../errors';
+import { UErrorLevels } from '../types/State';
 import { IUntrackedErrors } from '../types/WhiteboardTypes';
 import { RGX_24HOUR_TIME, RGX_IS_TR_CODE_LIST } from '../util/regEx';
-import { UErrorLevels } from '../types/State';
-import { isMoment } from 'moment';
 
 /**
  * Validators - show user input errors (still updates state with invalid input)
@@ -23,6 +23,7 @@ export const isString = (x: any) => {
 /**
  * Validator signature.
  * Validator must include a check for type, since input is any.
+ * - there should be a way around this...
  */
 export type ValidatorFn = (input: any) => IUntrackedErrors | null;
 
@@ -59,25 +60,6 @@ export const validMoment = (args?: IValArgs) => (input: any): IUntrackedErrors |
             type: errorTypes.FORM_VALIDATION,
             level: args && args.level ? args.level : errorLevels.CAUT,
             message: args && args.message ? args.message : errorMessages.INVALID_DATE,
-        };
-};
-
-/**
- * @param {Object} input expects shape: {start: Moment, end: Moment}
- */
-export const startEndTimeOrder = (args?: IValArgs) => (input: any): IUntrackedErrors | null => {
-    const validInputShape = input.start &&
-                            isMoment(input.start) &&
-                            input.end &&
-                            isMoment(input.end);
-    const validOrder = input.end.isSameOrAfter(input.start);
-    return validInputShape && validOrder ?
-        null :
-        {
-            id: cuid(),
-            type: errorTypes.FORM_VALIDATION,
-            level: args && args.level ? args.level : errorLevels.CAUT,
-            message: args && args.message ? args.message : errorMessages.INVALID_DATE_ORDER,
         };
 };
 

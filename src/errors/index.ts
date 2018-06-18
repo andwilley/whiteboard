@@ -39,6 +39,7 @@ export const errorLocs: IErrorLocs = {
     DAY_NOTE: 'DAY_NOTE',
     CREWLIST: 'CREWLIST',
     SNIVS: 'SNIVS',
+    SNIV_FORM: 'SNIV_FORM',
     APP: 'APP',
 };
 

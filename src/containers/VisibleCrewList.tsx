@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import CrewList from '../components/CrewList';
 import { seats } from '../whiteboard-constants';
-import { actions } from '../actions';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
+import { actions } from '../actions';
 const { delAircrew,
         delSniv,
         setAircrewForm,
