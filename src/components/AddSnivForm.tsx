@@ -5,13 +5,14 @@ import DelButton from './DelButton';
 import { errorLocs } from '../errors';
 import * as Datetime from 'react-datetime';
 import { editables } from '../whiteboard-constants';
-import { IAddUpdateSnivFormValues } from '../types/State';
+import { IAddUpdateSnivFormValues, IErrors } from '../types/State';
 import FlexInputContainer from '../containers/FlexInputContainer';
 import { IAddUpdateSnivArgs } from '../actions';
 
 interface IAddSnivFormProps {
     formValues: IAddUpdateSnivFormValues;
     addUpdateSnivFormDisplay: boolean;
+    errors: IErrors[];
     dateIsSelectable: (beforeOrAfter: 'before' | 'after',
                        referenceDate: Moment.Moment | '') => (currentDate: Moment.Moment,
                                                               selectedDate: Moment.Moment) => boolean;
@@ -25,6 +26,7 @@ interface IAddSnivFormProps {
 
 const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                                                     addUpdateSnivFormDisplay,
+                                                    errors,
                                                     dateIsSelectable,
                                                     onSnivSubmit,
                                                     onInputChange,

@@ -11,6 +11,7 @@ const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
                 [action.payload.errorId]: {
                     id: action.payload.errorId,
                     time: action.payload.time,
+                    dayId: action.payload.dayId,
                     type: action.payload.type,
                     location: action.payload.location,
                     locationId: action.payload.locationId,

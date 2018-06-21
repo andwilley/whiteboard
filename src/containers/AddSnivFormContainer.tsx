@@ -5,7 +5,7 @@ import { blankSnivForm, snivTimeTypes } from '../whiteboard-constants';
 import { IErrors, IState, IAddUpdateSnivFormValues } from '../types/State';
 import { errorTypes, errorLocs, errorLevels, errorMessages } from '../errors';
 import { actions, IAddUpdateSnivArgs, IAddErrorArgs } from '../actions';
-const { setSnivForm, addUpdateSniv, addUpdateSnivFormDisplay } = actions;
+const { setSnivForm, addUpdateSniv, addUpdateSnivFormDisplay, addError } = actions;
 
 const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => {
     return state.addUpdateSnivFormValues;
@@ -83,7 +83,7 @@ const mapDispatchToProps = (dispatch: any) => {
         onAircrewInputChange: (input: string) => {
             dispatch(setSnivForm({aircrew: input}));
         },
-        onTimeInputChange: (startOrEnd: string, compTime: Moment.Moment) => (refTime: Moment.Moment) => {
+        onTimeInputChange: (startOrEnd: 'start' | 'end', compTime: Moment.Moment) => (refTime: Moment.Moment) => {
             /**
              * @param {'start' | 'end'} startOrEnd label of the element calling the function
              * @param {Moment} compTime moment to compare this elements time to when this element changes
@@ -95,12 +95,12 @@ const mapDispatchToProps = (dispatch: any) => {
                 case 'start':
                     dispatch(setSnivForm({start: refTime}));
                     if (timesAreValid && !snivTimesAreInOrder(refTime, compTime)) {
-                        dispatch(getSnivOrderError('start'));
+                        dispatch(addError(getSnivOrderError('start')));
                     }
                 case 'end':
                     dispatch(setSnivForm({end: refTime}));
                     if (timesAreValid && !snivTimesAreInOrder(compTime, refTime)) {
-                        dispatch(getSnivOrderError('end'));
+                        dispatch(addError(getSnivOrderError('end')));
                     }
                 default:
                     return;

@@ -69,7 +69,8 @@ const daysById = (state: {[id: string]: IDays} = {}, action: IAction) => {
                 },
             };
         case getType(actions.addError):
-            if (state[action.payload.dayId].errors.indexOf(action.payload.errorId) > -1) {
+            if (action.payload.dayId === '' ||
+                state[action.payload.dayId].errors.indexOf(action.payload.errorId) > -1) {
                 return state;
             }
             return {
@@ -81,6 +82,9 @@ const daysById = (state: {[id: string]: IDays} = {}, action: IAction) => {
             };
         case getType(actions.delError):
         case getType(actions.clearError):
+            if (action.payload.dayId === '') {
+                return state;
+            }
             return {
                 ...state,
                 [action.payload.dayId]: {
