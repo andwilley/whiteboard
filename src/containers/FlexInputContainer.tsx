@@ -493,7 +493,7 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
     return aircrewList.filter(aircrew => inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()));
 };
 
-const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
+export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
     return (dispatch: any, getState: () => IState) => {
         const state = getState();
         /** clear and recalc schedule conflict errors */

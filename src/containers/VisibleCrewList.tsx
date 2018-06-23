@@ -4,15 +4,18 @@ import { seats } from '../whiteboard-constants';
 import { getErrors } from '../reducers/errorReducer';
 import { getAircrewById } from '../reducers/aircrewReducer';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
+import { setErrorsOnFreshState } from '../containers/FlexInputContainer';
 import { IEntity, IState, IAircrew, IFilters, ISnivs, IErrors, IEntityWithActive } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
 import { actions } from '../actions';
+import { errorTypes } from '../errors';
 const { delAircrew,
         delSniv,
         setAircrewForm,
         setSnivForm,
         addUpdateAircrewFormDisplay,
-        addUpdateSnivFormDisplay} = actions;
+        addUpdateSnivFormDisplay,
+        } = actions;
 type IAircrewEntity = IEntity<IAircrew>;
 
 const newPuck = {
@@ -171,6 +174,12 @@ const getDayId = (state: IState): string => {
   return state.crewListUI.currentDay;
 };
 
+// const clearSchedErrors = (errors: IEntityWithActive<IErrors>, aircrewId: string): void => {
+  /**
+   * clear any errors referencing delete aircrew or deleted snivs.
+   */
+// };
+
 interface IVisibleCrewListStateProps {
   aircrewById: {[key: string]: IAircrew};
   errors: IEntityWithActive<IErrors>;
@@ -206,8 +215,15 @@ const mergeProps = (stateProps: IVisibleCrewListStateProps, dispatchProps: any) 
     },
     onAircrewXClick: (id: string) => {
       dispatch(delAircrew(id));
-      // clear the sched errors
       dispatch(setAircrewForm({id: ''}));
+      // clear snivs for the aircrew we're deleting
+      stateProps.daySnivs.forEach(sniv => {
+        if (sniv.aircrewIds.indexOf(id) > -1) {
+            dispatch(delSniv(sniv.id, sniv.aircrewIds.length > 1 ? id : undefined));
+        }
+      });
+      // clear and reset the schedConflict errors
+      dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
     },
     onAircrewEditClick: (aircrew: IAircrewWithPucks) => {
       dispatch(setAircrewForm({existingAircrewUnchanged: true}));
@@ -216,13 +232,18 @@ const mergeProps = (stateProps: IVisibleCrewListStateProps, dispatchProps: any) 
     },
     onSnivXClick: (snivId: string, aircrewId?: string) => (e: any) => {
       dispatch(delSniv(snivId, aircrewId));
-      // clear the sched errors
       dispatch(setSnivForm({snivId: ''}));
+      // clear and reset the schedConflict errors
+      dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
     },
     onSnivEditClick: (sniv: ISnivs) => (e: any) => {
+      const snivedAircrewCallsigns = sniv.aircrewIds.reduce((resultString, currentAicrewId, currentIndex) => {
+        const spaceOrNot = currentIndex === 0 ? '' : ', ';
+        return `${resultString}${spaceOrNot}${stateProps.aircrewById[currentAicrewId].callsign}`;
+      }, '');
       dispatch(setSnivForm({
         snivId: sniv.id,
-        aircrew: 'I think I need state here. Merge props to the rescue.',
+        aircrew: snivedAircrewCallsigns,
         aircrewRefIds: sniv.aircrewIds,
         start: sniv.start,
         end: sniv.end,
