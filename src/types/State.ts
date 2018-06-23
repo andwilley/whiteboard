@@ -228,7 +228,7 @@ export interface ITimeErrors extends IBaseErrors {
     readonly meta: ITimeErrorMeta;
 }
 
-export type IErrors = IGenericErrors | ISchedErrors | ITimeErrors;
+export type IErrors = (IGenericErrors | ISchedErrors | ITimeErrors);
 
 export interface ISettings {
     readonly minutesBeforeBrief: number;

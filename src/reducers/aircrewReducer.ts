@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
-import { IEntity, IAircrew } from '../types/State';
+import { IEntity, IAircrew, IState } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 
@@ -77,5 +77,9 @@ const aircrewReducer = combineReducers<IEntity<IAircrew>>({
    byId: aircrewById,
    allIds: allAircrew,
 });
+
+export const getAircrewById = (state: IState) => {
+    return state.aircrew.byId;
+};
 
 export default aircrewReducer;

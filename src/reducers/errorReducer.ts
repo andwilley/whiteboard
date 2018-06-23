@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
-import { IEntity, IErrors, IDays } from '../types/State';
 import { actions, IAction } from '../actions';
+import { IEntity, IErrors, IDays, IState } from '../types/State';
 
 const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
     switch (action.type) {
@@ -118,4 +118,8 @@ export const getActiveDayErrors = (stateErrorsById: { [id: string]: IErrors }, c
      */
     const dayErrors = currentDay.errors.map(errorId => stateErrorsById[errorId]).filter(error => error.display);
     return dayErrors;
+};
+
+export const getErrors = (state: IState) => {
+    return state.errors;
 };

@@ -2,9 +2,10 @@ import * as React from 'react';
 import * as Moment from 'moment';
 import AddButton from './AddButton';
 import DelButton from './DelButton';
-import { errorLocs } from '../errors';
+import { errorLocs, errorTypes } from '../errors';
 import * as Datetime from 'react-datetime';
-import { editables } from '../whiteboard-constants';
+import { getHighestErrorLevel } from '../errors';
+import { editables, snivTimeTypes } from '../whiteboard-constants';
 import { IAddUpdateSnivFormValues, IErrors } from '../types/State';
 import FlexInputContainer from '../containers/FlexInputContainer';
 import { IAddUpdateSnivArgs } from '../actions';
@@ -18,7 +19,9 @@ interface IAddSnivFormProps {
                                                               selectedDate: Moment.Moment) => boolean;
     onSnivSubmit: (obj: IAddUpdateSnivArgs) => (e: any) => void;
     onInputChange: () => void;
-    onTimeInputChange: (timeType: 'start' | 'end', compTime: Moment.Moment | '') => (e: any) => void;
+    onTimeInputChange: (timeType: 'start' | 'end',
+                        compTime: Moment.Moment | '',
+                        errors: IErrors[]) => (e: any) => void;
     onAircrewInputChange: () => void;
     onSnivFormAddButtonClick: () => void;
     onSnivFormDelButtonClick: () => void;
@@ -43,6 +46,20 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
         end: formValues.end,
         message: formValues.message,
     });
+    const startErrorLevel = getHighestErrorLevel(errors.filter(error => {
+        if (error.type === errorTypes.TIME_ORDER) {
+            return error.meta.timeType === snivTimeTypes.SNIV_START;
+        }
+        return false;
+    }));
+    const startClassName = startErrorLevel ? `valError${startErrorLevel}` : '';
+    const endErrorLevel = getHighestErrorLevel(errors.filter(error => {
+        if (error.type === errorTypes.TIME_ORDER) {
+            return error.meta.timeType === snivTimeTypes.SNIV_END;
+        }
+        return false;
+    }));
+    const endClassName = endErrorLevel ? `valError${endErrorLevel}` : '';
     const snivFormDisplayButton = addUpdateSnivFormDisplay ?
         (
         <div>
@@ -83,7 +100,8 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 }}
                 isValidDate={dateIsSelectable('before', formValues.end)}
                 value={formValues.start}
-                onChange={onTimeInputChange('start', formValues.end)}
+                className={startClassName}
+                onChange={onTimeInputChange('start', formValues.end, errors)}
                 timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
             <Datetime
@@ -94,7 +112,8 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 }}
                 isValidDate={dateIsSelectable('after', formValues.start)}
                 value={formValues.end || formValues.start}
-                onChange={onTimeInputChange('end', formValues.start)}
+                className={endClassName}
+                onChange={onTimeInputChange('end', formValues.start, errors)}
                 timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
             <input

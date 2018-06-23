@@ -41,6 +41,14 @@ const getSnivFormErrors = (state: IState): IErrors[] => {
     }).map(errorId => state.errors.byId[errorId]);
 };
 
+const clearSnivFormErrors = (errors: IErrors[], dispatch: any) => {
+    errors.forEach(error => {
+        if (error.type === errorTypes.TIME_ORDER) {
+            dispatch(actions.clearError(error.id, ''));
+        }
+    });
+};
+
 const mapStateToProps = (state: IState) => {
     return {
         formValues: getAddUpdateSnivFormValues(state),
@@ -83,7 +91,10 @@ const mapDispatchToProps = (dispatch: any) => {
         onAircrewInputChange: (input: string) => {
             dispatch(setSnivForm({aircrew: input}));
         },
-        onTimeInputChange: (startOrEnd: 'start' | 'end', compTime: Moment.Moment) => (refTime: Moment.Moment) => {
+        onTimeInputChange: (startOrEnd: 'start' | 'end',
+                            compTime: Moment.Moment,
+                            errors: IErrors[]
+        ) => (refTime: Moment.Moment) => {
             /**
              * @param {'start' | 'end'} startOrEnd label of the element calling the function
              * @param {Moment} compTime moment to compare this elements time to when this element changes
@@ -91,17 +102,20 @@ const mapDispatchToProps = (dispatch: any) => {
              * @return {void} just dispatches required actions.
              */
             const timesAreValid = Moment.isMoment(refTime) && Moment.isMoment(compTime);
+            clearSnivFormErrors(errors, dispatch);
             switch (startOrEnd) {
                 case 'start':
                     dispatch(setSnivForm({start: refTime}));
                     if (timesAreValid && !snivTimesAreInOrder(refTime, compTime)) {
                         dispatch(addError(getSnivOrderError('start')));
                     }
+                    break;
                 case 'end':
                     dispatch(setSnivForm({end: refTime}));
                     if (timesAreValid && !snivTimesAreInOrder(compTime, refTime)) {
                         dispatch(addError(getSnivOrderError('end')));
                     }
+                    break;
                 default:
                     return;
             }

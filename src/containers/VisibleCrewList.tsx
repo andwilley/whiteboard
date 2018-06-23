@@ -1,8 +1,10 @@
 import { connect } from 'react-redux';
 import CrewList from '../components/CrewList';
 import { seats } from '../whiteboard-constants';
+import { getErrors } from '../reducers/errorReducer';
+import { getAircrewById } from '../reducers/aircrewReducer';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
-import { IEntity, IState, IAircrew, IFilters, ISnivs } from '../types/State';
+import { IEntity, IState, IAircrew, IFilters, ISnivs, IErrors, IEntityWithActive } from '../types/State';
 import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
 import { actions } from '../actions';
 const { delAircrew,
@@ -169,8 +171,21 @@ const getDayId = (state: IState): string => {
   return state.crewListUI.currentDay;
 };
 
-const mapStateToProps = (state: IState) => {
+interface IVisibleCrewListStateProps {
+  aircrewById: {[key: string]: IAircrew};
+  errors: IEntityWithActive<IErrors>;
+
+  aircrewList: IAircrewWithPucks[];
+  daySnivs: ISnivs[];
+  showSnivs: boolean;
+  dayId: string;
+}
+
+const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
   return {
+    aircrewById: getAircrewById(state),
+    errors: getErrors(state),
+
     aircrewList: getAircrewList(state),
     daySnivs: getDaySnivs(state),
     showSnivs: getShowSnivs(state),
@@ -178,14 +193,20 @@ const mapStateToProps = (state: IState) => {
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mergeProps = (stateProps: IVisibleCrewListStateProps, dispatchProps: any) => {
+  const { dispatch } = dispatchProps;
   return {
+    aircrewList: stateProps.aircrewList,
+    daySnivs: stateProps.daySnivs,
+    showSnivs: stateProps.showSnivs,
+    dayId: stateProps.dayId,
     onAircrewClick: (aircrew: IAircrewWithPucks) => {
       // dispatch(something(id)); not sure I'm going to need this. below is for test.
       alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));
     },
     onAircrewXClick: (id: string) => {
       dispatch(delAircrew(id));
+      // clear the sched errors
       dispatch(setAircrewForm({id: ''}));
     },
     onAircrewEditClick: (aircrew: IAircrewWithPucks) => {
@@ -195,6 +216,7 @@ const mapDispatchToProps = (dispatch: any) => {
     },
     onSnivXClick: (snivId: string, aircrewId?: string) => (e: any) => {
       dispatch(delSniv(snivId, aircrewId));
+      // clear the sched errors
       dispatch(setSnivForm({snivId: ''}));
     },
     onSnivEditClick: (sniv: ISnivs) => (e: any) => {
@@ -214,7 +236,8 @@ const mapDispatchToProps = (dispatch: any) => {
 
 const VisibleCrewList = connect(
   mapStateToProps,
-  mapDispatchToProps
+  ((dispatch: any) => { return { dispatch: dispatch }; }),
+  mergeProps
 )(CrewList);
 
 export default VisibleCrewList;
