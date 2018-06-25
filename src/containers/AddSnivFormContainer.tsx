@@ -5,6 +5,7 @@ import { blankSnivForm, snivTimeTypes } from '../whiteboard-constants';
 import { IErrors, IState, IAddUpdateSnivFormValues } from '../types/State';
 import { errorTypes, errorLocs, errorLevels, errorMessages } from '../errors';
 import { actions, IAddUpdateSnivArgs, IAddErrorArgs } from '../actions';
+import { setErrorsOnFreshState } from './FlexInputContainer';
 const { setSnivForm, addUpdateSniv, addUpdateSnivFormDisplay, addError } = actions;
 
 const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => {
@@ -87,6 +88,7 @@ const mapDispatchToProps = (dispatch: any) => {
             }));
             dispatch(setSnivForm(blankSnivForm));
             dispatch(addUpdateSnivFormDisplay(false));
+            dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         onAircrewInputChange: (input: string) => {
             dispatch(setSnivForm({aircrew: input}));

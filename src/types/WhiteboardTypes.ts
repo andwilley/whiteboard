@@ -1,4 +1,5 @@
-import { IAircrew, UErrorTypes, UErrorLevels, IErrors, ITimeTypes } from './State';
+import * as Moment from 'moment';
+import { IAircrew, UErrorTypes, UErrorLevels, UErrorLocs, IErrors, ITimeTypes } from './State';
 
 export interface IPucks {
     flight: number;
@@ -52,3 +53,14 @@ export interface IUntrackedErrors {
 }
 
 export type AllErrors = IErrors | IUntrackedErrors;
+
+export interface ISchedBlock {
+    start: Moment.Moment;
+    end: Moment.Moment;
+    location: UErrorLocs;
+    locationId: string;
+}
+
+export interface ISchedObject {
+    [id: string]: ISchedBlock[];
+}

@@ -1,10 +1,14 @@
 import * as React from 'react';
-import * as moment from 'moment';
-import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { getActiveDayErrors } from '../reducers/errorReducer';
+import { connect } from 'react-redux';
+import FlexInput from '../components/FlexInput';
+import { UEditables } from '../types/WhiteboardTypes';
+import { ISchedBlock } from '../types/WhiteboardTypes';
+import { nameLocation } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
-import { seats, nameLocation } from '../whiteboard-constants';
+import restrictor, { RestrictorFn } from '../util/restrictor';
+import { getActiveDayErrors } from '../reducers/errorReducer';
+import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs, errorMessages } from '../errors';
 import { IState,
@@ -13,13 +17,9 @@ import { IState,
          IErrors,
          IElementBeingEdited,
          UErrorTypes,
-         UErrorLocs,
-         ISnivs} from '../types/State';
-import { UEditables } from '../types/WhiteboardTypes';
+         UErrorLocs} from '../types/State';
 import { IAddErrorArgs } from '../actions';
-import FlexInput from '../components/FlexInput';
-import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/regEx';
-import restrictor, { RestrictorFn } from '../util/restrictor';
+
 type IAircrewEntity = IEntity<IAircrew>;
 
 /**
@@ -50,17 +50,6 @@ interface IFlexInputContainerProps {
     entityId: string;
     validatorFns?: ValidatorFn[];
     restrictorFns?: RestrictorFn[];
-}
-
-interface ISchedBlock {
-    start: moment.Moment;
-    end: moment.Moment;
-    location: UErrorLocs;
-    locationId: string;
-}
-
-interface ISchedObject {
-    [id: string]: ISchedBlock[];
 }
 
 const getAircrewList = (aircrew: IAircrewEntity): IAircrew[] => {
@@ -167,8 +156,12 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
      * state.crewList.currentDay
      * state.aircrew.byId
      */
-    const activeAircrewRefs = getActiveAircrewRefs(state);
-
+    const activeAircrewRefs = getActiveAircrewRefs(state.days.byId[state.crewListUI.currentDay],
+                                                   state.settings,
+                                                   state.flights.byId,
+                                                   state.sorties.byId,
+                                                   state.notes.byId,
+                                                   state.snivs);
     const pushBlockAsError = (errorArray: IAddErrorArgs[],
                               block: ISchedBlock,
                               conflictsWithBlock: ISchedBlock,
@@ -240,240 +233,6 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
             }, []);
     });
     return errors;
-};
-
-const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
-                                 state: IState,
-                                 flightId: string,
-                                 aircrewId: string
-): ISchedObject => {
-    /**
-     * Assumes worst case for flights unless we can deduce it from the settings.
-     * Crew in the seat for a sortie are assumed to be busy from brief to land with an offset on
-     * either end (default 60 min) to account for prep and debrief.
-     * If no brief time is given, its assumed to be the standard time from brief to takeoff (default
-     * is 120 minutes) plus the offset. If no takeoff time is given, assume flight starts at 0000.
-     * If no land time is given, assume flight lands at 2359. (may be smart to use a standard flight
-     * duration for this, so we can go past midnight if thats when the flight takes off)
-     *
-     * NEEDS:
-     * state.settings
-     * state.flights
-     * state.crewListUI.currentDay
-     */
-    let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
-    let startOffset = state.settings.minutesBeforeBrief * 60000;
-    let endOffset = state.settings.minutesAfterLand * 60000;
-    const briefTime = state.flights.byId[flightId].times.brief.replace(':', '');
-    const takeoffTime = state.flights.byId[flightId].times.takeoff.replace(':', '');
-    const landTime = state.flights.byId[flightId].times.land.replace(':', '');
-    if (RGX_24HOUR_TIME.test(briefTime)) {
-        startTimeHr = briefTime.slice(0, 2);
-        startTimeMn = briefTime.slice(2, 4);
-    } else if (RGX_24HOUR_TIME.test(takeoffTime)) {
-        startTimeHr = takeoffTime.slice(0, 2);
-        startTimeMn = takeoffTime.slice(2, 4);
-        startOffset += state.settings.minutesBriefToTakeoff * 60000;
-    } else {
-        startTimeHr = '00';
-        startTimeMn = '00';
-        startOffset = 0;
-    }
-    if (RGX_24HOUR_TIME.test(landTime)) {
-        endTimeHr = landTime.slice(0, 2);
-        endTimeMn = landTime.slice(2, 4);
-    } else {
-        endTimeHr = '23';
-        endTimeMn = '59';
-        endOffset = 0;
-    }
-    const startDate = moment(`${state.crewListUI.currentDay} ${startTimeHr}:${startTimeMn}:00.000`,
-                             'YYYY-MM-DD HH:mm:ss.SSS');
-    const endDate = moment(`${state.crewListUI.currentDay} ${endTimeHr}:${endTimeMn}:00.000`,
-                             'YYYY-MM-DD HH:mm:ss.SSS');
-    const schedBlock = {
-        start: moment(startDate.valueOf() - startOffset),
-        end: moment(endDate.valueOf() + endOffset),
-        location: errorLocs.FLIGHT,
-        locationId: flightId,
-    };
-    if (schedBlock.start > schedBlock.end) {
-        const tempStart = schedBlock.start;
-        schedBlock.start = schedBlock.end;
-        schedBlock.end = tempStart;
-    }
-    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-    return activeAircrewRefs;
-};
-
-const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
-                           state: IState,
-                           noteId: string,
-                           aircrewId: string,
-                           flightNote: boolean = false,
-                           flightId: string = ''
-): ISchedObject => {
-    /**
-     * Gets referenced aircrew start and end times from notes.
-     * @param {ISchedBlock} activeAircrewRefs The working dict of refed aircrew and their scheduled times.
-     * @param {IState} state The app state.
-     * @param {string} noteId
-     * @param {string} aircrewId
-     * @param {?boolean} flightNote True if this is a flight note. Default: false.
-     * @param {?string} flightId Needed if this is a flight note. Default: ''
-     * @returns {ISchedObject}
-     * if times were specified, uses those. if start time but no end time, uses land time.
-     * *** this doesn't check if land time comes after start time!!!!!!!!!
-     * If no land time, uses stardard note duration (default 60 min).
-     * If times aren't specified, uses flight times in the same way as above.
-     * If flightNote is false, skips using flight times, defaults to length.
-     *
-     * NEEDS:
-     * state.notes
-     * state.flights
-     * state.settings
-     * state.crewListUI.currentDay
-     */
-    const noteTimes = RGX_STARTS_WITH_TIME_BLOCK.exec(state.notes.byId[noteId].content);
-    let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
-    let endOffset = 0;
-    if (noteTimes) {
-        const startTime = noteTimes[1].replace(':', '');
-        startTimeHr = startTime.slice(0, 2);
-        startTimeMn = startTime.slice(2, 4);
-        if (noteTimes[2]) {
-            const endTime = noteTimes[2].replace(':', '');
-            endTimeHr = endTime.slice(0, 2);
-            endTimeMn = endTime.slice(2, 4);
-        } else if (flightNote &&
-                   RGX_24HOUR_TIME.test(state.flights.byId[flightId].times.land) &&
-                   state.flights.byId[flightId].times.land > startTime) {
-            endTimeHr = state.flights.byId[flightId].times.land.slice(0, 2);
-            endTimeMn = state.flights.byId[flightId].times.land.slice(2, 4);
-        } else {
-            endOffset = state.settings.minutesNoteDuration * 60000;
-        }
-        const startDate = moment(`${state.crewListUI.currentDay} ${startTimeHr}:${startTimeMn}:00.000`,
-                                 'YYYY-MM-DD HH:mm:ss.SSS');
-        const endDate = endOffset === 0 ?
-            /** use 00 seconds to be able to compare this time to the actual end of the day */
-            moment(`${state.crewListUI.currentDay} ${endTimeHr}:${endTimeMn}:00.000`,
-                   'YYYY-MM-DD HH:mm:ss.SSS') :
-            moment(startDate.valueOf() + endOffset);
-        const schedBlock = {
-            start: startDate,
-            end: endDate,
-            location: flightNote ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
-            locationId: flightNote ? flightId : state.crewListUI.currentDay,
-        };
-        if (schedBlock.start > schedBlock.end) {
-            const tempStart = schedBlock.start;
-            schedBlock.start = schedBlock.end;
-            schedBlock.end = tempStart;
-        }
-        activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-            [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-    } else {
-        if (flightNote) {
-            activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
-        } else {
-            const schedBlock = {
-                start: moment(`${state.crewListUI.currentDay} 00:00:00.000`,
-                              'YYYY-MM-DD HH:mm:ss.SSS'),
-                /** use 00 seconds to be able to compare this time to the actual end of the day */
-                end: moment(`${state.crewListUI.currentDay} 23:59:00.000`,
-                            'YYYY-MM-DD HH:mm:ss.SSS'),
-                location: flightNote ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
-                locationId: flightNote ? flightId : state.crewListUI.currentDay,
-            };
-            if (schedBlock.start > schedBlock.end) {
-                const tempStart = schedBlock.start;
-                schedBlock.start = schedBlock.end;
-                schedBlock.end = tempStart;
-            }
-            activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-                [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-        }
-    }
-    return activeAircrewRefs;
-};
-
-const getSchedFromSnivs = (activeAircrewRefs: ISchedObject, sniv: ISnivs, dayId: string): ISchedObject => {
-    sniv.aircrewIds.forEach(aircrewId => {
-        const schedBlock = {
-            start: sniv.dates[dayId].start,
-            end: sniv.dates[dayId].end,
-            location: errorLocs.SNIVS,
-            locationId: sniv.id,
-        };
-        activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-            [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-    });
-    return activeAircrewRefs;
-};
-
-const getActiveAircrewRefs = (state: IState): ISchedObject => {
-    /**
-     * @param {IState} state The application state (store.getState())
-     * @returns {object} keyed by aircrewId with values set to an array of the timespans associated with each ref
-     * This checks all the places aircrew Ids can be referenced in the current day, aggregates them into an object and
-     * includes the times they are scheduled for, so we can check for conflicts in another function.
-     * Looks for names in:
-     * state.days.byId[currentDay].flights (to find flights)
-     *  for each state.flights.byId[flightId].sorties (to find sorties)
-     *   for each state.sorites.byId[sortieId].front/back (to read the seats)
-     *  for each state.flights.byId[fligthId].notes (to find flight notes)
-     * state.days.byId[currentDay].notes (to find day notes)
-     * state.notes.byId[.allIds] (to read the notes)
-     * NEEDS:
-     * state.crewListUI.currentDay
-     * state.days
-     * state.flights
-     * state.sorties
-     * state.notes
-     *
-     * Optimization: as it is, this will run EVERY TIME THE STATE CHANGES, even if memoized.
-     * For sure, just passing the needed slices will make the app faster. That way, for example, if crewList is
-     * updated, this won't recalc. As of now, it will. However...
-     * If all that changes is the one currently active value... it still updates because the value changed in
-     * the state, even though an aircrewRef may not have changed. We update the aircrew ref every time anyway, so even
-     * if a it is the same by value, it will be shallow compared and not the same every time in reselect.
-     * We could break this up by section, get sorties, flight notes and day notes separately, so if say flight Notes
-     * change, we don't have to recompute all the other ones, but we'd still have to go all the way through flight
-     * Notes...
-     */
-    let activeAircrewRefs = {};
-    state.days.byId[state.crewListUI.currentDay].flights.forEach(flightId => {
-        state.flights.byId[flightId].sorties.forEach(sortieId => {
-            seats.forEach(seat => {
-                state.sorties.byId[sortieId][seat].aircrewRefIds.forEach((aircrewId: string) => {
-                    /** Get all the referenced aircrew from sorties in the current day */
-                    activeAircrewRefs = getSchedFromFlightTimes(activeAircrewRefs, state, flightId, aircrewId);
-                });
-            });
-        });
-        state.flights.byId[flightId].notes.forEach(noteId => {
-            state.notes.byId[noteId].aircrewRefIds.forEach(aircrewId => {
-                /** Get all the referenced aircrew from flight notes in the current day */
-                activeAircrewRefs = getSchedFromNotes(activeAircrewRefs, state, noteId, aircrewId, true, flightId);
-            });
-        });
-    });
-    state.days.byId[state.crewListUI.currentDay].notes.forEach(noteId => {
-        state.notes.byId[noteId].aircrewRefIds.forEach(aircrewId => {
-            /** Get all the referenced aircrew from day notes in the current day */
-            activeAircrewRefs = getSchedFromNotes(activeAircrewRefs, state, noteId, aircrewId);
-        });
-    });
-    state.snivs.allIds.forEach(snivId => {
-        if (state.snivs.byId[snivId].dates[state.crewListUI.currentDay]) {
-            activeAircrewRefs = getSchedFromSnivs(activeAircrewRefs,
-                                                  state.snivs.byId[snivId],
-                                                  state.crewListUI.currentDay);
-        }
-    });
-    return activeAircrewRefs;
 };
 
 const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
