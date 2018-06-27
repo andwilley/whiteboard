@@ -5,11 +5,12 @@ import { ISchedObject } from '../types/WhiteboardTypes';
 import { ISnivs, IDays, IFlights, ISorties, INotes, IEntity, ISettings } from '../types/State';
 import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/regEx';
 
-const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
-                                 currentDayId: string,
-                                 flight: IFlights,
-                                 aircrewId: string,
-                                 settings: ISettings
+export const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
+                                        currentDayId: string,
+                                        flight: IFlights,
+                                        aircrewId: string,
+                                        settings: ISettings,
+                                        note: INotes | null = null
 ): ISchedObject => {
     /**
      * Assumes worst case for flights unless we can deduce it from the settings.
@@ -55,10 +56,17 @@ const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
                              'YYYY-MM-DD HH:mm:ss.SSS');
     const endDate = Moment(`${currentDayId} ${endTimeHr}:${endTimeMn}:00.000`,
                            'YYYY-MM-DD HH:mm:ss.SSS');
+    const location = flight.sim ?
+        note ?
+            errorLocs.SIM_NOTE :
+            errorLocs.SIM :
+        note ?
+            errorLocs.FLIGHT_NOTE :
+            errorLocs.FLIGHT;
     const schedBlock = {
         start: Moment(startDate.valueOf() - startOffset),
         end: Moment(endDate.valueOf() + endOffset),
-        location: errorLocs.FLIGHT,
+        location, // : note ? errorLocs.FLIGHT_NOTE : errorLocs.FLIGHT,
         locationId: flight.id,
     };
     if (schedBlock.start > schedBlock.end) {
@@ -71,12 +79,12 @@ const getSchedFromFlightTimes = (activeAircrewRefs: ISchedObject,
     return activeAircrewRefs;
 };
 
-const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
-                           currentDayId: string,
-                           note: INotes,
-                           aircrewId: string,
-                           settings: ISettings,
-                           flight: IFlights | null = null
+export const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
+                                  currentDayId: string,
+                                  note: INotes,
+                                  aircrewId: string,
+                                  settings: ISettings,
+                                  flight: IFlights | null = null
 ): ISchedObject => {
     /**
      * Gets referenced aircrew start and end times from notes.
@@ -136,7 +144,8 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
                                                         currentDayId,
                                                         flight,
                                                         aircrewId,
-                                                        settings);
+                                                        settings,
+                                                        note);
         } else {
             const schedBlock = {
                 start: Moment(`${currentDayId} 00:00:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
@@ -157,7 +166,7 @@ const getSchedFromNotes = (activeAircrewRefs: ISchedObject,
     return activeAircrewRefs;
 };
 
-const getSchedFromSnivs = (activeAircrewRefs: ISchedObject, sniv: ISnivs, dayId: string): ISchedObject => {
+export const getSchedFromSnivs = (activeAircrewRefs: ISchedObject, sniv: ISnivs, dayId: string): ISchedObject => {
     sniv.aircrewIds.forEach(aircrewId => {
         const schedBlock = {
             start: sniv.dates[dayId].start,

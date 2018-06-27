@@ -120,7 +120,7 @@ const getSchedErrors = (dayErrors: IErrors[],
      */
     const schedErrors = dayErrors.filter(error => {
         return (error.type === errorTypes.SCHEDULE_CONFLICT &&
-                error.location === errorLoc &&
+                // error.location === errorLoc &&
                 error.locationId === errorLocId &&
                 aircrewRefIds.indexOf(error.meta.aircrewId) > -1);
     });
@@ -172,6 +172,15 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
             case errorLocs.FLIGHT:
                 message = errorMessages.FLIGHT_CONFLICT;
                 break;
+            case errorLocs.SIM:
+                message = errorMessages.SIM_CONFLICT;
+                break;
+            case errorLocs.FLIGHT_NOTE:
+                message = errorMessages.FLIGHT_NOTE_CONFLICT;
+                break;
+            case errorLocs.SIM_NOTE:
+                message = errorMessages.SIM_NOTE_CONFLICT;
+                break;
             case errorLocs.SNIVS:
                 message = errorMessages.SNIV_CONFLICT;
                 break;
@@ -179,6 +188,7 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
                 message = errorMessages.NOTE_CONFLICT;
                 break;
             default:
+                message = 'is scheduled at this time.';
                 break;
         }
         errorArray.push({

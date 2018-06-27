@@ -149,9 +149,12 @@ export type USnivTimeTypes = ISnivTimeTypes[keyof ISnivTimeTypes];
 
 export interface IErrorLocs extends ITimeTypes {
     FLIGHT: 'FLIGHT';
+    SIM: 'SIM';
     SORTIE: 'SORTIE';
     DAY: 'DAY';
     DAY_NOTE: 'DAY_NOTE';
+    FLIGHT_NOTE: 'FLIGHT_NOTE';
+    SIM_NOTE: 'SIM_NOTE';
     CREWLIST: 'CREWLIST';
     SNIVS: 'SNIVS';
     SNIV_FORM: 'SNIV_FORM';

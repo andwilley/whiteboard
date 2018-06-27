@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
 import { IEntity, IErrors, IDays, IState } from '../types/State';
+import { errorLocs } from '../errors';
 
 const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
     switch (action.type) {
@@ -99,8 +100,11 @@ export const getEntityErrors = (errorById: {[id: string]: IErrors},
                                 activeErrorIds: string[],
                                 errorLoc: string
 ): {[id: string]: IErrors[]} => {
+    /** show sim, flight note and sim note errors with flight errors for now */
+    const errorLocations = errorLoc === errorLocs.FLIGHT ?
+        [errorLocs.FLIGHT, errorLocs.FLIGHT_NOTE, errorLocs.SIM, errorLocs.SIM_NOTE] : [errorLoc];
     return activeErrorIds.reduce((errors, errorId) => {
-        if (errorById[errorId].location === errorLoc) {
+        if (errorLocations.indexOf(errorById[errorId].location) > -1) {
             errors[errorById[errorId].locationId] = errors[errorById[errorId].locationId] ?
             errors[errorById[errorId].locationId].concat(errorById[errorId]) :
             [errorById[errorId]];
