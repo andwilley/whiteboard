@@ -67,8 +67,8 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                 <span> F({aircrew.pucks.flight}) </span>}
             {aircrew.pucks.sim > 0 &&
                 <span> S({aircrew.pucks.sim}) </span>}
-            {(aircrew.pucks.flightNote + aircrew.pucks.dayNote) > 0 &&
-                <span> N({aircrew.pucks.flightNote + aircrew.pucks.dayNote}) </span>}
+            {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
+                <span> N({aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}) </span>}
             <span style={{cursor: 'pointer'}} onClick={onAircrewEditClick}> [EDIT] </span>
             <span style={{cursor: 'pointer'}} onClick={onAircrewXClick}> {'[X]'} </span>
             {showSnivs && <ul>{snivComponentList}</ul>}

@@ -5,6 +5,7 @@ export interface IPucks {
     flight: number;
     sim: number;
     flightNote: number;
+    simNote: number;
     dayNote: number;
 }
 

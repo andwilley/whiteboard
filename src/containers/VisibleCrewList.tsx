@@ -1,14 +1,14 @@
 import { connect } from 'react-redux';
 import CrewList from '../components/CrewList';
-import { seats } from '../whiteboard-constants';
 import { getErrors } from '../reducers/errorReducer';
 import { getAircrewById } from '../reducers/aircrewReducer';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { setErrorsOnFreshState } from '../containers/FlexInputContainer';
 import { IEntity, IState, IAircrew, IFilters, ISnivs, IErrors, IEntityWithActive } from '../types/State';
-import { IAircrewWithPucks, IAircrewDayPucks } from '../types/WhiteboardTypes';
+import { IAircrewWithPucks, IAircrewDayPucks, ISchedObject, IPucks } from '../types/WhiteboardTypes';
 import { actions } from '../actions';
-import { errorTypes } from '../errors';
+import { errorTypes, errorLocs } from '../errors';
+import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
 const { delAircrew,
         delSniv,
         setAircrewForm,
@@ -18,72 +18,41 @@ const { delAircrew,
         } = actions;
 type IAircrewEntity = IEntity<IAircrew>;
 
-const newPuck = {
+const newPuck: IPucks = {
   flight: 0,
   sim: 0,
   flightNote: 0,
+  simNote: 0,
   dayNote: 0,
 };
 
-const getDayPucks = (state: IState): IAircrewDayPucks => {
-  // slices of the state this needs for future optimization reference:
-  // state.days.byId[~currentDay]:
-  //    state.days.byId[~currentDay].flights
-  //    state.days.byId[~currentDay].notes
-  // state.flights.byId
-  // state.notes.byId
-  let crewIds: string[], eventType: string;
-  const aircrewCurrentDayPucks = state.days.byId[state.crewListUI.currentDay].flights
-    .reduce((flightPucks: IAircrewDayPucks, flightId: string) => {
-      eventType = state.flights.byId[flightId].sim ? 'sim' : 'flight';
-      state.flights.byId[flightId].sorties.forEach((sortieId: string) => {
-        seats.forEach(seat => {
-          crewIds = state.sorties.byId[sortieId][seat].aircrewRefIds;
-          if (crewIds.length > 0) {
-            crewIds.forEach(crewId => {
-              flightPucks[crewId] = flightPucks[crewId] ?
-                {
-                  ...flightPucks[crewId],
-                  [eventType]: flightPucks[crewId][eventType] + 1,
-                } :
-                {
-                  ...newPuck,
-                  [eventType]: 1,
-                };
-            });
-          }
-        });
-      });
-      state.flights.byId[flightId].notes.forEach((noteId: string) => {
-        state.notes.byId[noteId].aircrewRefIds.forEach((id: string) => {
-          flightPucks[id] = flightPucks[id] ?
-            {
-              ...flightPucks[id],
-              flightNote: flightPucks[id].flightNote + 1,
-            } :
-            {
-              ...newPuck,
-              flightNote: 1,
-            };
-        });
-      });
-      return flightPucks;
-    },
-            {});
-  state.days.byId[state.crewListUI.currentDay].notes.forEach((noteId: string) => {
-    state.notes.byId[noteId].aircrewRefIds.forEach((aircrewId: string) => {
-      aircrewCurrentDayPucks[aircrewId] = aircrewCurrentDayPucks[aircrewId] ?
-        {
-          ...aircrewCurrentDayPucks[aircrewId],
-          dayNote: aircrewCurrentDayPucks[aircrewId].dayNote + 1,
-        } :
-        {
-          ...newPuck,
-          dayNote: 1,
-        };
+const getDayPucks = (schedBlocks: ISchedObject): IAircrewDayPucks => {
+  const aircrewPucks: IAircrewDayPucks = {};
+  Object.keys(schedBlocks).forEach(aircrewId => {
+    aircrewPucks[aircrewId] = Object.assign({}, newPuck);
+    schedBlocks[aircrewId].forEach(block => {
+      switch (block.location) {
+        case errorLocs.FLIGHT:
+          aircrewPucks[aircrewId].flight++;
+          break;
+        case errorLocs.FLIGHT_NOTE:
+          aircrewPucks[aircrewId].flightNote++;
+          break;
+        case errorLocs.SIM:
+          aircrewPucks[aircrewId].sim++;
+          break;
+        case errorLocs.SIM_NOTE:
+          aircrewPucks[aircrewId].simNote++;
+          break;
+        case errorLocs.DAY_NOTE:
+          aircrewPucks[aircrewId].dayNote++;
+          break;
+        default:
+          break;
+      }
     });
   });
-  return aircrewCurrentDayPucks;
+  return aircrewPucks;
 };
 
 const getFilteredAircrewIds = (aircrew: IAircrewEntity,
@@ -150,13 +119,21 @@ const getAircrewList = (state: IState): IAircrewWithPucks[] => {
   // state.aircrew
   // state.crewListUI.filters
   // anything getDayPucks needs (see above)
-  const aircrewDayPucks = getDayPucks(state);
+  const aircrewBlocks = getActiveAircrewRefs(state.days.byId[state.crewListUI.currentDay],
+                                             state.settings,
+                                             state.flights.byId,
+                                             state.sorties.byId,
+                                             state.notes.byId,
+                                             state.snivs);
+  const aircrewDayPucks = getDayPucks(aircrewBlocks);
   const filteredAircrewIds = getFilteredAircrewIds(state.aircrew, state.crewListUI.filters, aircrewDayPucks);
   return filteredAircrewIds.map( (aircrewId: string): IAircrewWithPucks => {
-    const aircrewWithPucks: IAircrewWithPucks = Object.assign({}, state.aircrew.byId[aircrewId], {pucks: newPuck});
+    const aircrewWithPucks: IAircrewWithPucks = Object.assign({},
+                                                              state.aircrew.byId[aircrewId],
+                                                              {pucks: Object.assign({}, newPuck)});
     aircrewWithPucks.pucks = aircrewDayPucks[aircrewId] ?
       Object.assign({}, aircrewDayPucks[aircrewId]) :
-      newPuck;
+      Object.assign({}, newPuck);
     return aircrewWithPucks;
   });
 };
