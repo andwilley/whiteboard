@@ -72,6 +72,7 @@ const getFilteredAircrewIds = (aircrew: IAircrewEntity,
         filters.showAvailable === false) {
         return true;
     }
+    /** filter out aircrew without selected quals */
     if (filters.qualFilter.length > 0) {
         let allQualsMatch = true;
         filters.qualFilter.forEach((qual: string) => {
@@ -83,6 +84,7 @@ const getFilteredAircrewIds = (aircrew: IAircrewEntity,
             return false;
         }
     }
+    /** filter out aircrew that aren't the selected rank */
     if (filters.rankFilter.length > 0) {
       let matchRank = false;
       filters.rankFilter.forEach((rank: number) => {
@@ -94,6 +96,7 @@ const getFilteredAircrewIds = (aircrew: IAircrewEntity,
         return false;
       }
     }
+    /** filter based on the search bar input for the crew list */
     const crewSearchInput = filters.crewSearchInput.toLowerCase();
     if (crewSearchInput !== '') {
       const callsign = aircrew.byId[aircrewId].callsign.toLowerCase();
@@ -108,9 +111,14 @@ const getFilteredAircrewIds = (aircrew: IAircrewEntity,
         return false;
       }
     }
+    /** return false for any aircrew that are scheduled (other than a sniv) */
     if (filters.showAvailable) {
-      if (Object.keys(aircrewDayPucks).indexOf(aircrewId) > -1) {
-        return false;
+      if (aircrewDayPucks[aircrewId]) {
+        for (const key of Object.keys(aircrewDayPucks[aircrewId])) {
+          if (aircrewDayPucks[aircrewId][key] > 0) {
+            return false;
+          }
+        }
       }
     }
     return true;
