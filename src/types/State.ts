@@ -1,5 +1,5 @@
 import { EditorState } from 'draft-js';
-import { UEditables, NullForAll } from './WhiteboardTypes';
+import { UEditables, NullForAll, ISchedBlock } from './WhiteboardTypes';
 import { Moment } from 'moment';
 
 export interface IEntity<E> {
@@ -243,6 +243,7 @@ export interface ISettings {
 export interface IInputElement {
     readonly element: UEditables;
     readonly entityId: string;
+    readonly timeblock: ISchedBlock;
 }
 
 export type IElementBeingEdited = IInputElement | NullForAll<IInputElement>;

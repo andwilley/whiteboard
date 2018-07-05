@@ -8,6 +8,7 @@ const editorStateReducer = (state: IEditor = {
                                 elementBeingEdited: {
                                     element: null,
                                     entityId: null,
+                                    timeblock: null,
                                 },
                             },
                             action: IAction) => {
@@ -21,8 +22,17 @@ const editorStateReducer = (state: IEditor = {
             return {
                 ...state,
                 elementBeingEdited: {
+                    ...state.elementBeingEdited,
                     element: action.payload.editable,
                     entityId: action.payload.entityId,
+                },
+            };
+        case getType(actions.setEditedElementTimeblock):
+            return {
+                ...state,
+                elementBeingEdited: {
+                    ...state.elementBeingEdited,
+                    timeblock: action.payload.timeblock,
                 },
             };
         default:

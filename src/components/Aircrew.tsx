@@ -5,6 +5,7 @@ import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 
 interface IAircrewProps {
     aircrew: IAircrewWithPucks;
+    unavailable: boolean;
     snivs: ISnivs[];
     showSnivs: boolean;
     dayId: string;
@@ -16,6 +17,7 @@ interface IAircrewProps {
 }
 
 const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
+                                             unavailable,
                                              snivs,
                                              showSnivs,
                                              dayId,
@@ -31,7 +33,8 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                                           aircrew.pucks.dayNote)
                                         : 0;
     const aircrewStyle: React.CSSProperties = { cursor: 'pointer',
-                                                textDecoration: totalPucks === 0 ? '' : 'line-through' };
+                                                textDecoration: totalPucks === 0 ? '' : 'line-through',
+                                                color: unavailable ? 'red' : 'black' };
     const snivComponentList = snivs.map(sniv => {
         const delSnivButtons = sniv.aircrewIds.length > 1 ?
         (

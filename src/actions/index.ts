@@ -3,7 +3,7 @@ import { UErrorTypes, UErrorLocs, UErrorLevels, ICustomErrorMeta, IAddUpdateSniv
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 import { EditorState } from 'draft-js';
-import { UEditables } from '../types/WhiteboardTypes';
+import { UEditables, ISchedBlock } from '../types/WhiteboardTypes';
 import { RGX_FIND_TR_CODES } from '../util/regEx';
 import * as moment from 'moment';
 
@@ -43,6 +43,7 @@ export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const DEL_ERROR = 'DEL_ERROR';
 export const SET_EDITOR_STATE = 'SET_EDITOR_STATE';
 export const SET_EDITED_ELEMENT = 'SET_EDITED_ELEMENT';
+export const SET_EDITED_ELEMENT_TIMEBLOCK = 'SET_EDITED_ELEMENT_TIMEBLOCK';
 export const ADD_UPDATE_SNIV = 'ADD_UPDATE_SNIV';
 export const DEL_SNIV = 'DEL_SNIV';
 export const SET_SNIV_FORM = 'SET_SNIV_FORM';
@@ -525,6 +526,12 @@ export const actions = {
         payload: {
             editable,
             entityId,
+        },
+    })),
+    setEditedElementTimeblock: createAction(SET_EDITED_ELEMENT_TIMEBLOCK, (timeblock: ISchedBlock | null) => ({
+        type: SET_EDITED_ELEMENT_TIMEBLOCK,
+        payload: {
+            timeblock,
         },
     })),
     addUpdateSniv: createAction(ADD_UPDATE_SNIV, (args: IAddUpdateSnivArgs) => ({

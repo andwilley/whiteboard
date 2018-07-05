@@ -274,6 +274,7 @@ export const INITIAL_STATE: IState = {
         elementBeingEdited: {
             element: null,
             entityId: null,
+            timeblock: null,
         },
     },
 };

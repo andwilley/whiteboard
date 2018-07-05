@@ -9,6 +9,7 @@ import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormCon
 
 interface ICrewListProps {
     aircrewList: IAircrewWithPucks[];
+    unavailableAircrewIds: string[];
     daySnivs: ISnivs[];
     showSnivs: boolean;
     dayId: string;
@@ -21,6 +22,7 @@ interface ICrewListProps {
 
 const CrewList: React.SFC<ICrewListProps> = ({
     aircrewList,
+    unavailableAircrewIds,
     daySnivs,
     showSnivs,
     dayId,
@@ -37,6 +39,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
             <Aircrew
                 key={aircrew.id}
                 aircrew={aircrew}
+                unavailable={unavailableAircrewIds.indexOf(aircrew.id) > -1 ? true : false}
                 snivs={daySnivs.filter(sniv => sniv.aircrewIds.indexOf(aircrew.id) > -1)}
                 showSnivs={showSnivs}
                 dayId={dayId}

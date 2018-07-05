@@ -65,3 +65,8 @@ export interface ISchedBlock {
 export interface ISchedObject {
     [id: string]: ISchedBlock[];
 }
+
+export interface IActiveRefsAndBlock {
+    activeAircrewRefs: ISchedObject;
+    activeTimeblock: ISchedBlock | null;
+}

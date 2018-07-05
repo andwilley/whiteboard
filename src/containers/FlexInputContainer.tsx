@@ -2,7 +2,7 @@ import * as React from 'react';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 import FlexInput from '../components/FlexInput';
-import { UEditables } from '../types/WhiteboardTypes';
+import { UEditables, ISchedObject } from '../types/WhiteboardTypes';
 import { ISchedBlock } from '../types/WhiteboardTypes';
 import { nameLocation } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
@@ -142,7 +142,10 @@ const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
     return validator(text, ...validatorFns);
 };
 
-const findSchedErrors = (state: IState): IAddErrorArgs[] => {
+const findSchedErrors = (activeAircrewRefs: ISchedObject,
+                         currentDayId: string,
+                         aircrewById: {[key: string]: IAircrew}
+): IAddErrorArgs[] => {
     /**
      * @param
      * @param
@@ -156,12 +159,6 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
      * state.crewList.currentDay
      * state.aircrew.byId
      */
-    const activeAircrewRefs = getActiveAircrewRefs(state.days.byId[state.crewListUI.currentDay],
-                                                   state.settings,
-                                                   state.flights.byId,
-                                                   state.sorties.byId,
-                                                   state.notes.byId,
-                                                   state.snivs);
     const pushBlockAsError = (errorArray: IAddErrorArgs[],
                               block: ISchedBlock,
                               conflictsWithBlock: ISchedBlock,
@@ -192,12 +189,12 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
                 break;
         }
         errorArray.push({
-            dayId: state.crewListUI.currentDay,
+            dayId: currentDayId,
             type: errorTypes.SCHEDULE_CONFLICT,
             location: block.location,
             locationId: block.locationId,
             level: errorLevels.WARN,
-            message: `${state.aircrew.byId[aircrewId].callsign} ${message}`,
+            message: `${aircrewById[aircrewId].callsign} ${message}`,
             meta: {
                 aircrewId,
             },
@@ -219,6 +216,7 @@ const findSchedErrors = (state: IState): IAddErrorArgs[] => {
                  * if both blocks are snivs, ignore the error.
                  * add the new sched block to schedConflicArray and repeat for the next block.
                  *
+                 * This logic is duplicated in VisibleCrewList ***!
                  * Assumes start and end are actually in order ***!
                  */
                 schedConflictArray.forEach(scblock => {
@@ -272,10 +270,20 @@ export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
                     dispatch(actions.clearError(errorId, state.crewListUI.currentDay));
                 }
             });
-            const newErrors = findSchedErrors(state);
+            const activeRefsAndBlock = getActiveAircrewRefs(state.days.byId[state.crewListUI.currentDay],
+                                                            state.editor.elementBeingEdited,
+                                                            state.settings,
+                                                            state.flights.byId,
+                                                            state.sorties.byId,
+                                                            state.notes.byId,
+                                                            state.snivs);
+            const newErrors = findSchedErrors(activeRefsAndBlock.activeAircrewRefs,
+                                              state.crewListUI.currentDay,
+                                              state.aircrew.byId);
             newErrors.forEach(error => {
                 dispatch(actions.addError(error));
             });
+            dispatch(actions.setEditedElementTimeblock(activeRefsAndBlock.activeTimeblock));
         }
     };
 };
@@ -503,9 +511,11 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             /** set and dispatch editorState and elementBeingEdited */
             dispatchProps.dispatch(actions.setEditorState(editorState));
             dispatchProps.dispatch(actions.setEditedElement(ownProps.element, ownProps.entityId));
+            dispatchProps.dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         onBlur: (e: any) => {
             dispatchProps.dispatch(actions.setEditedElement(null, null));
+            dispatchProps.dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,

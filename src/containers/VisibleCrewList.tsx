@@ -5,7 +5,11 @@ import { getAircrewById } from '../reducers/aircrewReducer';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { setErrorsOnFreshState } from '../containers/FlexInputContainer';
 import { IEntity, IState, IAircrew, IFilters, ISnivs, IErrors, IEntityWithActive } from '../types/State';
-import { IAircrewWithPucks, IAircrewDayPucks, ISchedObject, IPucks } from '../types/WhiteboardTypes';
+import { IAircrewWithPucks,
+         IAircrewDayPucks,
+         ISchedObject,
+         IPucks,
+         IActiveRefsAndBlock } from '../types/WhiteboardTypes';
 import { actions } from '../actions';
 import { errorTypes, errorLocs } from '../errors';
 import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
@@ -114,28 +118,50 @@ const getFilteredAircrewIds = (aircrew: IAircrewEntity,
   return filteredAircrewIds;
 };
 
-const getAircrewList = (state: IState): IAircrewWithPucks[] => {
+const getAircrewList = (activeAircrewRefs: ISchedObject,
+                        aircrew: IEntity<IAircrew>,
+                        filters: IFilters): IAircrewWithPucks[] => {
   // slices of the state this needs for future optimization reference:
   // state.aircrew
   // state.crewListUI.filters
   // anything getDayPucks needs (see above)
-  const aircrewBlocks = getActiveAircrewRefs(state.days.byId[state.crewListUI.currentDay],
-                                             state.settings,
-                                             state.flights.byId,
-                                             state.sorties.byId,
-                                             state.notes.byId,
-                                             state.snivs);
-  const aircrewDayPucks = getDayPucks(aircrewBlocks);
-  const filteredAircrewIds = getFilteredAircrewIds(state.aircrew, state.crewListUI.filters, aircrewDayPucks);
-  return filteredAircrewIds.map( (aircrewId: string): IAircrewWithPucks => {
+  const aircrewDayPucks = getDayPucks(activeAircrewRefs);
+  const filteredAircrewIds = getFilteredAircrewIds(aircrew, filters, aircrewDayPucks);
+  return filteredAircrewIds.map((aircrewId): IAircrewWithPucks => {
     const aircrewWithPucks: IAircrewWithPucks = Object.assign({},
-                                                              state.aircrew.byId[aircrewId],
+                                                              aircrew.byId[aircrewId],
                                                               {pucks: Object.assign({}, newPuck)});
     aircrewWithPucks.pucks = aircrewDayPucks[aircrewId] ?
       Object.assign({}, aircrewDayPucks[aircrewId]) :
       Object.assign({}, newPuck);
     return aircrewWithPucks;
   });
+};
+
+const getUnavailableAircrewIds = (activeRefsAndBlock: IActiveRefsAndBlock,
+                                  filteredCrewList: IAircrewWithPucks[]): string[] => {
+  const unavailableAircrewIds: string[] = [];
+  const timeBlock = activeRefsAndBlock.activeTimeblock;
+  const filteredCrewIds = filteredCrewList.map(aircrew => aircrew.id);
+  Object.keys(activeRefsAndBlock.activeAircrewRefs).forEach(aircrewId => {
+    if (filteredCrewIds.indexOf(aircrewId) > -1 && timeBlock) {
+      activeRefsAndBlock.activeAircrewRefs[aircrewId]
+        .forEach(block => {
+          /**
+           * This logic is duplicated from FlexInputContainer findSchedErrors() ***!
+           * Assumes start and end are actually in order ***!
+           */
+          if (block.start >= timeBlock.start && block.start <= timeBlock.end) {
+            unavailableAircrewIds.push(aircrewId);
+          } else if (block.end >= timeBlock.start && block.end <= timeBlock.end) {
+            unavailableAircrewIds.push(aircrewId);
+          } else if (timeBlock.start >= block.start && timeBlock.start <= block.end) {
+            unavailableAircrewIds.push(aircrewId);
+          }
+        });
+    }
+  });
+  return unavailableAircrewIds;
 };
 
 const getDaySnivs = (state: IState): ISnivs[] => {
@@ -162,17 +188,29 @@ interface IVisibleCrewListStateProps {
   errors: IEntityWithActive<IErrors>;
 
   aircrewList: IAircrewWithPucks[];
+  unavailableAircrewIds: string[];
   daySnivs: ISnivs[];
   showSnivs: boolean;
   dayId: string;
 }
 
 const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
+  const activeRefsAndBlock = getActiveAircrewRefs(state.days.byId[state.crewListUI.currentDay],
+                                                  state.editor.elementBeingEdited,
+                                                  state.settings,
+                                                  state.flights.byId,
+                                                  state.sorties.byId,
+                                                  state.notes.byId,
+                                                  state.snivs);
+  const aircrewList = getAircrewList(activeRefsAndBlock.activeAircrewRefs,
+                                     state.aircrew,
+                                     state.crewListUI.filters);
   return {
     aircrewById: getAircrewById(state),
     errors: getErrors(state),
 
-    aircrewList: getAircrewList(state),
+    aircrewList,
+    unavailableAircrewIds: getUnavailableAircrewIds(activeRefsAndBlock, aircrewList),
     daySnivs: getDaySnivs(state),
     showSnivs: getShowSnivs(state),
     dayId: getDayId(state),
@@ -183,6 +221,7 @@ const mergeProps = (stateProps: IVisibleCrewListStateProps, dispatchProps: any) 
   const { dispatch } = dispatchProps;
   return {
     aircrewList: stateProps.aircrewList,
+    unavailableAircrewIds: stateProps.unavailableAircrewIds,
     daySnivs: stateProps.daySnivs,
     showSnivs: stateProps.showSnivs,
     dayId: stateProps.dayId,
