@@ -28,6 +28,12 @@ export interface IAircrew {
     readonly snivs: string[];
 }
 
+export interface IGroups {
+    readonly id: string;
+    readonly name: string;
+    readonly aircrewIds: string[];
+}
+
 export interface IDays {
     readonly id: string;
     readonly flights: string[];
@@ -255,6 +261,7 @@ export interface IEditor {
 
 export interface IState {
     readonly aircrew: IEntity<IAircrew>;
+    readonly groups: IEntity<IGroups>;
     readonly days: IEntity<IDays>;
     readonly flights: IEntity<IFlights>;
     readonly sorties: IEntity<ISorties>;

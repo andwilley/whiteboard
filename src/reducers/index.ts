@@ -3,6 +3,7 @@ import { IState } from '../types/State';
 
 import addUpdateAircrewFormValuesReducer from './addUpdateAircrewFormValuesReducer';
 import aircrewReducer from './aircrewReducer';
+import groupsReducer from './groupsReducer';
 import crewListUIReducer from './crewListUIReducer';
 import daysReducer from './daysReducer';
 import flightsReducer from './flightsReducer';
@@ -17,6 +18,7 @@ import addUpdateSnivFormValuesReducer from './addUpdateSnivFormValuesReducer';
 
 export const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
+    groups: groupsReducer,
     days: daysReducer,
     flights: flightsReducer,
     snivs: snivsReducer,

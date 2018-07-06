@@ -65,6 +65,16 @@ export const INITIAL_STATE: IState = {
         },
         allIds: ['a', 'b', 'c', 'd'],
     },
+    groups: {
+        byId: {
+            a: {
+                id: 'a',
+                name: '18-1',
+                aircrewIds: ['a', 'b'],
+            },
+        },
+        allIds: ['a'],
+    },
     days: {
         byId: {
             '2018-01-24': {

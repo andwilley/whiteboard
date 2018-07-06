@@ -121,12 +121,10 @@ const getFilteredAircrewIds = (
       }
     }
     /** return false for any aircrew that are scheduled (other than a sniv) */
-    // if (filters.dontShowScheduled) {
-    //   if (aircrewDayPucks[aircrewId]) {
-    //     for (const key of Object.keys(aircrewDayPucks[aircrewId])) {
-    //       if (aircrewDayPucks[aircrewId][key] > 0) {
-    //         return false;
-    //       }
+    // if (filters.showUnscheduled && aircrewDayPucks[aircrewId]) {
+    //   for (const key of Object.keys(aircrewDayPucks[aircrewId])) {
+    //     if (aircrewDayPucks[aircrewId][key] > 0) {
+    //       return false;
     //     }
     //   }
     // }

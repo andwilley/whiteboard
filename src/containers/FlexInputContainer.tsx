@@ -17,7 +17,8 @@ import { IState,
          IErrors,
          IElementBeingEdited,
          UErrorTypes,
-         UErrorLocs} from '../types/State';
+         UErrorLocs,
+         IGroups} from '../types/State';
 import { IAddErrorArgs } from '../actions';
 
 type IAircrewEntity = IEntity<IAircrew>;
@@ -243,7 +244,29 @@ const findSchedErrors = (activeAircrewRefs: ISchedObject,
     return errors;
 };
 
-const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
+const getGroupRefsFromInput = (inputValue: string, groupList: IGroups[]): IGroups[] => {
+    return groupList.filter(group => {
+        return inputValue.includes(group.name);
+    });
+};
+
+const getUniqueAircrewIdsFromGroups = (groupRefs: IGroups[]): string[] => {
+    const uniqueAircrewIds: string[] = [];
+    groupRefs.forEach(group => {
+        group.aircrewIds.forEach(aircrewId => {
+            if (uniqueAircrewIds.indexOf(aircrewId) === -1) {
+                uniqueAircrewIds.push(aircrewId);
+            }
+        });
+    });
+    return uniqueAircrewIds;
+};
+
+const nameMatch = (
+    aircrewList: IAircrew[],
+    groupList: IGroups[],
+    inputValue: string
+): IAircrew[] => {
     /**
      * @param {IAircrew[]} aircrewList Array containing full list of aircrew objects.
      * @param {string} inputValue The actual value of the input field
@@ -257,7 +280,12 @@ const nameMatch = (aircrewList: IAircrew[], inputValue: string): IAircrew[] => {
      *
      * This is its own function because I think this will become more complex later.
      */
-    return aircrewList.filter(aircrew => inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()));
+    const groupRefs = getGroupRefsFromInput(inputValue, groupList);
+    const groupAircrewRefsIds = getUniqueAircrewIdsFromGroups(groupRefs);
+    return aircrewList.filter(aircrew => {
+        return inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()) ||
+            (groupAircrewRefsIds.indexOf(aircrew.id) > -1);
+    });
 };
 
 export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
@@ -290,6 +318,7 @@ export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
 
 interface IGetOnChangeWithNameMatchArgs {
     aircrewList: IAircrew[];
+    groupList: IGroups[];
     dispatch: any;
     hasNames: boolean;
     element: UEditables;
@@ -300,6 +329,7 @@ interface IGetOnChangeWithNameMatchArgs {
 
 const getOnChangeWithNameMatch = ({
     aircrewList,
+    groupList,
     dispatch,
     hasNames,
     element,
@@ -351,12 +381,13 @@ const getOnChangeWithNameMatch = ({
         /** update the aircrewRefs state for this input */
         const matchedAircrew = nameMatch(
             aircrewList,
+            groupList,
             editorState.getCurrentContent().getPlainText()
         );
         const matchedAircrewIds = matchedAircrew.map(aircrew => aircrew.id);
         aircrewRefIdDispatch(matchedAircrewIds);
         /** update the editor state and reset the decorators for the editor */
-        const decorator = getDecorators(matchedAircrew);
+        const decorator = getDecorators(matchedAircrew, groupList);
         const newEditorState = EditorState.set(editorState, {decorator});
         dispatch(actions.setEditorState(newEditorState));
         /** run the original onChange passed to this container as a prop (update the input value) */
@@ -382,9 +413,11 @@ const isInputActive = (state: IState, ownProps: IFlexInputContainerProps) => {
     return false;
 };
 
-const nameStrategy = (name: string) => (contentBlock: ContentBlock,
-                                        callback: (start: number, end: number) => void,
-                                        contentState: ContentState) => {
+const nameStrategy = (name: string) => (
+    contentBlock: ContentBlock,
+    callback: (start: number, end: number) => void,
+    contentState: ContentState
+) => {
     const text = contentBlock.getText().toLowerCase();
     const start = text.indexOf(name.toLowerCase());
     if (start > -1) {
@@ -399,7 +432,7 @@ const nameSpan = (id: string) => (props: any) => {
             data-offset-key={props.dataOffsetKey}
             onClick={onXClick(id)}
         >
-        {props.children}
+            {props.children}
         </span>
     );
 };
@@ -408,13 +441,19 @@ const onXClick = (id: string) => (e: any) => {
     alert(id);
 };
 
-const getDecorators = (aircrewRefList: IAircrew[]): CompositeDecorator => {
-    const decorators = aircrewRefList.map(aircrew => {
+const getDecorators = (aircrewRefList: IAircrew[], groupRefList: IGroups[]): CompositeDecorator => {
+    let decorators = aircrewRefList.map(aircrew => {
         return {
             strategy: nameStrategy(aircrew.callsign),
             component: nameSpan(aircrew.id),
         };
     });
+    decorators = decorators.concat(groupRefList.map(group => {
+        return {
+            strategy: nameStrategy(group.name),
+            component: nameSpan(group.id),
+        };
+    }));
     const compositeDecorators = new CompositeDecorator(decorators);
     return compositeDecorators;
 };
@@ -423,8 +462,13 @@ const doesInputHaveNames = (editable: UEditables) => {
     return (Object.values(nameLocation).indexOf(editable) > -1);
 };
 
+const getGroupList = (groups: IEntity<IGroups>): IGroups[] => {
+    return groups.allIds.map(groupId => groups.byId[groupId]);
+};
+
 interface IFlexInputStateProps {
     aircrewList: IAircrew[];
+    groupList: IGroups[];
     aircrewRefList: IAircrew[];
     state: IState;
     errors: IErrors[];
@@ -448,6 +492,7 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
     );
     return {
         aircrewList: hasNames ? getAircrewList(state.aircrew) : [],
+        groupList: hasNames ? getGroupList(state.groups) : [],
         aircrewRefList,
         state,
         errors: componentErrors,
@@ -471,7 +516,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      *
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
-    const decorators = getDecorators(stateProps.aircrewRefList);
+    const decorators = getDecorators(stateProps.aircrewRefList, stateProps.groupList);
     /** handle text insert and paste. function signatures are different, but function is the same. */
     const restrictorFn = ownProps.restrictorFns && ownProps.restrictorFns.length > 0 ?
         restrictor(...ownProps.restrictorFns) : null;
@@ -484,6 +529,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
     return Object.assign({}, ownProps, {
         onChange: getOnChangeWithNameMatch({
             aircrewList: stateProps.aircrewList,
+            groupList: stateProps.groupList,
             dispatch: dispatchProps.dispatch,
             hasNames: stateProps.hasNames,
             element: ownProps.element,
