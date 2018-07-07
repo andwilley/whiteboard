@@ -6,13 +6,31 @@ import AddButton from './AddButton';
 interface IFlightBoxProps {
     dayId: string;
     flights: IFlights[];
+    sims: IFlights[];
     errors: {[id: string]: IErrors[]};
     onAddFlightClick: (dayId: string, sim: boolean) => void;
     onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => void;
 }
 
-const FlightBox: React.SFC<IFlightBoxProps> = ({ dayId, flights, errors, onAddFlightClick, onDelFlightClick }) => {
+const FlightBox: React.SFC<IFlightBoxProps> = ({
+    dayId,
+    flights,
+    sims,
+    errors,
+    onAddFlightClick,
+    onDelFlightClick,
+}) => {
     const flightComponents = flights.map(flight =>
+        (
+        <Flight
+            key={flight.id}
+            flight={flight}
+            dayId={dayId}
+            onDelFlightClick={onDelFlightClick}
+            errors={errors[flight.id] ? errors[flight.id] : []}
+        />
+        ));
+    const simComponents = sims.map(flight =>
         (
         <Flight
             key={flight.id}
@@ -26,7 +44,11 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({ dayId, flights, errors, onAddFl
         <div>
             {flightComponents}
             <AddButton onClick={() => onAddFlightClick(dayId, false)}>
-                Flight
+                Add Flight
+            </AddButton>
+            {simComponents}
+            <AddButton onClick={() => onAddFlightClick(dayId, true)}>
+                Add Sim
             </AddButton>
         </div>
     );

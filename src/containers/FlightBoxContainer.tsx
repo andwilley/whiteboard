@@ -23,6 +23,14 @@ const getDayFlights = (state: IState, currentDayId: string): IFlights[] => {
     });
 };
 
+const getFlightsOnly = (flights: IFlights[]): IFlights[] => {
+    return flights.filter(flight => !flight.sim);
+};
+
+const getSimsFromFlights = (flights: IFlights[]): IFlights[] => {
+    return flights.filter(flight => flight.sim);
+};
+
 const orderFlights = (flights: IFlights[], currentDayId: string, settings: ISettings): IFlights[] => {
     /**
      * sort by takeoff, then land times
@@ -68,9 +76,15 @@ const orderFlights = (flights: IFlights[], currentDayId: string, settings: ISett
 
 const mapStateToProps = (state: IState) => {
     const currentDayId = getDayId(state);
+    const flightsAndSims = orderFlights(
+        getDayFlights(state, currentDayId),
+        state.crewListUI.currentDay,
+        state.settings
+    );
     return {
         dayId: currentDayId,
-        flights: orderFlights(getDayFlights(state, currentDayId), state.crewListUI.currentDay, state.settings),
+        flights: getFlightsOnly(flightsAndSims),
+        sims: getSimsFromFlights(flightsAndSims),
         errors: getEntityErrors(state.errors.byId,
                                 state.days.byId[state.crewListUI.currentDay].errors,
                                 errorLocs.FLIGHT),
