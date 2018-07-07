@@ -11,15 +11,13 @@ interface ISortieProps {
 }
 
 const Sortie: React.SFC<ISortieProps> = ({ sortie, flightId, onDelSortieClick }) => (
-    <div style={{border: '1px solid black', marginTop: '20px'}}>
-        <span style={{position: 'relative', top: '-10px', left: '10px', background: 'white'}}>Sortie</span>
+    <div className="col-md-6">
         <DelButton onClick={onDelSortieClick(sortie.id, flightId)}>
             Delete Sortie
         </DelButton>
         <LoadoutBoxContainer
             sortieId={sortie.id}
         />
-        <br/>
         <CrewBoxContainer
             sortieId={sortie.id}
             flightId={flightId}

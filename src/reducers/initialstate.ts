@@ -275,7 +275,7 @@ export const INITIAL_STATE: IState = {
     },
     settings: {
         minutesAfterLand: 60,
-        minutesBeforeBrief: 60,
+        minutesBeforeBrief: 29,
         minutesBriefToTakeoff: 120,
         minutesNoteDuration: 60,
     },

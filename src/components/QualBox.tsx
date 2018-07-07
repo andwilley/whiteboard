@@ -9,21 +9,23 @@ interface IQualBoxProps {
 
 const QualBox: React.SFC<IQualBoxProps> = ({ qualsList, onInputChange, filters }) => {
     const qualCheckboxList = qualsList.map( (qual: string) => (
-        <label htmlFor="s_qual" key={`s_${qual}`}>
-            <input
-                type="checkbox"
-                name="s_quals"
-                value={qual}
-                checked={filters.qualFilter.indexOf(qual) > -1 ? true : false}
-                onChange={onInputChange}
-            />
-            {qual}
-        </label>
+        <li className="nav-item">
+            <label htmlFor="s_qual" key={`s_${qual}`}>
+                <input
+                    type="checkbox"
+                    name="s_quals"
+                    value={qual}
+                    checked={filters.qualFilter.indexOf(qual) > -1 ? true : false}
+                    onChange={onInputChange}
+                />
+                {qual}
+            </label>
+        </li>
     ));
     return (
-        <div>
+        <ul className="nav flex-column">
             {qualCheckboxList}
-        </div>
+        </ul>
     );
 };
 

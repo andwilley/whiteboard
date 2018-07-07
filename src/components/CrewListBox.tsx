@@ -3,11 +3,12 @@ import CrewSearchBoxContainer from '../containers/CrewSearchBoxContainer';
 import VisibleCrewList from '../containers/VisibleCrewList';
 
 const CrewListBox: React.SFC = () => (
-    <div style={{border: '1px solid black', marginTop: '20px'}}>
-        <span style={{position: 'relative', top: '-10px', left: '10px', background: 'white'}}>CrewList</span>
-        <CrewSearchBoxContainer />
-        <VisibleCrewList />
-    </div>
+    <nav className="col-md-2 d-none d-md-block bg-light sidebar">
+        <div className="sidebar-sticky">
+            <CrewSearchBoxContainer />
+            <VisibleCrewList />
+        </div>
+    </nav>
 );
 
 export default CrewListBox;

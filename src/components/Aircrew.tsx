@@ -59,22 +59,24 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
         );
     });
     return (
-        <li>
-            <span
-                style={aircrewStyle}
-                onClick={onAircrewClick}
-            >
-                {aircrew.callsign}
-            </span>
-            {aircrew.pucks.flight > 0 &&
-                <span> F({aircrew.pucks.flight}) </span>}
-            {aircrew.pucks.sim > 0 &&
-                <span> S({aircrew.pucks.sim}) </span>}
-            {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
-                <span> N({aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}) </span>}
-            <span style={{cursor: 'pointer'}} onClick={onAircrewEditClick}> [EDIT] </span>
-            <span style={{cursor: 'pointer'}} onClick={onAircrewXClick}> {'[X]'} </span>
-            {showSnivs && <ul>{snivComponentList}</ul>}
+        <li className="nav-item">
+            <a className="nav-link">
+                <span
+                    style={aircrewStyle}
+                    onClick={onAircrewClick}
+                >
+                    {aircrew.callsign}
+                </span>
+                {aircrew.pucks.flight > 0 &&
+                    <span> F({aircrew.pucks.flight}) </span>}
+                {aircrew.pucks.sim > 0 &&
+                    <span> S({aircrew.pucks.sim}) </span>}
+                {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
+                    <span> N({aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}) </span>}
+                <span style={{cursor: 'pointer'}} onClick={onAircrewEditClick}> [EDIT] </span>
+                <span style={{cursor: 'pointer'}} onClick={onAircrewXClick}> {'[X]'} </span>
+                {showSnivs && <ul>{snivComponentList}</ul>}
+            </a>
         </li>
     );
 };

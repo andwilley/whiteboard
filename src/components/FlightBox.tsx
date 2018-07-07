@@ -41,7 +41,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
         />
         ));
     return (
-        <div>
+        <div className="row mb-2">
             {flightComponents}
             <AddButton onClick={() => onAddFlightClick(dayId, false)}>
                 Add Flight

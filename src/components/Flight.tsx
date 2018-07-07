@@ -15,29 +15,23 @@ interface IFlightProps {
 }
 
 const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, dayId }) => (
-    <div style={{border: '1px solid black', marginTop: '20px'}}>
-        <span
-            style={{
-                position: 'relative',
-                top: '-10px',
-                left: '10px',
-                background: 'white',
-            }}
-        >
-            {flight.sim ? 'Sim' : 'Flight'}
-        </span>
-        <DelButton onClick={onDelFlightClick(flight, dayId)}>
-            Delete Flight
-        </DelButton>
-        <TimesBox
-            flightId={flight.id}
-        />
-        <SortieBoxContainer flightId={flight.id} />
-        <NoteBoxContainer
-            entityId={flight.id}
-            entityType={noteEntity.FLIGHT_NOTE}
-        />
-        <ErrorList errors={errors} />
+    <div className="col-md-6">
+        <div className="card-body d-flex flex-column align-items-start">
+            <div className="card flex-md-row mb-4 box-shadow h-md-250">
+                <DelButton onClick={onDelFlightClick(flight, dayId)}>
+                    Delete Flight
+                </DelButton>
+                <TimesBox
+                    flightId={flight.id}
+                />
+                <SortieBoxContainer flightId={flight.id} />
+                <NoteBoxContainer
+                    entityId={flight.id}
+                    entityType={noteEntity.FLIGHT_NOTE}
+                />
+                <ErrorList errors={errors} />
+            </div>
+        </div>
     </div>
 );
 

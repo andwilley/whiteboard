@@ -54,12 +54,21 @@ const CrewList: React.SFC<ICrewListProps> = ({
     });
     return (
         <div>
-            <h3>Pilots</h3>
-            <ul>
+            <h6
+                className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+            >
+                Pilots
+            </h6>
+            <ul className="nav flex-column">
                 {pilotList.length > 0 ? pilotList : errorMessages.ERR_NO_RESULTS_FOUND}
             </ul>
-            <h3>WSOs</h3>
-            <ul>
+            <hr />
+            <h6
+                className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+            >
+                WSOs
+            </h6>
+            <ul className="nav flex-column">
                 {wsoList.length > 0 ? wsoList : errorMessages.ERR_NO_RESULTS_FOUND}
             </ul>
             <AddUpdateAircrewFormContainer />
