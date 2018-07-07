@@ -1,10 +1,12 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { IState, IFlights } from '../types/State';
+import { IState, IFlights, ISettings } from '../types/State';
 import FlightBox from '../components/FlightBox';
 import { errorLocs } from '../errors';
 import { getEntityErrors } from '../reducers/errorReducer';
 import { noteEntity } from '../whiteboard-constants';
+import * as Moment from 'moment';
+import { RGX_24HOUR_TIME } from '../util/regEx';
 const { addFlight, delFlight, delSortie, delNote } = actions;
 
 const getDayId = (state: IState): string => {
@@ -21,11 +23,54 @@ const getDayFlights = (state: IState, currentDayId: string): IFlights[] => {
     });
 };
 
+const orderFlights = (flights: IFlights[], currentDayId: string, settings: ISettings): IFlights[] => {
+    /**
+     * sort by takeoff, then land times
+     * this is nasty, clean it up.
+     */
+    const sortedFlights = flights.concat().sort((a, b) => {
+        const takeoffA = RGX_24HOUR_TIME.test(a.times.takeoff) ?
+            Moment(`${currentDayId} ${a.times.takeoff.slice(0, 2)}:${a.times.takeoff.slice(2, 4)}:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS') :
+            Moment(`${currentDayId} 23:59:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS');
+        const takeoffB = RGX_24HOUR_TIME.test(b.times.takeoff) ?
+            Moment(`${currentDayId} ${b.times.takeoff.slice(0, 2)}:${b.times.takeoff.slice(2, 4)}:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS') :
+            Moment(`${currentDayId} 23:59:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS');
+        const landA = RGX_24HOUR_TIME.test(a.times.land) ?
+            Moment(`${currentDayId} ${a.times.land.slice(0, 2)}:${a.times.land.slice(2, 4)}:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS') :
+            Moment(`${currentDayId} 23:59:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS');
+        const landB = RGX_24HOUR_TIME.test(b.times.land) ?
+            Moment(`${currentDayId} ${b.times.land.slice(0, 2)}:${b.times.land.slice(2, 4)}:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS') :
+            Moment(`${currentDayId} 23:59:00.000`,
+                'YYYY-MM-DD HH:mm:ss.SSS');
+        if (takeoffA.isBefore(takeoffB)) {
+            return -1;
+        }
+        if (takeoffA.isAfter(takeoffB)) {
+            return 1;
+        }
+        if (landA.isBefore(landB)) {
+            return -1;
+        }
+        if (landA.isAfter(landB)) {
+            return 1;
+        }
+        return 0;
+    });
+    return sortedFlights;
+};
+
 const mapStateToProps = (state: IState) => {
     const currentDayId = getDayId(state);
     return {
         dayId: currentDayId,
-        flights: getDayFlights(state, currentDayId),
+        flights: orderFlights(getDayFlights(state, currentDayId), state.crewListUI.currentDay, state.settings),
         errors: getEntityErrors(state.errors.byId,
                                 state.days.byId[state.crewListUI.currentDay].errors,
                                 errorLocs.FLIGHT),
