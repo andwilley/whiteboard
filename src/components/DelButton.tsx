@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface IDelButtonProps {
-    onClick: () => any;
+    onClick: (...args: any[]) => any;
 }
 
 const DelButton: React.SFC<IDelButtonProps> = ({children, onClick}) => {

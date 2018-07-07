@@ -7,10 +7,13 @@ interface ISortieBoxProps {
     flightId: string;
     sorties: ISorties[];
     onAddSortieClick: () => void;
+    onDelSortieClick: (sortieId: string, flightId: string) => (e: any) => void;
 }
 
-const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieClick }) => {
-    const sortieComponents = sorties.map(sortie => (<Sortie key={sortie.id} sortie={sortie} flightId={flightId} />));
+const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieClick, onDelSortieClick }) => {
+    const sortieComponents = sorties.map(sortie => (
+        <Sortie key={sortie.id} sortie={sortie} flightId={flightId} onDelSortieClick={onDelSortieClick} />
+    ));
     return (
         <div>
             {sortieComponents}

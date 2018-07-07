@@ -1,13 +1,12 @@
 import { connect } from 'react-redux';
-import { actions } from '../actions';
+import { actions, IDelNoteArgs } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
-import { errorLocs } from '../errors';
-import { IState, INotes, IFlights, IDays, ISorties, IAircrew, IErrors } from '../types/State';
+import { IState, INotes, IFlights, IDays, ISorties, IAircrew, IErrors, UNoteEntity } from '../types/State';
 import NoteBox from '../components/NoteBox';
-const { addUpdateNote } = actions;
+const { addUpdateNote, delNote } = actions;
 
 interface INoteBoxContainerProps {
-    entityType: string;
+    entityType: UNoteEntity;
     entityId: string;
     errors?: IErrors[];
 }
@@ -30,16 +29,16 @@ const getNotes = (entityType: string, entityId: string, state: IState): INotes[]
      */
     let entity: IFlights | IDays | ISorties | IAircrew;
     switch (entityType) {
-        case noteEntity.FLIGHT:
+        case noteEntity.FLIGHT_NOTE:
             entity = state.flights.byId[entityId];
             break;
-        case noteEntity.DAY:
+        case noteEntity.DAY_NOTE:
             entity = state.days.byId[entityId];
             break;
-        case noteEntity.SORTIE:
+        case noteEntity.SORTIE_NOTE:
             entity = state.sorties.byId[entityId];
             break;
-        case noteEntity.AIRCREW:
+        case noteEntity.AIRCREW_NOTE:
             entity = state.aircrew.byId[entityId];
             break;
         default:
@@ -49,17 +48,10 @@ const getNotes = (entityType: string, entityId: string, state: IState): INotes[]
     return entity.notes.map(noteId => state.notes.byId[noteId]);
 };
 
-const noteErrorLocMap = {
-    FLIGHT: errorLocs.FLIGHT,
-    DAY: errorLocs.DAY_NOTE,
-    SORTIE: errorLocs.SORTIE,
-    AIRCREW: errorLocs.CREWLIST,
-};
-
 const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
     return {
         notes: getNotes(ownProps.entityType, ownProps.entityId, state),
-        errorLoc: noteErrorLocMap[ownProps.entityType],
+        errorLoc: ownProps.entityType,
         errorLocId: ownProps.entityId,
     };
 };
@@ -71,6 +63,9 @@ const mapDispatchToProps = (dispatch: any, ownProps: INoteBoxContainerProps) => 
                 entity: ownProps.entityType,
                 entityId: ownProps.entityId,
             }));
+        },
+        onDelNoteClick: (args: IDelNoteArgs) => (e: any) => {
+            dispatch(delNote(args));
         },
         onInputChange: (noteId: string) => (inputValue: string): void => {
             dispatch(addUpdateNote({

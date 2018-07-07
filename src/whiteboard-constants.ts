@@ -1,5 +1,5 @@
 import { INameLocations, IEditables } from './types/WhiteboardTypes';
-import { ITimeTypes, IAddUpdateSnivFormValues, ISnivTimeTypes } from './types/State';
+import { ITimeTypes, IAddUpdateSnivFormValues, ISnivTimeTypes, INoteEntity } from './types/State';
 
 export const qualsList =
     ['SL', 'DL', 'MC', 'NSI', 'FAI', 'MDTI', 'WTI', 'FAC(A)', 'FAC(A)I', 'NS', 'ACM', 'LAT', 'PMCF', 'ODO'];
@@ -27,11 +27,11 @@ export const blankSnivForm: IAddUpdateSnivFormValues = {
 
 export const seats = ['front', 'back'];
 
-export const noteEntity = {
-    DAY: 'DAY',
-    FLIGHT: 'FLIGHT',
-    SORTIE: 'SORTIE',
-    AIRCREW: 'AIRCREW',
+export const noteEntity: INoteEntity = {
+    DAY_NOTE: 'DAY_NOTE',
+    FLIGHT_NOTE: 'FLIGHT_NOTE',
+    SORTIE_NOTE: 'SORTIE_NOTE',
+    AIRCREW_NOTE: 'AIRCREW_NOTE',
 };
 
 export const nameLocation: INameLocations = {

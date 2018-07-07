@@ -1,18 +1,27 @@
 import * as React from 'react';
 import Flight from './Flight';
-import { IErrors } from '../types/State';
+import { IErrors, IFlights } from '../types/State';
 import AddButton from './AddButton';
 
 interface IFlightBoxProps {
     dayId: string;
-    flightIds: string[];
+    flights: IFlights[];
     errors: {[id: string]: IErrors[]};
-    onAddFlightClick: (dayId: string, sim: boolean) => any;
+    onAddFlightClick: (dayId: string, sim: boolean) => void;
+    onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => void;
 }
 
-const FlightBox: React.SFC<IFlightBoxProps> = ({ dayId, flightIds, errors, onAddFlightClick }) => {
-    const flightComponents = flightIds.map(id =>
-        (<Flight key={id} flightId={id} errors={errors[id] ? errors[id] : []} />));
+const FlightBox: React.SFC<IFlightBoxProps> = ({ dayId, flights, errors, onAddFlightClick, onDelFlightClick }) => {
+    const flightComponents = flights.map(flight =>
+        (
+        <Flight
+            key={flight.id}
+            flight={flight}
+            dayId={dayId}
+            onDelFlightClick={onDelFlightClick}
+            errors={errors[flight.id] ? errors[flight.id] : []}
+        />
+        ));
     return (
         <div>
             {flightComponents}

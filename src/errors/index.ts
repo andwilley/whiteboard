@@ -34,11 +34,13 @@ export const errorMessages = {
 
 export const errorLocs: IErrorLocs = {
     FLIGHT: 'FLIGHT',
+    AIRCREW_NOTE: 'AIRCREW_NOTE',
     SIM: 'SIM',
     BRIEF: 'BRIEF',
     TAKEOFF: 'TAKEOFF',
     LAND: 'LAND',
     SORTIE: 'SORTIE',
+    SORTIE_NOTE: 'SORTIE_NOTE',
     DAY: 'DAY',
     DAY_NOTE: 'DAY_NOTE',
     FLIGHT_NOTE: 'FLIGHT_NOTE',

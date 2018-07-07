@@ -1,5 +1,10 @@
 import * as cuid from 'cuid';
-import { UErrorTypes, UErrorLocs, UErrorLevels, ICustomErrorMeta, IAddUpdateSnivFormValues } from '../types/State';
+import { UErrorTypes,
+         UErrorLocs,
+         UErrorLevels,
+         ICustomErrorMeta,
+         IAddUpdateSnivFormValues,
+         UNoteEntity} from '../types/State';
 import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 import { EditorState } from 'draft-js';
@@ -92,14 +97,14 @@ export interface IAddUpdateAircrewArgs {
 
 export interface IAddUpdateNoteArgs {
     id?: string;
-    entity: string;
+    entity: UNoteEntity;
     entityId: string;
     content?: string;
 }
 
 export interface IDelNoteArgs {
     id: string;
-    entity: string;
+    entity: UNoteEntity;
     entityId: string;
 }
 
@@ -306,6 +311,7 @@ export const actions = {
         };
     }),
     delFlight: createAction(DEL_FLIGHT, (id: string, dayId: string) => ({
+        /** must be accompanied by del sortie and del notes */
         type: DEL_FLIGHT,
         payload: {
             id,

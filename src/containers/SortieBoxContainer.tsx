@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { IState, ISorties } from '../types/State';
 import SortieBox from '../components/SortieBox';
-const { addSortie } = actions;
+const { addSortie, delSortie } = actions;
 
 interface ISortieBoxContainerProps {
     flightId: string;
@@ -24,6 +24,9 @@ const mapDispatchToProps = (dispatch: any, ownProps: ISortieBoxContainerProps) =
     return {
         onAddSortieClick: () => {
             dispatch(addSortie(ownProps.flightId));
+        },
+        onDelSortieClick: (sortieId: string, flightId: string) => (e: any) => {
+            dispatch(delSortie(sortieId, flightId));
         },
     };
 };

@@ -153,13 +153,20 @@ export interface ISnivTimeTypes {
 
 export type USnivTimeTypes = ISnivTimeTypes[keyof ISnivTimeTypes];
 
-export interface IErrorLocs extends ITimeTypes {
+export interface INoteEntity {
+    DAY_NOTE: 'DAY_NOTE';
+    FLIGHT_NOTE: 'FLIGHT_NOTE';
+    AIRCREW_NOTE: 'AIRCREW_NOTE';
+    SORTIE_NOTE: 'SORTIE_NOTE';
+}
+
+export type UNoteEntity = INoteEntity[keyof INoteEntity];
+
+export interface IErrorLocs extends ITimeTypes, INoteEntity {
     FLIGHT: 'FLIGHT';
     SIM: 'SIM';
     SORTIE: 'SORTIE';
     DAY: 'DAY';
-    DAY_NOTE: 'DAY_NOTE';
-    FLIGHT_NOTE: 'FLIGHT_NOTE';
     SIM_NOTE: 'SIM_NOTE';
     CREWLIST: 'CREWLIST';
     SNIVS: 'SNIVS';

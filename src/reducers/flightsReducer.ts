@@ -70,7 +70,7 @@ const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
                 },
             };
         case getType(actions.addUpdateNote):
-            if (action.payload.entity !== noteEntity.FLIGHT ||
+            if (action.payload.entity !== noteEntity.FLIGHT_NOTE ||
                 state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
@@ -82,7 +82,7 @@ const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
                 },
             };
         case getType(actions.delNote):
-            if (action.payload.entity !== 'flight') {
+            if (action.payload.entity !== noteEntity.FLIGHT_NOTE) {
                 return state;
             }
             return {

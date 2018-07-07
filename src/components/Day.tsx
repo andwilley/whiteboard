@@ -17,7 +17,7 @@ const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors } ) => (
         <ErrorList errors={dayErrors[dayId] ? dayErrors[dayId] : []} />
         <FlightBoxContainer />
         <NoteBoxContainer
-            entityType={noteEntity.DAY}
+            entityType={noteEntity.DAY_NOTE}
             entityId={dayId}
             errors={noteErrors[dayId] ? noteErrors[dayId] : []}
         />

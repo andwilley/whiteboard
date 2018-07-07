@@ -45,7 +45,7 @@ const daysById = (state: {[id: string]: IDays} = {}, action: IAction) => {
                 },
             };
         case getType(actions.addUpdateNote):
-            if (action.payload.entity !== noteEntity.DAY ||
+            if (action.payload.entity !== noteEntity.DAY_NOTE ||
                 state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
@@ -57,7 +57,7 @@ const daysById = (state: {[id: string]: IDays} = {}, action: IAction) => {
                 },
             };
         case getType(actions.delNote):
-            if (action.payload.entity !== 'day') {
+            if (action.payload.entity !== noteEntity.DAY_NOTE) {
                 return state;
             }
             return {

@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
-import { IEntity, ISorties } from '../types/State';
 import { actions, IAction } from '../actions';
+import { IEntity, ISorties } from '../types/State';
 import { noteEntity } from '../whiteboard-constants';
 
 const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
@@ -16,13 +16,13 @@ const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
                         inputName: '',
                         aircrewRefIds: [],
                         codes: [],
-                        symbols: [],
+                        symbols: '',
                     },
                     back: {
                         inputName: '',
                         aircrewRefIds: [],
                         codes: [],
-                        symbols: [],
+                        symbols: '',
                     },
                     loadout: '',
                     notes: [],
@@ -58,7 +58,7 @@ const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
             });
             return newSortiesById;
         case getType(actions.addUpdateNote):
-            if (action.payload.entity !== noteEntity.SORTIE ||
+            if (action.payload.entity !== noteEntity.SORTIE_NOTE ||
                 state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
@@ -70,7 +70,7 @@ const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
                 },
             };
         case getType(actions.delNote):
-            if (action.payload.entity !== 'sortie') {
+            if (action.payload.entity !== noteEntity.SORTIE_NOTE) {
                 return state;
             }
             return {
@@ -141,6 +141,7 @@ const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
 const allSorties = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addFlight):
+            /** add first sortie by default. */
         case getType(actions.addSortie):
             return state.concat(action.payload.sortieId);
         case getType(actions.delSortie):

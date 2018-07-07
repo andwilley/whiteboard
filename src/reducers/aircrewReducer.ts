@@ -31,7 +31,7 @@ const aircrewById = (state: {[id: string]: IAircrew} = {}, action: IAction) => {
             // let { [action.id]: delcrew, ...rest } = state;
             return rest;
         case getType(actions.addUpdateNote):
-            if (action.payload.entity !== noteEntity.AIRCREW ||
+            if (action.payload.entity !== noteEntity.AIRCREW_NOTE ||
                 state[action.payload.entityId].notes.indexOf(action.payload.id) > -1) {
                 return state;
             }
@@ -43,7 +43,7 @@ const aircrewById = (state: {[id: string]: IAircrew} = {}, action: IAction) => {
                 },
             };
         case getType(actions.delNote):
-            if (action.payload.entity !== 'aircrew') {
+            if (action.payload.entity !== noteEntity.AIRCREW_NOTE) {
                 return state;
             }
             return {
