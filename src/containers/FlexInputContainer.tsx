@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
+import * as cuid from 'cuid';
 import FlexInput from '../components/FlexInput';
 import { UEditables, ISchedObject } from '../types/WhiteboardTypes';
 import { ISchedBlock } from '../types/WhiteboardTypes';
-import { nameLocation } from '../whiteboard-constants';
+import { nameLocation, builtInGroupNames } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
 import restrictor, { RestrictorFn } from '../util/restrictor';
 import { getActiveDayErrors } from '../reducers/errorReducer';
@@ -462,8 +463,16 @@ const doesInputHaveNames = (editable: UEditables) => {
     return (Object.values(nameLocation).indexOf(editable) > -1);
 };
 
-const getGroupList = (groups: IEntity<IGroups>): IGroups[] => {
-    return groups.allIds.map(groupId => groups.byId[groupId]);
+const getGroupList = (groups: IEntity<IGroups>, aircrewIds: string[]): IGroups[] => {
+    const userGroups = groups.allIds.map(groupId => groups.byId[groupId]);
+    const builtInGroups = builtInGroupNames.map(name => {
+        return {
+            id: cuid(),
+            name: name,
+            aircrewIds,
+        };
+    });
+    return userGroups.concat(builtInGroups);
 };
 
 interface IFlexInputStateProps {
@@ -492,7 +501,7 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
     );
     return {
         aircrewList: hasNames ? getAircrewList(state.aircrew) : [],
-        groupList: hasNames ? getGroupList(state.groups) : [],
+        groupList: hasNames ? getGroupList(state.groups, state.aircrew.allIds) : [],
         aircrewRefList,
         state,
         errors: componentErrors,

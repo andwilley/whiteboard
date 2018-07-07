@@ -62,3 +62,5 @@ export const editables: IEditables = {
     LOADOUT: 'LOADOUT',
     AIRSPACE: 'AIRSPACE',
 };
+
+export const builtInGroupNames = ['all hands', 'all aircrew', 'all officers'];
