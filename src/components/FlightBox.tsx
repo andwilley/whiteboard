@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Flight from './Flight';
 import { IErrors, IFlights } from '../types/State';
-import AddButton from './AddButton';
+import AddButton from './IconButton';
 
 interface IFlightBoxProps {
     dayId: string;
@@ -41,15 +41,19 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
         />
         ));
     return (
-        <div className="row mb-2">
-            {flightComponents}
-            <AddButton onClick={() => onAddFlightClick(dayId, false)}>
-                Add Flight
-            </AddButton>
-            {simComponents}
-            <AddButton onClick={() => onAddFlightClick(dayId, true)}>
-                Add Sim
-            </AddButton>
+        <div className="col-md-12">
+            <div className="row mb-2">
+                {flightComponents}
+                <AddButton onClick={() => onAddFlightClick(dayId, false)}>
+                    Add Flight
+                </AddButton>
+            </div>
+            <div className="row mb-2">
+                {simComponents}
+                <AddButton onClick={() => onAddFlightClick(dayId, true)}>
+                    Add Sim
+                </AddButton>
+            </div>
         </div>
     );
 };

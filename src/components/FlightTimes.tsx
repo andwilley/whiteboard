@@ -22,9 +22,10 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
         timeIsValid[time] = /^0[0-9][0-5][0-9]|1[0-9][0-5][0-9]|2[0-3][0-5][0-9]$/.test(times[time]);
     });
     return (
-        <form>
+        <div className="row">
+            <div className="col-md-4">
             <FlexInputContainer
-                placeHolder="Brief Time"
+                placeHolder="Brief"
                 name="flightTimes"
                 value={times.brief}
                 errorConfig={{
@@ -38,8 +39,10 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 validatorFns={[is24HourTime()]}
                 restrictorFns={[restrictToTimeChars]}
             />
+            </div>
+            <div className="col-md-4">
             <FlexInputContainer
-                placeHolder="Takeoff Time"
+                placeHolder="Takeoff"
                 name="flightTimes"
                 value={times.takeoff}
                 errorConfig={{
@@ -53,8 +56,10 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 validatorFns={[is24HourTime()]}
                 restrictorFns={[restrictToTimeChars]}
             />
+            </div>
+            <div className="col-md-4">
             <FlexInputContainer
-                placeHolder="Land Time"
+                placeHolder="Land"
                 name="flightTimes"
                 value={times.land}
                 errorConfig={{
@@ -68,7 +73,8 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 validatorFns={[is24HourTime()]}
                 restrictorFns={[restrictToTimeChars]}
             />
-        </form>
+            </div>
+        </div>
     );
 };
 

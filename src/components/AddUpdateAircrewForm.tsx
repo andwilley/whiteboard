@@ -1,7 +1,7 @@
 import * as React from 'react';
-import AddButton from './AddButton';
-import DelButton from './DelButton';
+import AddButton from './IconButton';
 import { IAddUpdateAircrewFormValues } from '../types/State';
+import IconButton from './IconButton';
 
 const parseRank = (rank: string | number): number => {
     const validRanks = {
@@ -133,9 +133,9 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
     const addUpdateAircrewFormDisplayButton = addUpdateAircrewFormDisplay ?
         (
         <div>
-            <DelButton onClick={() => onDelAircrewFormButtonClick()}>
+            <IconButton onClick={() => onDelAircrewFormButtonClick()}>
                 Close This Form
-            </DelButton>
+            </IconButton>
         </div>
         ) :
         (

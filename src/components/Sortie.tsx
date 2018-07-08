@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ISorties } from '../types/State';
 import CrewBoxContainer from '../containers/CrewBoxContainer';
 import LoadoutBoxContainer from '../containers/LoadoutBoxContainer';
-import DelButton from './DelButton';
+import IconButton from './IconButton';
 
 interface ISortieProps {
     sortie: ISorties;
@@ -11,13 +11,17 @@ interface ISortieProps {
 }
 
 const Sortie: React.SFC<ISortieProps> = ({ sortie, flightId, onDelSortieClick }) => (
-    <div className="col-md-6">
-        <DelButton onClick={onDelSortieClick(sortie.id, flightId)}>
-            Delete Sortie
-        </DelButton>
+    <div className="col-md-12">
+        <div className="row">
+            <IconButton onClick={onDelSortieClick(sortie.id, flightId)}>
+                Delete Sortie
+            </IconButton>
+        </div>
+        <div className="row">
         <LoadoutBoxContainer
             sortieId={sortie.id}
         />
+        </div>
         <CrewBoxContainer
             sortieId={sortie.id}
             flightId={flightId}

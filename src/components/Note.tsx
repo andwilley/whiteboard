@@ -3,7 +3,7 @@ import { INotes, UNoteEntity } from '../types/State';
 import { errorTypes } from '../errors';
 import { editables } from '../whiteboard-constants';
 import FlexInputContainer from '../containers/FlexInputContainer';
-import DelButton from './DelButton';
+import IconButton from './IconButton';
 import { IDelNoteArgs } from '../actions';
 
 interface INoteProps {
@@ -16,7 +16,7 @@ interface INoteProps {
 
 const Note: React.SFC<INoteProps> = ({ note, onDelNoteClick, onInputChange, errorLoc, errorLocId }) => {
     return (
-        <div>
+        <div className="col-md-12">
             <FlexInputContainer
                 placeHolder="time-time: Note text."
                 name="flightNote"
@@ -30,9 +30,9 @@ const Note: React.SFC<INoteProps> = ({ note, onDelNoteClick, onInputChange, erro
                 element={editables.NOTE}
                 entityId={note.id}
             />
-            <DelButton onClick={onDelNoteClick({id: note.id, entity: errorLoc, entityId: errorLocId})}>
+            <IconButton onClick={onDelNoteClick({id: note.id, entity: errorLoc, entityId: errorLocId})}>
                 Delete Note
-            </DelButton>
+            </IconButton>
         </div>
     );
 };

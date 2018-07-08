@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Sortie from './Sortie';
 import { ISorties } from '../types/State';
-import AddButton from './AddButton';
+import IconButton from './IconButton';
 
 interface ISortieBoxProps {
     flightId: string;
@@ -15,11 +15,13 @@ const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieC
         <Sortie key={sortie.id} sortie={sortie} flightId={flightId} onDelSortieClick={onDelSortieClick} />
     ));
     return (
-        <div>
-            {sortieComponents}
-            <AddButton onClick={() => onAddSortieClick()}>
-                Sortie
-            </AddButton>
+        <div className="col-md-12">
+            <div className="row">
+                {sortieComponents}
+                <IconButton onClick={() => onAddSortieClick()}>
+                    Sortie
+                </IconButton>
+            </div>
         </div>
     );
 };

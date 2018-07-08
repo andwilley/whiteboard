@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ISnivs } from '../types/State';
 import { IAddUpdateSnivArgs } from '../actions';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
+import IconButton from './IconButton';
 
 interface IAircrewProps {
     aircrew: IAircrewWithPucks;
@@ -74,7 +75,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                 {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
                     <span> N({aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}) </span>}
                 <span style={{cursor: 'pointer'}} onClick={onAircrewEditClick}> [EDIT] </span>
-                <span style={{cursor: 'pointer'}} onClick={onAircrewXClick}> {'[X]'} </span>
+                <IconButton onClick={onAircrewXClick} />
                 {showSnivs && <ul>{snivComponentList}</ul>}
             </a>
         </li>

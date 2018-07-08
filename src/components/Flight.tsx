@@ -5,7 +5,7 @@ import { noteEntity } from '../whiteboard-constants';
 import SortieBoxContainer from '../containers/SortieBoxContainer';
 import NoteBoxContainer from '../containers/NoteBoxContainer';
 import ErrorList from './ErrorList';
-import DelButton from './DelButton';
+import IconButton from './IconButton';
 
 interface IFlightProps {
     flight: IFlights;
@@ -15,16 +15,21 @@ interface IFlightProps {
 }
 
 const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, dayId }) => (
-    <div className="col-md-6">
-        <div className="card-body d-flex flex-column align-items-start">
-            <div className="card flex-md-row mb-4 box-shadow h-md-250">
-                <DelButton onClick={onDelFlightClick(flight, dayId)}>
-                    Delete Flight
-                </DelButton>
+    <div className="col-md-3">
+        <div className="card mb-3 box-shadow">
+            <div className="card-header">
+                <IconButton
+                    onClick={onDelFlightClick(flight, dayId)}
+                    icon="trash"
+                />
+            </div>
+            <div className="card-body">
                 <TimesBox
                     flightId={flight.id}
                 />
                 <SortieBoxContainer flightId={flight.id} />
+            </div>
+            <div className="card-footer">
                 <NoteBoxContainer
                     entityId={flight.id}
                     entityType={noteEntity.FLIGHT_NOTE}

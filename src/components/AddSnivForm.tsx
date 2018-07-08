@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Moment from 'moment';
-import AddButton from './AddButton';
-import DelButton from './DelButton';
+import IconButton from './IconButton';
 import { errorLocs, errorTypes } from '../errors';
 import * as Datetime from 'react-datetime';
 import { getHighestErrorLevel } from '../errors';
@@ -63,16 +62,16 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
     const snivFormDisplayButton = addUpdateSnivFormDisplay ?
         (
         <div>
-            <DelButton onClick={onSnivFormDelButtonClick}>
+            <IconButton onClick={onSnivFormDelButtonClick}>
                 Close This Form
-            </DelButton>
+            </IconButton>
         </div>
         ) :
         (
         <div>
-            <AddButton onClick={onSnivFormAddButtonClick}>
+            <IconButton onClick={onSnivFormAddButtonClick}>
                 Add Sniv
-            </AddButton>
+            </IconButton>
         </div>
         );
     const snivForm = addUpdateSnivFormDisplay ?
