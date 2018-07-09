@@ -15,8 +15,7 @@ const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieC
         <Sortie key={sortie.id} sortie={sortie} flightId={flightId} onDelSortieClick={onDelSortieClick} />
     ));
     return (
-        <div className="col-md-12">
-            <div className="row">
+            <div>
                 {sortieComponents}
                 <IconButton
                     onClick={() => onAddSortieClick()}
@@ -24,7 +23,6 @@ const SortieBox: React.SFC<ISortieBoxProps> = ({ flightId, sorties, onAddSortieC
                     size={12}
                 />
             </div>
-        </div>
     );
 };
 

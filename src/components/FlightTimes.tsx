@@ -23,7 +23,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
     });
     return (
         <div className="row">
-            <div className="col-md-4">
+            <div className="col-4 pr-1">
             <FlexInputContainer
                 placeHolder="Brief"
                 name="flightTimes"
@@ -40,7 +40,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 restrictorFns={[restrictToTimeChars]}
             />
             </div>
-            <div className="col-md-4">
+            <div className="col-4 pr-1 pl-1">
             <FlexInputContainer
                 placeHolder="Takeoff"
                 name="flightTimes"
@@ -57,7 +57,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                 restrictorFns={[restrictToTimeChars]}
             />
             </div>
-            <div className="col-md-4">
+            <div className="col-4 pl-1">
             <FlexInputContainer
                 placeHolder="Land"
                 name="flightTimes"

@@ -45,6 +45,10 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
                     onClick={onAddNoteClick}
                     icon="plus"
                     size={10}
+                    style={{
+                        margin: '-20 0 0 0',
+                    }}
+                    svgClass="float-right"
                 />
             </div>
             <div className="row">

@@ -11,19 +11,23 @@ interface ISortieProps {
 }
 
 const Sortie: React.SFC<ISortieProps> = ({ sortie, flightId, onDelSortieClick }) => (
-    <div className="col-md-12">
-        <div className="row">
+    <div>
+    <hr / >
+    <div className="row">
+        <div className="col-10">
+            <LoadoutBoxContainer
+                sortieId={sortie.id}
+            />
+        </div>
+        <div className="col-2">
             <IconButton
                 onClick={onDelSortieClick(sortie.id, flightId)}
                 icon="trash"
                 size={10}
+                svgClass="float-right"
             />
         </div>
-        <div className="row">
-        <LoadoutBoxContainer
-            sortieId={sortie.id}
-        />
-        </div>
+    </div>
         <CrewBoxContainer
             sortieId={sortie.id}
             flightId={flightId}

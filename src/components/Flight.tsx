@@ -15,13 +15,14 @@ interface IFlightProps {
 }
 
 const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, dayId }) => (
-    <div className="col-md-3">
+    <div className="col-xl-3 col-lg-4 col-md-6">
         <div className="card mb-3 box-shadow">
             <div className="card-header">
                 <IconButton
                     onClick={onDelFlightClick(flight, dayId)}
                     icon="trash"
                     size={14}
+                    svgClass="float-right"
                 />
             </div>
             <div className="card-body">

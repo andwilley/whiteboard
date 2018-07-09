@@ -18,7 +18,7 @@ const Note: React.SFC<INoteProps> = ({ note, onDelNoteClick, onInputChange, erro
     return (
         <div className="col-md-12">
             <FlexInputContainer
-                placeHolder="time-time: Note text."
+                placeHolder="Note text."
                 name="flightNote"
                 value={note.content}
                 errorConfig={{
@@ -30,9 +30,14 @@ const Note: React.SFC<INoteProps> = ({ note, onDelNoteClick, onInputChange, erro
                 element={editables.NOTE}
                 entityId={note.id}
             />
-            <IconButton onClick={onDelNoteClick({id: note.id, entity: errorLoc, entityId: errorLocId})}>
-                Delete Note
-            </IconButton>
+            <IconButton
+                onClick={onDelNoteClick({id: note.id, entity: errorLoc, entityId: errorLocId})}
+                icon="trash"
+                style={{
+                    margin: '-18 0 0 0',
+                }}
+                svgClass="float-right"
+            />
         </div>
     );
 };

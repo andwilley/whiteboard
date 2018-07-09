@@ -6,21 +6,31 @@ interface IIconButtonProps {
     onClick: (...args: any[]) => any;
     icon?: UIcons;
     size?: number;
-    fill?: string;
     href?: string;
+    svgClass?: string;
+    style?: React.CSSProperties;
 }
 
-const IconButton: React.SFC<IIconButtonProps> = ({onClick, children, icon, href = '', fill = '', size = 10}) => {
+const IconButton: React.SFC<IIconButtonProps> = ({
+    onClick,
+    children,
+    icon,
+    href = '',
+    size = 10,
+    style = {},
+    svgClass = '',
+}) => {
     return (
         <a href={href ? href : '#'}>
             <span onClick={onClick}>
                 {icon &&
                     <svg
-                        className={`float-right icon ${icon}`}
+                        className={`icon icon-${icon}${svgClass ? ` ${svgClass}` : ''}`}
                         xmlns="http://www.w3.org/2000/svg"
                         width={size}
                         height={size}
                         viewBox={`0 0 8 8`}
+                        style={style}
                     >
                         <path d={icons[icon]}/>
                     </svg>

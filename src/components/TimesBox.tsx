@@ -8,7 +8,7 @@ interface ITimesBoxProps {
 }
 
 const TimesBox: React.SFC<ITimesBoxProps> = ({ flightId }) => (
-    <div className="col-md-12">
+    <div>
         <FlightTimesContainer
             flightId={flightId}
         />

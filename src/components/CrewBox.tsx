@@ -28,7 +28,7 @@ interface ICrewBoxProps {
 
 const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputChange }) => (
     <div className="row">
-        <div className="col-md-6">
+        <div className="col-6">
             <FlexInputContainer
                 placeHolder="Pilot"
                 name="pilot"
@@ -65,7 +65,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
                 restrictorFns={[restrictToSymbols, noDuplicateChars]}
             /> */}
         </div>
-        <div className="col-md-6">
+        <div className="col-6">
             <FlexInputContainer
                 placeHolder="WSO"
                 name="wso"

@@ -42,6 +42,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
         ));
     return (
         <div className="col-md-12">
+            <h5>Flights</h5>
             <div className="row mb-2">
                 {flightComponents}
                 <IconButton
@@ -51,6 +52,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
                 />
             </div>
             <hr />
+            <h5>Simuators</h5>
             <div className="row mb-2">
                 {simComponents}
                 <IconButton
