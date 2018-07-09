@@ -21,6 +21,7 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, day
                 <IconButton
                     onClick={onDelFlightClick(flight, dayId)}
                     icon="trash"
+                    size={14}
                 />
             </div>
             <div className="card-body">

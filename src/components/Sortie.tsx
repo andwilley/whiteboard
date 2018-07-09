@@ -13,9 +13,11 @@ interface ISortieProps {
 const Sortie: React.SFC<ISortieProps> = ({ sortie, flightId, onDelSortieClick }) => (
     <div className="col-md-12">
         <div className="row">
-            <IconButton onClick={onDelSortieClick(sortie.id, flightId)}>
-                Delete Sortie
-            </IconButton>
+            <IconButton
+                onClick={onDelSortieClick(sortie.id, flightId)}
+                icon="trash"
+                size={10}
+            />
         </div>
         <div className="row">
         <LoadoutBoxContainer

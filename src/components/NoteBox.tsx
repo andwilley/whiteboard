@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Note from './Note';
 import { INotes, IErrors, UNoteEntity } from '../types/State';
-import AddButton from './IconButton';
+import IconButton from './IconButton';
 import ErrorList from './ErrorList';
 import { IDelNoteArgs } from '../actions';
 
@@ -41,9 +41,11 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
         <div>
             <div>
                 <h6 className="sidebar-heading text-muted">Notes</h6>
-                <AddButton onClick={onAddNoteClick}>
-                    {`${errorLoc}`}
-                </AddButton>
+                <IconButton
+                    onClick={onAddNoteClick}
+                    icon="plus"
+                    size={10}
+                />
             </div>
             <div className="row">
                 <ErrorList errors={noteErrors} />
