@@ -69,13 +69,57 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                     {aircrew.callsign}
                 </span>
                 {aircrew.pucks.flight > 0 &&
-                    <span> F({aircrew.pucks.flight}) </span>}
+                    (<IconButton
+                        onClick={onAircrewEditClick}
+                        icon="plane"
+                        size={12}
+                        svgClass="crew-icons"
+                        style={{
+                            margin: '0 2px 0 8px',
+                        }}
+                        pointer={false}
+                        viewBox="0 0 21 22"
+                    >
+                        {aircrew.pucks.flight}
+                    </IconButton>)}
                 {aircrew.pucks.sim > 0 &&
-                    <span> S({aircrew.pucks.sim}) </span>}
+                    (<IconButton
+                        onClick={onAircrewEditClick}
+                        icon="controller"
+                        size={12}
+                        svgClass="crew-icons"
+                        style={{
+                            margin: '0 2px 0 8px',
+                        }}
+                        pointer={false}
+                        viewBox="0 0 512 512"
+                    >
+                        {aircrew.pucks.sim}
+                    </IconButton>)}
                 {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
-                    <span> N({aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}) </span>}
-                <span style={{cursor: 'pointer'}} onClick={onAircrewEditClick}> [EDIT] </span>
-                <IconButton onClick={onAircrewXClick} />
+                    (<IconButton
+                        onClick={onAircrewEditClick}
+                        icon="paperclip"
+                        size={12}
+                        svgClass="crew-icons"
+                        style={{
+                            margin: '0 2px 0 8px',
+                        }}
+                        pointer={false}
+                    >
+                        {aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}
+                    </IconButton>)}
+                <IconButton
+                    onClick={onAircrewXClick}
+                    icon="trash"
+                    size={12}
+                    svgClass="float-right crew-icons"
+                /><IconButton
+                    onClick={onAircrewEditClick}
+                    icon="pencil"
+                    size={12}
+                    svgClass="float-right crew-icons"
+                />
                 {showSnivs && <ul>{snivComponentList}</ul>}
             </a>
         </li>

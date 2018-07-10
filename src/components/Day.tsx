@@ -29,13 +29,15 @@ const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors } ) => (
                 </button>
                 </div>
         </div>
-        <ErrorList errors={dayErrors[dayId] ? dayErrors[dayId] : []} />
         <FlightBoxContainer />
-        <NoteBoxContainer
-            entityType={noteEntity.DAY_NOTE}
-            entityId={dayId}
-            errors={noteErrors[dayId] ? noteErrors[dayId] : []}
-        />
+        <div className="col-12">
+            <NoteBoxContainer
+                entityType={noteEntity.DAY_NOTE}
+                entityId={dayId}
+                errors={noteErrors[dayId] ? noteErrors[dayId] : []}
+            />
+            <ErrorList errors={dayErrors[dayId] ? dayErrors[dayId] : []} />
+        </div>
     </main>
 );
 

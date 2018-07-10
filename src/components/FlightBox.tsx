@@ -41,7 +41,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
         />
         ));
     return (
-        <div className="col-md-12">
+        <div className="col-12">
             <h5>Flights</h5>
             <div className="row mb-2">
                 {flightComponents}

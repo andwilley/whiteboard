@@ -52,8 +52,8 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
                 />
             </div>
             <div className="row">
-                <ErrorList errors={noteErrors} />
                 {noteComponentsList}
+                <ErrorList errors={noteErrors} />
             </div>
         </div>
     );

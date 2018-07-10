@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { IErrors } from '../types/State';
+import IconButton from './IconButton';
 
 interface IErrorListProps {
     errors: IErrors[];
@@ -7,13 +8,26 @@ interface IErrorListProps {
 
 const ErrorList: React.SFC<IErrorListProps> = ({ errors }) => {
     const errorsComps = errors.map(error => {
-        return (<li key={error.id} className={`error-level-${error.level}`}>{error.message}</li>);
+        return (
+            <li key={error.id} className={`list-group-item error-level-${error.level} wb-error-list-item`}>
+                <IconButton
+                    icon="x"
+                    size={10}
+                    style={{
+                        margin: '0 5 0 -15',
+                    }}
+                    svgClass="align-middle"
+                    pointer={false}
+                />
+                {error.message}
+            </li>
+        );
     });
     return errors.length > 0 ?
         (
-            <div style={{border: '1px solid black', marginTop: '20px'}}>
-                <span style={{position: 'relative', top: '-10px', left: '10px', background: 'white'}}>Errors</span>
-                <ul>
+            <div>
+                <h6 className="sidebar-heading text-muted">Conflicts</h6>
+                <ul className="list-group list-group-flush">
                     {errorsComps}
                 </ul>
             </div>
