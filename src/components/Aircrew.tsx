@@ -35,7 +35,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                                         : 0;
     const aircrewStyle: React.CSSProperties = { cursor: 'pointer',
                                                 textDecoration: totalPucks === 0 ? '' : 'line-through',
-                                                color: unavailable ? 'red' : 'black' };
+                                                color: unavailable ? 'red' : 'inherit' };
     const snivComponentList = snivs.map(sniv => {
         const delSnivButtons = sniv.aircrewIds.length > 1 ?
         (
@@ -50,7 +50,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
             </span>
         );
         return (
-            <li key={sniv.id}>
+            <li className="nav-item wb-nav-item text-light" key={sniv.id}>
                 <span>{sniv.dates[dayId].start.format('HHmm')}</span>-
                 <span>{sniv.dates[dayId].end.format('HHmm')}</span>{': '}
                 <span>{sniv.message} </span>
@@ -60,68 +60,66 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
         );
     });
     return (
-        <li className="nav-item">
-            <a className="nav-link">
-                <span
-                    style={aircrewStyle}
-                    onClick={onAircrewClick}
-                >
-                    {aircrew.callsign}
-                </span>
-                {aircrew.pucks.flight > 0 &&
-                    (<IconButton
-                        onClick={onAircrewEditClick}
-                        icon="plane"
-                        size={12}
-                        svgClass="crew-icons"
-                        style={{
-                            margin: '0 2px 0 8px',
-                        }}
-                        pointer={false}
-                        viewBox="0 0 21 22"
-                    >
-                        {aircrew.pucks.flight}
-                    </IconButton>)}
-                {aircrew.pucks.sim > 0 &&
-                    (<IconButton
-                        onClick={onAircrewEditClick}
-                        icon="controller"
-                        size={12}
-                        svgClass="crew-icons"
-                        style={{
-                            margin: '0 2px 0 8px',
-                        }}
-                        pointer={false}
-                        viewBox="0 0 512 512"
-                    >
-                        {aircrew.pucks.sim}
-                    </IconButton>)}
-                {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
-                    (<IconButton
-                        onClick={onAircrewEditClick}
-                        icon="paperclip"
-                        size={12}
-                        svgClass="crew-icons"
-                        style={{
-                            margin: '0 2px 0 8px',
-                        }}
-                        pointer={false}
-                    >
-                        {aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}
-                    </IconButton>)}
-                <IconButton
-                    onClick={onAircrewXClick}
-                    icon="trash"
-                    size={12}
-                    svgClass="float-right crew-icons"
-                /><IconButton
+        <li className="nav-item wb-nav-item text-light">
+            <span
+                style={aircrewStyle}
+                onClick={onAircrewClick}
+            >
+                {aircrew.callsign}
+            </span>
+            {aircrew.pucks.flight > 0 &&
+                (<IconButton
                     onClick={onAircrewEditClick}
-                    icon="pencil"
+                    icon="plane"
                     size={12}
-                    svgClass="float-right crew-icons"
-                />
-                {showSnivs && <ul>{snivComponentList}</ul>}
-            </a>
+                    svgClass="crew-icons"
+                    style={{
+                        margin: '0 2px 0 8px',
+                    }}
+                    pointer={false}
+                    viewBox="0 0 21 22"
+                >
+                    {aircrew.pucks.flight}
+                </IconButton>)}
+            {aircrew.pucks.sim > 0 &&
+                (<IconButton
+                    onClick={onAircrewEditClick}
+                    icon="controller"
+                    size={12}
+                    svgClass="crew-icons"
+                    style={{
+                        margin: '0 2px 0 8px',
+                    }}
+                    pointer={false}
+                    viewBox="0 0 512 512"
+                >
+                    {aircrew.pucks.sim}
+                </IconButton>)}
+            {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
+                (<IconButton
+                    onClick={onAircrewEditClick}
+                    icon="paperclip"
+                    size={12}
+                    svgClass="crew-icons"
+                    style={{
+                        margin: '0 2px 0 8px',
+                    }}
+                    pointer={false}
+                >
+                    {aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}
+                </IconButton>)}
+            <IconButton
+                onClick={onAircrewXClick}
+                icon="trash"
+                size={12}
+                svgClass="float-right crew-icons"
+            /><IconButton
+                onClick={onAircrewEditClick}
+                icon="pencil"
+                size={12}
+                svgClass="float-right crew-icons"
+            />
+            {showSnivs && <ul className="nav flex-column">{snivComponentList}</ul>}
         </li>
     );
 };

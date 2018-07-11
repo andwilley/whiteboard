@@ -17,7 +17,7 @@ interface IFlightProps {
 const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, dayId }) => (
     <div className="col-xl-3 col-lg-4 col-md-6">
         <div className="card mb-3 box-shadow">
-            <div className="card-header">
+            <div className="card-header bg-dark">
                 <IconButton
                     onClick={onDelFlightClick(flight, dayId)}
                     icon="trash"
@@ -31,7 +31,10 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, day
                 />
                 <SortieBoxContainer flightId={flight.id} />
             </div>
-            <div className="card-footer">
+            <div className="card-footer bg-dark">
+                <h6 className="sidebar-heading text-muted">
+                    Notes
+                </h6>
                 <NoteBoxContainer
                     entityId={flight.id}
                     entityType={noteEntity.FLIGHT_NOTE}

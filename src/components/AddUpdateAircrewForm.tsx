@@ -1,5 +1,4 @@
 import * as React from 'react';
-import AddButton from './IconButton';
 import { IAddUpdateAircrewFormValues } from '../types/State';
 import IconButton from './IconButton';
 
@@ -119,7 +118,7 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
         });
     };
     const qualCheckboxList = qualsList.map( (qual: string) => (
-        <label htmlFor="qual" key={qual}>
+        <label htmlFor="qual" key={qual} className="text-light">
             <input
                 type="checkbox"
                 name="quals"
@@ -132,23 +131,35 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
     ));
     const addUpdateAircrewFormDisplayButton = addUpdateAircrewFormDisplay ?
         (
-        <div>
-            <IconButton onClick={() => onDelAircrewFormButtonClick()}>
-                Close This Form
-            </IconButton>
-        </div>
+        <ul className="nav flex-column">
+            <li className="nav-item wb-nav-item text-light">
+                Add Aircrew
+                <IconButton
+                    onClick={() => onDelAircrewFormButtonClick()}
+                    icon="chevron-top"
+                    svgClass="float-right mt-1 mr-1"
+                    size={12}
+                />
+            </li>
+        </ul>
         ) :
         (
-        <div>
-            <AddButton onClick={() => onAddAircrewFormButtonClick()}>
+        <ul className="nav flex-column">
+            <li className="nav-item wb-nav-item text-light">
                 Add Aircrew
-            </AddButton>
-        </div>
+                <IconButton
+                    onClick={() => onAddAircrewFormButtonClick()}
+                    icon="chevron-bottom"
+                    svgClass="float-right mt-1 mr-1"
+                    size={12}
+                />
+            </li>
+        </ul>
         );
     const addAircrewForm = addUpdateAircrewFormDisplay ?
         (
         <form onSubmit={e => onSubmit(e)}>
-            {addUpdateAircrewFormValues.id === '' ? 'Add' : 'Update'} Aircrew:<br />
+            <p className="text-light">{addUpdateAircrewFormValues.id === '' ? 'Add' : 'Update'} Aircrew:</p>
             <input
                 type="hidden"
                 name="id"

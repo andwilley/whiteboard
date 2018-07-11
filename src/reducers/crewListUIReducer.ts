@@ -7,7 +7,7 @@ const crewListUIReducer = (state: ICrewListUI = { qualsList,
                                                   addUpdateAircrewFormDisplay: false,
                                                   addUpdateSnivFormDisplay: false,
                                                   currentDay: '',
-                                                  showSnivs: true,
+                                                  showSnivs: false,
                                                   showFilters: false,
                                                   filters: {
                                                       crewSearchInput: '',

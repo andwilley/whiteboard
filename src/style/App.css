@@ -78,6 +78,10 @@
   left: auto;
 }
 
+.wb-nav-item {
+  padding: 0rem .6rem 0rem .6rem;
+}
+
 .wb-title-text {
   color: #fff;
   font-size: 1rem;
@@ -90,4 +94,13 @@
 .wb-title-text:hover {
   color: #ddd;
   text-decoration: none;
+}
+
+.wb-bg-med {
+  background-color: #f1f1f1;
+}
+
+.wb-form-input {
+  padding: 0rem .2rem 0rem .2rem;
+  border-radius: 0;
 }

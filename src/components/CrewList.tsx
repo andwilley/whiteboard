@@ -54,6 +54,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
     });
     return (
         <div>
+            <hr />
             <h6
                 className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
             >
@@ -71,6 +72,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
             <ul className="nav flex-column">
                 {wsoList.length > 0 ? wsoList : errorMessages.ERR_NO_RESULTS_FOUND}
             </ul>
+            <hr />
             <AddUpdateAircrewFormContainer />
             <AddSnivFormContainer />
         </div>

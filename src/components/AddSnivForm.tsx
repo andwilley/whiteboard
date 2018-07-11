@@ -61,18 +61,30 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
     const endClassName = endErrorLevel ? `valError${endErrorLevel}` : '';
     const snivFormDisplayButton = addUpdateSnivFormDisplay ?
         (
-        <div>
-            <IconButton onClick={onSnivFormDelButtonClick}>
-                Close This Form
-            </IconButton>
-        </div>
+        <ul className="nav flex-column">
+            <li className="nav-item wb-nav-item text-light">
+                Add Sniv
+                <IconButton
+                    onClick={onSnivFormDelButtonClick}
+                    icon="chevron-top"
+                    svgClass="float-right mt-1 mr-1"
+                    size={12}
+                />
+            </li>
+        </ul>
         ) :
         (
-        <div>
-            <IconButton onClick={onSnivFormAddButtonClick}>
+        <ul className="nav flex-column">
+            <li className="nav-item wb-nav-item text-light">
                 Add Sniv
-            </IconButton>
-        </div>
+                <IconButton
+                    onClick={onSnivFormAddButtonClick}
+                    icon="chevron-bottom"
+                    svgClass="float-right mt-1 mr-1"
+                    size={12}
+                />
+            </li>
+        </ul>
         );
     const snivForm = addUpdateSnivFormDisplay ?
         (

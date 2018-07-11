@@ -61,7 +61,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
         }, 0);
     }
     return (
-        <div className={`flexInput${errorClasses}`}>
+        <div className={`form-control wb-form-input flexInput${errorClasses}`}>
         {showEditor ?
         (
             <Editor

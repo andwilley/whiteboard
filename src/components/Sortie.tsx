@@ -24,7 +24,7 @@ const Sortie: React.SFC<ISortieProps> = ({ sortie, flightId, onDelSortieClick })
                 onClick={onDelSortieClick(sortie.id, flightId)}
                 icon="trash"
                 size={10}
-                svgClass="float-right"
+                svgClass="float-right mt-1"
             />
         </div>
     </div>

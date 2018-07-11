@@ -40,7 +40,6 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
     return (
         <div>
             <div>
-                <h6 className="sidebar-heading text-muted">Notes</h6>
                 <IconButton
                     onClick={onAddNoteClick}
                     icon="plus"

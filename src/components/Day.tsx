@@ -33,12 +33,17 @@ const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors } ) => (
         </div>
         <FlightBoxContainer />
         <div className="col-12">
+            <hr />
+            <h5>Notes</h5>
             <NoteBoxContainer
                 entityType={noteEntity.DAY_NOTE}
                 entityId={dayId}
                 errors={noteErrors[dayId] ? noteErrors[dayId] : []}
             />
             <ErrorList errors={dayErrors[dayId] ? dayErrors[dayId] : []} />
+        </div>
+        <div className="footer pt-5">
+            A footer.
         </div>
     </main>
 );

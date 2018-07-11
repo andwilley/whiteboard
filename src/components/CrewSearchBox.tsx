@@ -38,16 +38,16 @@ const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
             </nav>
             {showFilters ?
                 <ul className="nav flex-column">
-                    <li className="nav-item pl-3">
+                    <li className="nav-item wb-nav-item text-light">
                         Filters
                         <IconButton
                             onClick={onShowFilterClick}
                             icon="chevron-top"
-                            svgClass="float-right mt-1 mr-3"
+                            svgClass="float-right mt-1 mr-1"
                             size={12}
                         />
                     </li>
-                    <li className="nav-item pl-3">
+                    <li className="nav-item wb-nav-item text-light">
                         <label htmlFor="showAvailable">
                             <input
                                 type="checkbox"
@@ -59,7 +59,7 @@ const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
                             Show Only Available Aircrew
                         </label>
                     </li>
-                    <li className="nav-item pl-3">
+                    <li className="nav-item wb-nav-item text-light">
                         <label htmlFor="showSnivs">
                             <input
                                 type="checkbox"
@@ -80,12 +80,12 @@ const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
                 </ul>
                 :
                 <ul className="nav flex-column">
-                    <li className="nav-item pl-3">
+                    <li className="nav-item wb-nav-item text-light">
                         Filters
                         <IconButton
                             onClick={onShowFilterClick}
                             icon="chevron-bottom"
-                            svgClass="float-right mt-1 mr-3"
+                            svgClass="float-right mt-1 mr-1"
                             size={12}
                         />
                     </li>

@@ -5,7 +5,7 @@ import '../style/App.css';
 
 const App = () => (
     <div>
-        <div className="container-fluid">
+        <div className="container-fluid  wb-bg-med">
             <div className="row">
                 <CrewListBox />
                 <DayContainer />
