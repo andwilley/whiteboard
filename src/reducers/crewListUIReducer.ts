@@ -8,6 +8,7 @@ const crewListUIReducer = (state: ICrewListUI = { qualsList,
                                                   addUpdateSnivFormDisplay: false,
                                                   currentDay: '',
                                                   showSnivs: true,
+                                                  showFilters: false,
                                                   filters: {
                                                       crewSearchInput: '',
                                                       showAvailable: false,
@@ -56,6 +57,11 @@ const crewListUIReducer = (state: ICrewListUI = { qualsList,
                 ...state,
                 showSnivs: !state.showSnivs,
             };
+        case getType(actions.toggleShowFilters):
+            return {
+                ...state,
+                showFilters: !state.showFilters,
+            };
         case getType(actions.addUpdateSnivFormDisplay):
             return {
                 ...state,
@@ -70,4 +76,8 @@ export default crewListUIReducer;
 
 export const getShowSnivs = (state: IState): boolean => {
     return state.crewListUI.showSnivs;
+};
+
+export const getShowFilters = (state: IState): boolean => {
+    return state.crewListUI.showFilters;
 };

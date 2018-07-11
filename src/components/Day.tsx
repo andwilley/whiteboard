@@ -4,6 +4,7 @@ import NoteBoxContainer from '../containers/NoteBoxContainer';
 import { noteEntity } from '../whiteboard-constants';
 import { IErrors } from '../types/State';
 import ErrorList from './ErrorList';
+import NavBar from './NavBar';
 
 interface IDayProps {
     dayId: string;
@@ -13,6 +14,7 @@ interface IDayProps {
 
 const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors } ) => (
     <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <NavBar />
         <div
             className={`d-flex justify-content-between flex-wrap flex-md-nowrap
                 align-items-center pt-3 pb-2 mb-3 border-bottom`}

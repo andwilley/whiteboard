@@ -44,6 +44,7 @@ export const UPDATE_AIRSPACE = 'UPDATE_AIRSPACE';
 export const UPDATE_LOADOUT = 'UPDATE_LOADOUT';
 export const ADD_ERROR = 'ADD_ERROR';
 export const TOGGLE_SHOW_ERROR = 'TOGGLE_SHOW_ERROR';
+export const TOGGLE_SHOW_FILTERS = 'TOGGLE_SHOW_FILTERS';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const DEL_ERROR = 'DEL_ERROR';
 export const SET_EDITOR_STATE = 'SET_EDITOR_STATE';
@@ -266,6 +267,7 @@ export const actions = {
         },
     })),
     toggleShowSnivs: createAction(TOGGLE_SHOW_SNIVS),
+    toggleShowFilters: createAction(TOGGLE_SHOW_FILTERS),
     addUpdateAircrewFormDisplay: createAction(ADD_UPDATE_AIRCREW_FORM_DISPLAY, (display: boolean) => ({
         type: ADD_UPDATE_AIRCREW_FORM_DISPLAY,
         payload: {

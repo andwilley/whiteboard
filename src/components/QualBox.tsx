@@ -9,8 +9,8 @@ interface IQualBoxProps {
 
 const QualBox: React.SFC<IQualBoxProps> = ({ qualsList, onInputChange, filters }) => {
     const qualCheckboxList = qualsList.map( (qual: string) => (
-        <li className="nav-item">
-            <label htmlFor="s_qual" key={`s_${qual}`}>
+        <li className="nav-item pl-3" key={`s_${qual}`}>
+            <label htmlFor="s_qual">
                 <input
                     type="checkbox"
                     name="s_quals"

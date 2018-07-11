@@ -2,11 +2,12 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { IState, IFilters } from '../types/State';
 import CrewSearchBox from '../components/CrewSearchBox';
-import { getShowSnivs } from '../reducers/crewListUIReducer';
+import { getShowSnivs, getShowFilters } from '../reducers/crewListUIReducer';
 const { setAircrewSearchForm,
         addQualFilter,
         delQualFilter,
-        toggleShowSnivs } = actions;
+        toggleShowSnivs,
+        toggleShowFilters } = actions;
 
 const getQualsList = (state: IState): string[] => {
     return state.crewListUI.qualsList;
@@ -23,6 +24,7 @@ const mapStateToProps = (state: IState) => {
         qualsList: getQualsList(state),
         filters: getFilters(state),
         showSnivs: getShowSnivs(state),
+        showFilters: getShowFilters(state),
     };
 };
 
@@ -53,6 +55,9 @@ const mapDispatchToProps = (dispatch: any) => {
                 qualFilter: [],
                 rankFilter: [],
             }));
+        },
+        onShowFilterClick: () => {
+            dispatch(toggleShowFilters());
         },
     };
 };

@@ -71,3 +71,23 @@
   padding-left: 0px;
   padding-right: 0px;
 }
+
+.wb-navbar {
+  width: 100%;
+  right: auto;
+  left: auto;
+}
+
+.wb-title-text {
+  color: #fff;
+  font-size: 1rem;
+  background: inherit;
+  padding: 12px 16px 12px 16px;
+  margin-left: -15px;
+  font-weight: bold;
+}
+
+.wb-title-text:hover {
+  color: #ddd;
+  text-decoration: none;
+}

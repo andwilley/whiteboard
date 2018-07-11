@@ -164,6 +164,7 @@ export const INITIAL_STATE: IState = {
         currentDay: '2018-01-24',
         qualsList,
         showSnivs: true,
+        showFilters: false,
         addUpdateAircrewFormDisplay: false,
         addUpdateSnivFormDisplay: false,
         filters: {
