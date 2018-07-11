@@ -34,7 +34,7 @@ const Note: React.SFC<INoteProps> = ({ note, onDelNoteClick, onInputChange, erro
                 onClick={onDelNoteClick({id: note.id, entity: errorLoc, entityId: errorLocId})}
                 icon="trash"
                 style={{
-                    margin: '-18 0 0 0',
+                    margin: '-18px 0px 0px 0px',
                 }}
                 svgClass="float-right"
             />

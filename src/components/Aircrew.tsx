@@ -28,13 +28,12 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                                              onSnivXClick,
                                              onSnivEditClick,
 }) => {
-    const totalPucks = aircrew.pucks ? (aircrew.pucks.flight +
-                                          aircrew.pucks.sim +
-                                          aircrew.pucks.flightNote +
-                                          aircrew.pucks.dayNote)
-                                        : 0;
+    // const totalPucks = aircrew.pucks ? (aircrew.pucks.flight +
+                                        //   aircrew.pucks.sim +
+                                        //   aircrew.pucks.flightNote +
+                                        //   aircrew.pucks.dayNote)
+                                        // : 0;
     const aircrewStyle: React.CSSProperties = { cursor: 'pointer',
-                                                textDecoration: totalPucks === 0 ? '' : 'line-through',
                                                 color: unavailable ? 'red' : 'inherit' };
     const snivComponentList = snivs.map(sniv => {
         const delSnivButtons = sniv.aircrewIds.length > 1 ?
