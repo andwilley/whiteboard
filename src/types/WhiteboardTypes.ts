@@ -58,6 +58,9 @@ export type AllErrors = IErrors | IUntrackedErrors;
 export interface ISchedBlock {
     start: Moment.Moment;
     end: Moment.Moment;
+    brief: Moment.Moment | null;
+    hardStart: Moment.Moment;
+    hardEnd: Moment.Moment;
     location: UErrorLocs;
     locationId: string;
 }

@@ -7,6 +7,8 @@ const settingsReducer = (state: ISettings = {
                             minutesAfterLand: 60,
                             minutesBriefToTakeoff: 120,
                             minutesNoteDuration: 60,
+                            hotPitNoShorterThan: 45,
+                            hotPitNoLongerThan: 75,
                          },
                          action: IAction): ISettings => {
     switch (action.type) {

@@ -3,6 +3,7 @@ import Flight from './Flight';
 import { IErrors, IFlights } from '../types/State';
 import IconButton from './IconButton';
 import * as Moment from 'moment';
+import { conv24HrTimeToMoment } from '../types/utilFunctions';
 
 interface IFlightBoxProps {
     dayId: string;
@@ -28,20 +29,13 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
     onDelFlightClick,
 }) => {
     const flightComponents = flights.reduce((acc: IFlightListAcc, flight, i) => {
+        /** adds a column break element if flight falls in another "go" */
         if (i === 0) {
-            acc.goStartTime =
-                Moment(`${dayId} ${flight.times.takeoff.slice(0, 2)}:${flight.times.takeoff.slice(2, 4)}:00.000`,
-            'YYYY-MM-DD HH:mm:ss.SSS');
-            acc.goEndTime =
-                Moment(`${dayId} ${flight.times.land.slice(0, 2)}:${flight.times.land.slice(2, 4)}:00.000`,
-            'YYYY-MM-DD HH:mm:ss.SSS').add(59, 'minutes');
+            acc.goStartTime = conv24HrTimeToMoment(dayId, flight.times.takeoff);
+            acc.goEndTime = conv24HrTimeToMoment(dayId, flight.times.land).add(44, 'minutes');
         }
-        const flightTakeoffTime =
-            Moment(`${dayId} ${flight.times.takeoff.slice(0, 2)}:${flight.times.takeoff.slice(2, 4)}:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS');
-        const flightLandTime =
-            Moment(`${dayId} ${flight.times.land.slice(0, 2)}:${flight.times.land.slice(2, 4)}:00.000`,
-                    'YYYY-MM-DD HH:mm:ss.SSS');
+        const flightTakeoffTime = conv24HrTimeToMoment(dayId, flight.times.takeoff);
+        const flightLandTime = conv24HrTimeToMoment(dayId, flight.times.land);
         const flightComponent = (
             <Flight
                 key={flight.id}

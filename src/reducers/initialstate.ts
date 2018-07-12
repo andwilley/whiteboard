@@ -279,6 +279,8 @@ export const INITIAL_STATE: IState = {
         minutesBeforeBrief: 29,
         minutesBriefToTakeoff: 120,
         minutesNoteDuration: 60,
+        hotPitNoShorterThan: 45,
+        hotPitNoLongerThan: 75,
     },
     editor: {
         editorState: EditorState.createEmpty(),

@@ -4,6 +4,7 @@ import { seats, nameLocation } from '../whiteboard-constants';
 import { IActiveRefsAndBlock, ISchedBlock } from '../types/WhiteboardTypes';
 import { ISnivs, IDays, IFlights, ISorties, INotes, IEntity, ISettings, IElementBeingEdited } from '../types/State';
 import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from '../util/regEx';
+import { conv24HrTimeToMoment } from '../types/utilFunctions';
 
 export const getSchedFromFlightTimes = (currentDayId: string,
                                         flight: IFlights,
@@ -64,6 +65,9 @@ export const getSchedFromFlightTimes = (currentDayId: string,
     const schedBlock = {
         start: Moment(startDate.valueOf() - startOffset),
         end: Moment(endDate.valueOf() + endOffset),
+        brief: conv24HrTimeToMoment(currentDayId, briefTime),
+        hardStart: conv24HrTimeToMoment(currentDayId, takeoffTime),
+        hardEnd: conv24HrTimeToMoment(currentDayId, landTime),
         location, // : note ? errorLocs.FLIGHT_NOTE : errorLocs.FLIGHT,
         locationId: flight.id,
     };
@@ -71,6 +75,10 @@ export const getSchedFromFlightTimes = (currentDayId: string,
         const tempStart = schedBlock.start;
         schedBlock.start = schedBlock.end;
         schedBlock.end = tempStart;
+
+        const tempHardStart = schedBlock.hardStart;
+        schedBlock.hardStart = schedBlock.hardEnd;
+        schedBlock.hardEnd = tempHardStart;
     }
     return schedBlock;
 };
@@ -121,6 +129,9 @@ export const getSchedFromNotes = (currentDayId: string,
         const schedBlock = {
             start: startDate,
             end: endDate,
+            brief: null,
+            hardStart: startDate,
+            hardEnd: endDate,
             location: flight ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
             locationId: flight ? flight.id : currentDayId,
         };
@@ -141,6 +152,9 @@ export const getSchedFromNotes = (currentDayId: string,
                 start: Moment(`${currentDayId} 00:00:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
                 /** use 00 seconds to be able to compare this time to the actual end of the day */
                 end: Moment(`${currentDayId} 23:59:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+                brief: null,
+                hardStart: Moment(`${currentDayId} 00:00:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+                hardEnd: Moment(`${currentDayId} 23:59:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
                 location: errorLocs.DAY_NOTE, // flight ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
                 locationId: currentDayId, // flight ? flight.id : currentDayId,
             };
@@ -160,6 +174,9 @@ export const getSchedFromSnivs = (sniv: ISnivs,
     return {
         start: sniv.dates[dayId].start,
         end: sniv.dates[dayId].end,
+        brief: null,
+        hardStart: sniv.dates[dayId].start,
+        hardEnd: sniv.dates[dayId].end,
         location: errorLocs.SNIVS,
         locationId: sniv.id,
     };

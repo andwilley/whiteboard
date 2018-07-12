@@ -252,6 +252,8 @@ export interface ISettings {
     readonly minutesBriefToTakeoff: number;
     readonly minutesNoteDuration: number;
     readonly minutesAfterLand: number;
+    readonly hotPitNoShorterThan: number;
+    readonly hotPitNoLongerThan: number;
 }
 
 export interface IInputElement {

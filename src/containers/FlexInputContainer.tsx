@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Moment from 'moment';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 import * as cuid from 'cuid';
@@ -19,7 +20,8 @@ import { IState,
          IElementBeingEdited,
          UErrorTypes,
          UErrorLocs,
-         IGroups} from '../types/State';
+         IGroups,
+         ISettings} from '../types/State';
 import { IAddErrorArgs } from '../actions';
 
 type IAircrewEntity = IEntity<IAircrew>;
@@ -144,9 +146,69 @@ const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
     return validator(text, ...validatorFns);
 };
 
+const flightIsCrewHotPit = (block: ISchedBlock, scblock: ISchedBlock, settings: ISettings): boolean => {
+    if (block.location !== errorLocs.FLIGHT || scblock.location !== errorLocs.FLIGHT) {
+        return false;
+    }
+    const diff1 = Moment.duration(block.hardStart.diff(scblock.hardEnd));
+    const diff2 = Moment.duration(scblock.hardStart.diff(block.hardEnd));
+    if ((diff1 < Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
+        diff1 > Moment.duration(settings.hotPitNoShorterThan, 'minutes')) ||
+        (diff2 < Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
+        diff2 > Moment.duration(settings.hotPitNoShorterThan, 'minutes'))) {
+        return true;
+    }
+    return false;
+};
+
+const pushBlockAsError = (
+    errorArray: IAddErrorArgs[],
+    block: ISchedBlock,
+    conflictsWithBlock: ISchedBlock,
+    aircrew: IAircrew,
+    currentDayId: string
+): void => {
+    let message = '';
+    switch (conflictsWithBlock.location) {
+        case errorLocs.FLIGHT:
+            message = errorMessages.FLIGHT_CONFLICT;
+            break;
+        case errorLocs.SIM:
+            message = errorMessages.SIM_CONFLICT;
+            break;
+        case errorLocs.FLIGHT_NOTE:
+            message = errorMessages.FLIGHT_NOTE_CONFLICT;
+            break;
+        case errorLocs.SIM_NOTE:
+            message = errorMessages.SIM_NOTE_CONFLICT;
+            break;
+        case errorLocs.SNIVS:
+            message = errorMessages.SNIV_CONFLICT;
+            break;
+        case errorLocs.DAY_NOTE:
+            message = errorMessages.NOTE_CONFLICT;
+            break;
+        default:
+            message = 'is scheduled at this time.';
+            break;
+    }
+    errorArray.push({
+        dayId: currentDayId,
+        type: errorTypes.SCHEDULE_CONFLICT,
+        location: block.location,
+        locationId: block.locationId,
+        level: errorLevels.WARN,
+        message: `${aircrew.callsign} ${message}`,
+        meta: {
+            aircrewId: aircrew.id,
+        },
+    });
+};
+
 const findSchedErrors = (activeAircrewRefs: ISchedObject,
                          currentDayId: string,
-                         aircrewById: {[key: string]: IAircrew}
+                         aircrewById: {[key: string]: IAircrew},
+                         settings: ISettings
 ): IAddErrorArgs[] => {
     /**
      * @param
@@ -161,47 +223,6 @@ const findSchedErrors = (activeAircrewRefs: ISchedObject,
      * state.crewList.currentDay
      * state.aircrew.byId
      */
-    const pushBlockAsError = (errorArray: IAddErrorArgs[],
-                              block: ISchedBlock,
-                              conflictsWithBlock: ISchedBlock,
-                              aircrewId: string
-    ): void => {
-        let message = '';
-        switch (conflictsWithBlock.location) {
-            case errorLocs.FLIGHT:
-                message = errorMessages.FLIGHT_CONFLICT;
-                break;
-            case errorLocs.SIM:
-                message = errorMessages.SIM_CONFLICT;
-                break;
-            case errorLocs.FLIGHT_NOTE:
-                message = errorMessages.FLIGHT_NOTE_CONFLICT;
-                break;
-            case errorLocs.SIM_NOTE:
-                message = errorMessages.SIM_NOTE_CONFLICT;
-                break;
-            case errorLocs.SNIVS:
-                message = errorMessages.SNIV_CONFLICT;
-                break;
-            case errorLocs.DAY_NOTE:
-                message = errorMessages.NOTE_CONFLICT;
-                break;
-            default:
-                message = 'is scheduled at this time.';
-                break;
-        }
-        errorArray.push({
-            dayId: currentDayId,
-            type: errorTypes.SCHEDULE_CONFLICT,
-            location: block.location,
-            locationId: block.locationId,
-            level: errorLevels.WARN,
-            message: `${aircrewById[aircrewId].callsign} ${message}`,
-            meta: {
-                aircrewId,
-            },
-        });
-    };
 
     const errors: IAddErrorArgs[] = [];
     Object.keys(activeAircrewRefs).forEach(aircrewId => {
@@ -222,20 +243,18 @@ const findSchedErrors = (activeAircrewRefs: ISchedObject,
                  * Assumes start and end are actually in order ***!
                  */
                 schedConflictArray.forEach(scblock => {
-                    if (block.start >= scblock.start && block.start <= scblock.end) {
-                        if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
-                            pushBlockAsError(errors, block, scblock, aircrewId);
-                            pushBlockAsError(errors, scblock, block, aircrewId);
-                        }
-                    } else if (block.end >= scblock.start && block.end <= scblock.end) {
-                        if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
-                            pushBlockAsError(errors, block, scblock, aircrewId);
-                            pushBlockAsError(errors, scblock, block, aircrewId);
-                        }
-                    } else if (scblock.start >= block.start && scblock.start <= block.end) {
-                        if (!(block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS)) {
-                            pushBlockAsError(errors, block, scblock, aircrewId);
-                            pushBlockAsError(errors, scblock, block, aircrewId);
+                    if (!(block.location === errorLocs.SNIVS &&
+                          scblock.location === errorLocs.SNIVS &&
+                          flightIsCrewHotPit(block, scblock, settings))) {
+                        if (block.start >= scblock.start && block.start <= scblock.end) {
+                            pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                            pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
+                        } else if (block.end >= scblock.start && block.end <= scblock.end) {
+                            pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                            pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
+                        } else if (scblock.start >= block.start && scblock.start <= block.end) {
+                            pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                            pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
                         }
                     }
                 });
@@ -308,7 +327,8 @@ export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
                                                             state.snivs);
             const newErrors = findSchedErrors(activeRefsAndBlock.activeAircrewRefs,
                                               state.crewListUI.currentDay,
-                                              state.aircrew.byId);
+                                              state.aircrew.byId,
+                                              state.settings);
             newErrors.forEach(error => {
                 dispatch(actions.addError(error));
             });
