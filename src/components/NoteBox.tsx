@@ -6,6 +6,7 @@ import ErrorList from './ErrorList';
 import { IDelNoteArgs } from '../actions';
 
 interface INoteBoxProps {
+    className?: string;
     notes: INotes[];
     errorLoc: UNoteEntity;
     errorLocId: string;
@@ -16,6 +17,7 @@ interface INoteBoxProps {
 }
 
 const NoteBox: React.SFC<INoteBoxProps> = ({
+    className = '',
     notes,
     onInputChange,
     onAddNoteClick,
@@ -27,6 +29,7 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
     const noteComponentsList = notes.map(note =>
         (
         <Note
+            className={className}
             note={note}
             key={note.id}
             onDelNoteClick={onDelNoteClick}

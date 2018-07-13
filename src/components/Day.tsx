@@ -36,6 +36,7 @@ const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors } ) => (
             <hr />
             <h5>Notes</h5>
             <NoteBoxContainer
+                className="text-dark"
                 entityType={noteEntity.DAY_NOTE}
                 entityId={dayId}
                 errors={noteErrors[dayId] ? noteErrors[dayId] : []}

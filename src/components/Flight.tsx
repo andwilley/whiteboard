@@ -36,6 +36,7 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, day
                     Notes
                 </h6>
                 <NoteBoxContainer
+                    className="text-light"
                     entityId={flight.id}
                     entityType={noteEntity.FLIGHT_NOTE}
                 />

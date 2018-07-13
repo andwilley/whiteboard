@@ -6,6 +6,7 @@ import NoteBox from '../components/NoteBox';
 const { addUpdateNote, delNote } = actions;
 
 interface INoteBoxContainerProps {
+    className?: string;
     entityType: UNoteEntity;
     entityId: string;
     errors?: IErrors[];
@@ -50,6 +51,7 @@ const getNotes = (entityType: string, entityId: string, state: IState): INotes[]
 
 const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
     return {
+        className: ownProps.className,
         notes: getNotes(ownProps.entityType, ownProps.entityId, state),
         errorLoc: ownProps.entityType,
         errorLocId: ownProps.entityId,

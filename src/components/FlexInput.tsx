@@ -6,6 +6,7 @@ import { getHighestErrorLevel } from '../errors';
 
 interface IFlexInputProps {
     placeHolder: string;
+    className?: string;
     name: string;
     value: string;
     onChange: (e: EditorState) => void;
@@ -24,6 +25,7 @@ interface IFlexInputProps {
 
 const FlexInput: React.SFC<IFlexInputProps> = ({
     placeHolder,
+    className = '',
     name,
     value,
     onChange,
@@ -61,7 +63,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
         }, 0);
     }
     return (
-        <div className={`form-control wb-form-input flexInput${errorClasses}`}>
+        <div className={`form-control wb-form-input flexInput${errorClasses}${className ? ` ${className}` : ''}`}>
         {showEditor ?
         (
             <Editor
