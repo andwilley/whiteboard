@@ -3,8 +3,8 @@ import CrewList from '../components/CrewList';
 import { getErrors } from '../reducers/errorReducer';
 import { getAircrewById } from '../reducers/aircrewReducer';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
-import { setErrorsOnFreshState } from '../containers/FlexInputContainer';
-import { IEntity, IState, IAircrew, IFilters, ISnivs, IErrors, IEntityWithActive } from '../types/State';
+import { setErrorsOnFreshState, flightIsCrewHotPit } from '../containers/FlexInputContainer';
+import { IEntity, IState, IAircrew, IFilters, ISnivs, IErrors, IEntityWithActive, ISettings } from '../types/State';
 import { IAircrewWithPucks,
          IAircrewDayPucks,
          ISchedObject,
@@ -157,7 +157,8 @@ const getAircrewList = (
 };
 
 const getUnavailableAircrewIds = (activeRefsAndBlock: IActiveRefsAndBlock,
-                                  aircrewIds: string[]): string[] => {
+                                  aircrewIds: string[],
+                                  settings: ISettings): string[] => {
   const unavailableAircrewIds: string[] = [];
   const timeBlock = activeRefsAndBlock.activeTimeblock;
   Object.keys(activeRefsAndBlock.activeAircrewRefs).forEach(aircrewId => {
@@ -168,7 +169,9 @@ const getUnavailableAircrewIds = (activeRefsAndBlock: IActiveRefsAndBlock,
            * This logic is duplicated from FlexInputContainer findSchedErrors() ***!
            * Assumes start and end are actually in order ***!
            */
-          if (block.start >= timeBlock.start && block.start <= timeBlock.end) {
+          if (flightIsCrewHotPit(block, timeBlock, settings)) {
+            return;
+          } else if (block.start >= timeBlock.start && block.start <= timeBlock.end) {
             unavailableAircrewIds.push(aircrewId);
           } else if (block.end >= timeBlock.start && block.end <= timeBlock.end) {
             unavailableAircrewIds.push(aircrewId);
@@ -221,7 +224,7 @@ const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
     state.notes.byId,
     state.snivs
   );
-  const unavailableAircrewIds = getUnavailableAircrewIds(activeRefsAndBlock, state.aircrew.allIds);
+  const unavailableAircrewIds = getUnavailableAircrewIds(activeRefsAndBlock, state.aircrew.allIds, state.settings);
   const aircrewList = getAircrewList(
     activeRefsAndBlock.activeAircrewRefs,
     state.aircrew,

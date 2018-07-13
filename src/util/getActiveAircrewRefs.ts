@@ -65,9 +65,9 @@ export const getSchedFromFlightTimes = (currentDayId: string,
     const schedBlock = {
         start: Moment(startDate.valueOf() - startOffset),
         end: Moment(endDate.valueOf() + endOffset),
-        brief: conv24HrTimeToMoment(currentDayId, briefTime),
-        hardStart: conv24HrTimeToMoment(currentDayId, takeoffTime),
-        hardEnd: conv24HrTimeToMoment(currentDayId, landTime),
+        brief: conv24HrTimeToMoment(briefTime, currentDayId),
+        hardStart: conv24HrTimeToMoment(takeoffTime, currentDayId),
+        hardEnd: conv24HrTimeToMoment(landTime, currentDayId),
         location, // : note ? errorLocs.FLIGHT_NOTE : errorLocs.FLIGHT,
         locationId: flight.id,
     };

@@ -146,16 +146,16 @@ const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
     return validator(text, ...validatorFns);
 };
 
-const flightIsCrewHotPit = (block: ISchedBlock, scblock: ISchedBlock, settings: ISettings): boolean => {
+export const flightIsCrewHotPit = (block: ISchedBlock, scblock: ISchedBlock, settings: ISettings): boolean => {
     if (block.location !== errorLocs.FLIGHT || scblock.location !== errorLocs.FLIGHT) {
         return false;
     }
     const diff1 = Moment.duration(block.hardStart.diff(scblock.hardEnd));
     const diff2 = Moment.duration(scblock.hardStart.diff(block.hardEnd));
-    if ((diff1 < Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
-        diff1 > Moment.duration(settings.hotPitNoShorterThan, 'minutes')) ||
-        (diff2 < Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
-        diff2 > Moment.duration(settings.hotPitNoShorterThan, 'minutes'))) {
+    if ((diff1 <= Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
+        diff1 >= Moment.duration(settings.hotPitNoShorterThan, 'minutes')) ||
+        (diff2 <= Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
+        diff2 >= Moment.duration(settings.hotPitNoShorterThan, 'minutes'))) {
         return true;
     }
     return false;
@@ -243,19 +243,18 @@ const findSchedErrors = (activeAircrewRefs: ISchedObject,
                  * Assumes start and end are actually in order ***!
                  */
                 schedConflictArray.forEach(scblock => {
-                    if (!(block.location === errorLocs.SNIVS &&
-                          scblock.location === errorLocs.SNIVS &&
-                          flightIsCrewHotPit(block, scblock, settings))) {
-                        if (block.start >= scblock.start && block.start <= scblock.end) {
-                            pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                            pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
-                        } else if (block.end >= scblock.start && block.end <= scblock.end) {
-                            pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                            pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
-                        } else if (scblock.start >= block.start && scblock.start <= block.end) {
-                            pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                            pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
-                        }
+                    if ((block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS) ||
+                        flightIsCrewHotPit(block, scblock, settings)) {
+                        return;
+                    } else if (block.start >= scblock.start && block.start <= scblock.end) {
+                        pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                        pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
+                    } else if (block.end >= scblock.start && block.end <= scblock.end) {
+                        pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                        pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
+                    } else if (scblock.start >= block.start && scblock.start <= block.end) {
+                        pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                        pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
                     }
                 });
                 return schedConflictArray.concat(block);

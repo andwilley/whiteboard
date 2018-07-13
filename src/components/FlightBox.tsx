@@ -31,11 +31,11 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
     const flightComponents = flights.reduce((acc: IFlightListAcc, flight, i) => {
         /** adds a column break element if flight falls in another "go" */
         if (i === 0) {
-            acc.goStartTime = conv24HrTimeToMoment(dayId, flight.times.takeoff);
-            acc.goEndTime = conv24HrTimeToMoment(dayId, flight.times.land).add(44, 'minutes');
+            acc.goStartTime = conv24HrTimeToMoment(flight.times.takeoff, dayId);
+            acc.goEndTime = conv24HrTimeToMoment(flight.times.land, dayId).add(44, 'minutes');
         }
-        const flightTakeoffTime = conv24HrTimeToMoment(dayId, flight.times.takeoff);
-        const flightLandTime = conv24HrTimeToMoment(dayId, flight.times.land);
+        const flightTakeoffTime = conv24HrTimeToMoment(flight.times.takeoff, dayId);
+        const flightLandTime = conv24HrTimeToMoment(flight.times.land, dayId);
         const flightComponent = (
             <Flight
                 key={flight.id}
