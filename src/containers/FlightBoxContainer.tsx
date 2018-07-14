@@ -88,6 +88,7 @@ const mapStateToProps = (state: IState) => {
         errors: getEntityErrors(state.errors.byId,
                                 state.days.byId[state.crewListUI.currentDay].errors,
                                 errorLocs.FLIGHT),
+        settings: state.settings,
     };
 };
 

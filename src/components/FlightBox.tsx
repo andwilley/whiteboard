@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Flight from './Flight';
-import { IErrors, IFlights } from '../types/State';
+import { IErrors, IFlights, ISettings } from '../types/State';
 import IconButton from './IconButton';
 import * as Moment from 'moment';
 import { conv24HrTimeToMoment } from '../types/utilFunctions';
@@ -10,6 +10,7 @@ interface IFlightBoxProps {
     flights: IFlights[];
     sims: IFlights[];
     errors: {[id: string]: IErrors[]};
+    settings: ISettings;
     onAddFlightClick: (dayId: string, sim: boolean) => void;
     onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => void;
 }
@@ -27,12 +28,14 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
     errors,
     onAddFlightClick,
     onDelFlightClick,
+    settings,
 }) => {
     const flightComponents = flights.reduce((acc: IFlightListAcc, flight, i) => {
         /** adds a column break element if flight falls in another "go" */
         if (i === 0) {
             acc.goStartTime = conv24HrTimeToMoment(flight.times.takeoff, dayId);
-            acc.goEndTime = conv24HrTimeToMoment(flight.times.land, dayId).add(44, 'minutes');
+            acc.goEndTime = conv24HrTimeToMoment(flight.times.land, dayId)
+                .add(settings.hotPitNoShorterThan - 1, 'minutes');
         }
         const flightTakeoffTime = conv24HrTimeToMoment(flight.times.takeoff, dayId);
         const flightLandTime = conv24HrTimeToMoment(flight.times.land, dayId);
@@ -79,7 +82,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
                 />
             </div>
             <hr />
-            <h5>Simuators</h5>
+            <h5>Simulators</h5>
             <div className="row mb-2">
                 {simComponents}
                 <IconButton
