@@ -1,27 +1,29 @@
 import * as React from 'react';
-import { ISorties } from '../types/State';
+import { ISorties, IFlights } from '../types/State';
 import CrewBoxContainer from '../containers/CrewBoxContainer';
 import LoadoutBoxContainer from '../containers/LoadoutBoxContainer';
 import IconButton from './IconButton';
 
 interface ISortieProps {
     sortie: ISorties;
-    flightId: string;
+    flight: IFlights;
     onDelSortieClick: (sortieId: string, flightId: string) => (e: any) => void;
 }
 
-const Sortie: React.SFC<ISortieProps> = ({ sortie, flightId, onDelSortieClick }) => (
+const Sortie: React.SFC<ISortieProps> = ({ sortie, flight, onDelSortieClick }) => (
     <div>
     <hr / >
     <div className="row">
-        <div className="col-10">
-            <LoadoutBoxContainer
-                sortieId={sortie.id}
-            />
-        </div>
-        <div className="col-2">
+        {flight.sim
+        ?   null
+        :   <div className="col-10">
+                <LoadoutBoxContainer
+                    sortieId={sortie.id}
+                />
+            </div>}
+        <div className={`col-2${flight.sim ? ' offset-10 sim-sortie-icon' : ''}`}>
             <IconButton
-                onClick={onDelSortieClick(sortie.id, flightId)}
+                onClick={onDelSortieClick(sortie.id, flight.id)}
                 icon="trash"
                 size={10}
                 svgClass="float-right mt-1"
@@ -30,7 +32,7 @@ const Sortie: React.SFC<ISortieProps> = ({ sortie, flightId, onDelSortieClick })
     </div>
         <CrewBoxContainer
             sortieId={sortie.id}
-            flightId={flightId}
+            flightId={flight.id}
         />
     </div>
 );

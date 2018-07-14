@@ -75,21 +75,25 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
             <h5>Flights</h5>
             <div className="row mb-2">
                 {flightComponents}
-                <IconButton
-                    onClick={() => onAddFlightClick(dayId, false)}
-                    icon="plus"
-                    size={14}
-                />
+                <div className="col-2">
+                    <IconButton
+                        onClick={() => onAddFlightClick(dayId, false)}
+                        icon="plus"
+                        size={14}
+                    />
+                </div>
             </div>
             <hr />
             <h5>Simulators</h5>
             <div className="row mb-2">
                 {simComponents}
-                <IconButton
-                    onClick={() => onAddFlightClick(dayId, true)}
-                    icon="plus"
-                    size={14}
-                />
+                <div className="col-2">
+                    <IconButton
+                        onClick={() => onAddFlightClick(dayId, true)}
+                        icon="plus"
+                        size={14}
+                    />
+                </div>
             </div>
         </div>
     );

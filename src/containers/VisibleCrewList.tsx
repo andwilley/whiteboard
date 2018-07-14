@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import CrewList from '../components/CrewList';
+import * as Moment from 'moment';
 import { getErrors } from '../reducers/errorReducer';
 import { getAircrewById } from '../reducers/aircrewReducer';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
@@ -153,6 +154,16 @@ const getAircrewList = (
       Object.assign({}, aircrewDayPucks[aircrewId]) :
       Object.assign({}, newPuck);
     return aircrewWithPucks;
+  });
+};
+
+const getCrewDay = (activeAircrewRefs: ISchedObject): {[key: string]: {workDay: string, legalCrewDay: string}} => {
+  const crewDays = {};
+  Object.keys(activeAircrewRefs).forEach(aircrewId => {
+    crewDays[aircrewId] = activeAircrewRefs[aircrewId]
+      .reduce((acc: {start: Moment.Moment, end: Moment.Moment}, block) => {
+        // get the total expected work day, as well as legal crew day.
+      }, {start: Moment(NaN), end: Moment(NaN)});
   });
 };
 

@@ -17,6 +17,7 @@ const getSorties = (state: IState, flightId: string): ISorties[] => {
 const mapStateToProps = (state: IState, ownProps: ISortieBoxContainerProps) => {
     return {
         sorties: getSorties(state, ownProps.flightId),
+        flight: state.flights.byId[ownProps.flightId],
     };
 };
 
