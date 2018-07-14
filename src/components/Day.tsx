@@ -30,6 +30,7 @@ const Day: React.SFC<IDayProps> = ({ dayId, totalFlightTime, totalSorties, dayEr
                             viewBox="0 0 21 22"
                             pointer={false}
                             size={16}
+                            className="h6"
                             style={{
                                 margin: '.5rem .1rem 0 0',
                             }}
@@ -40,6 +41,7 @@ const Day: React.SFC<IDayProps> = ({ dayId, totalFlightTime, totalSorties, dayEr
                             icon="clock"
                             pointer={false}
                             size={16}
+                            className="h6"
                             style={{
                                 margin: '.5rem .1rem 0 .6rem',
                             }}

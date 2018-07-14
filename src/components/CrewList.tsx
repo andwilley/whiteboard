@@ -6,10 +6,12 @@ import { IAddUpdateSnivArgs } from '../actions';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import AddSnivFormContainer from '../containers/AddSnivFormContainer';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
+import { ICrewDayAcc } from '../containers/VisibleCrewList';
 
 interface ICrewListProps {
     aircrewList: IAircrewWithPucks[];
     unavailableAircrewIds: string[];
+    crewDayAndWorkDay: {[key: string]: ICrewDayAcc['res']};
     daySnivs: ISnivs[];
     showSnivs: boolean;
     dayId: string;
@@ -22,6 +24,7 @@ interface ICrewListProps {
 
 const CrewList: React.SFC<ICrewListProps> = ({
     aircrewList,
+    crewDayAndWorkDay,
     unavailableAircrewIds,
     daySnivs,
     showSnivs,
@@ -39,6 +42,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
             <Aircrew
                 key={aircrew.id}
                 aircrew={aircrew}
+                crewDayAndWorkDay={crewDayAndWorkDay[aircrew.id]}
                 unavailable={unavailableAircrewIds.indexOf(aircrew.id) > -1 ? true : false}
                 snivs={daySnivs.filter(sniv => sniv.aircrewIds.indexOf(aircrew.id) > -1)}
                 showSnivs={showSnivs}

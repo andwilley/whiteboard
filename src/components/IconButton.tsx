@@ -7,6 +7,7 @@ interface IIconButtonProps {
     icon?: UIcons;
     size?: number;
     svgClass?: string;
+    className?: string;
     pointer?: boolean;
     style?: React.CSSProperties;
     viewBox?: string;
@@ -19,11 +20,12 @@ const IconButton: React.SFC<IIconButtonProps> = ({
     size = 10,
     style = {},
     svgClass = '',
+    className = '',
     pointer = true,
     viewBox = '0 0 8 8',
 }) => {
     return (
-        <span onClick={onClick}>
+        <span onClick={onClick} className={className}>
             {icon &&
                 <svg
                     className={`icon icon-${icon}${svgClass ? ` ${svgClass}` : ''}${pointer ? ' wb-pointer' : ''}`}

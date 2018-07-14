@@ -157,14 +157,60 @@ const getAircrewList = (
   });
 };
 
-const getCrewDay = (activeAircrewRefs: ISchedObject): {[key: string]: {workDay: string, legalCrewDay: string}} => {
+export interface ICrewDayAcc {
+  start: Moment.Moment;
+  flightEnd: Moment.Moment;
+  workDayEnd: Moment.Moment;
+  res: {
+    workDay: number;
+    legalCrewDay: number;
+  };
+}
+
+const getCrewDay = (activeAircrewRefs: ISchedObject): {[key: string]: ICrewDayAcc['res']} => {
   const crewDays = {};
   Object.keys(activeAircrewRefs).forEach(aircrewId => {
+    let setOnce = true;
     crewDays[aircrewId] = activeAircrewRefs[aircrewId]
-      .reduce((acc: {start: Moment.Moment, end: Moment.Moment}, block) => {
-        // get the total expected work day, as well as legal crew day.
-      }, {start: Moment(NaN), end: Moment(NaN)});
+      .reduce((acc: ICrewDayAcc, block, i) => {
+        if (block.location === errorLocs.SNIVS) {
+          return acc;
+        }
+        if (i === 0) {
+          acc.start = block.start;
+          acc.workDayEnd = block.end;
+        }
+        if (setOnce && errorLocs.FLIGHT) {
+          acc.flightEnd = block.hardEnd;
+          setOnce = false;
+        }
+        if (block.start.isBefore(acc.start)) {
+          acc.start = block.start;
+        }
+        if (block.end.isAfter(acc.workDayEnd)) {
+          acc.workDayEnd = block.end;
+        }
+        if (block.location === errorLocs.FLIGHT && block.hardEnd.isAfter(acc.flightEnd)) {
+          acc.flightEnd = block.hardEnd;
+        }
+        if (acc.start.isValid() && acc.flightEnd.isValid()) {
+          acc.res.legalCrewDay = Moment.duration(acc.flightEnd.diff(acc.start)).asHours();
+        }
+        if (acc.start.isValid() && acc.workDayEnd.isValid()) {
+          acc.res.workDay = Moment.duration(acc.workDayEnd.diff(acc.start)).asHours();
+        }
+        return acc;
+      }, {start: Moment(NaN),
+          flightEnd: Moment(NaN),
+          workDayEnd: Moment(NaN),
+          res: {
+            workDay: 0,
+            legalCrewDay: 0,
+          },
+        }
+      ).res;
   });
+  return crewDays;
 };
 
 const getUnavailableAircrewIds = (activeRefsAndBlock: IActiveRefsAndBlock,
@@ -223,6 +269,7 @@ interface IVisibleCrewListStateProps {
   daySnivs: ISnivs[];
   showSnivs: boolean;
   dayId: string;
+  crewDayAndWorkDay: {[key: string]: ICrewDayAcc['res']};
 }
 
 const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
@@ -242,6 +289,7 @@ const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
     unavailableAircrewIds,
     state.crewListUI.filters
   );
+  const crewDayAndWorkDay = getCrewDay(activeRefsAndBlock.activeAircrewRefs);
   return {
     aircrewById: getAircrewById(state),
     errors: getErrors(state),
@@ -251,6 +299,7 @@ const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
     daySnivs: getDaySnivs(state),
     showSnivs: getShowSnivs(state),
     dayId: getDayId(state),
+    crewDayAndWorkDay,
   };
 };
 
@@ -262,6 +311,7 @@ const mergeProps = (stateProps: IVisibleCrewListStateProps, dispatchProps: any) 
     daySnivs: stateProps.daySnivs,
     showSnivs: stateProps.showSnivs,
     dayId: stateProps.dayId,
+    crewDayAndWorkDay: stateProps.crewDayAndWorkDay,
     onAircrewClick: (aircrew: IAircrewWithPucks) => {
       // dispatch(something(id)); not sure I'm going to need this. below is for test.
       alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));

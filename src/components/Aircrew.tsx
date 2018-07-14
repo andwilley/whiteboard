@@ -3,9 +3,11 @@ import { ISnivs } from '../types/State';
 import { IAddUpdateSnivArgs } from '../actions';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import IconButton from './IconButton';
+import { ICrewDayAcc } from '../containers/VisibleCrewList';
 
 interface IAircrewProps {
     aircrew: IAircrewWithPucks;
+    crewDayAndWorkDay: ICrewDayAcc['res'];
     unavailable: boolean;
     snivs: ISnivs[];
     showSnivs: boolean;
@@ -17,16 +19,18 @@ interface IAircrewProps {
     onSnivEditClick: (sniv: IAddUpdateSnivArgs) => any;
 }
 
-const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
-                                             unavailable,
-                                             snivs,
-                                             showSnivs,
-                                             dayId,
-                                             onAircrewClick,
-                                             onAircrewXClick,
-                                             onAircrewEditClick,
-                                             onSnivXClick,
-                                             onSnivEditClick,
+const Aircrew: React.SFC<IAircrewProps> = ({
+    aircrew,
+    crewDayAndWorkDay,
+    unavailable,
+    snivs,
+    showSnivs,
+    dayId,
+    onAircrewClick,
+    onAircrewXClick,
+    onAircrewEditClick,
+    onSnivXClick,
+    onSnivEditClick,
 }) => {
     // const totalPucks = aircrew.pucks ? (aircrew.pucks.flight +
                                         //   aircrew.pucks.sim +
@@ -68,7 +72,6 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
             </span>
             {aircrew.pucks.flight > 0 &&
                 (<IconButton
-                    onClick={onAircrewEditClick}
                     icon="plane"
                     size={12}
                     svgClass="crew-icons"
@@ -82,7 +85,6 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                 </IconButton>)}
             {aircrew.pucks.sim > 0 &&
                 (<IconButton
-                    onClick={onAircrewEditClick}
                     icon="controller"
                     size={12}
                     svgClass="crew-icons"
@@ -96,7 +98,6 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                 </IconButton>)}
             {(aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote) > 0 &&
                 (<IconButton
-                    onClick={onAircrewEditClick}
                     icon="paperclip"
                     size={12}
                     svgClass="crew-icons"
@@ -106,6 +107,30 @@ const Aircrew: React.SFC<IAircrewProps> = ({ aircrew,
                     pointer={false}
                 >
                     {aircrew.pucks.flightNote + aircrew.pucks.simNote + aircrew.pucks.dayNote}
+                </IconButton>)}
+            {(Object.keys(aircrew.pucks).some(key => aircrew.pucks[key] > 0)) &&
+                (<IconButton
+                    icon="clock"
+                    size={12}
+                    svgClass="crew-icons"
+                    style={{
+                        margin: '0 2px 0 8px',
+                    }}
+                    pointer={false}
+                >
+                    {crewDayAndWorkDay.workDay.toFixed(1)}
+                </IconButton>)}
+            {(aircrew.pucks.flight > 0 && crewDayAndWorkDay.legalCrewDay > 0) &&
+                (<IconButton
+                    icon="warning"
+                    size={12}
+                    svgClass="crew-icons"
+                    style={{
+                        margin: '0 2px 0 8px',
+                    }}
+                    pointer={false}
+                >
+                    {crewDayAndWorkDay.legalCrewDay.toFixed(1)}
                 </IconButton>)}
             <IconButton
                 onClick={onAircrewXClick}
