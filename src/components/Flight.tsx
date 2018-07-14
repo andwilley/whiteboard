@@ -30,8 +30,8 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, day
         <div className="card mb-3 box-shadow">
             <div className="card-header bg-dark">
                 <IconButton
-                    icon="plane"
-                    viewBox="0 0 21 22"
+                    icon={flight.sim ? 'controller' : 'plane'}
+                    viewBox={flight.sim ? '0 0 512 512' : '0 0 21 22'}
                     svgClass="crew-icon"
                     pointer={false}
                     size={12}

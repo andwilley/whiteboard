@@ -5,14 +5,17 @@ import { noteEntity } from '../whiteboard-constants';
 import { IErrors } from '../types/State';
 import ErrorList from './ErrorList';
 import NavBar from './NavBar';
+import IconButton from './IconButton';
 
 interface IDayProps {
     dayId: string;
+    totalFlightTime: string;
+    totalSorties: string;
     dayErrors: {[id: string]: IErrors[]};
     noteErrors: {[id: string]: IErrors[]};
 }
 
-const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors } ) => (
+const Day: React.SFC<IDayProps> = ({ dayId, totalFlightTime, totalSorties, dayErrors, noteErrors } ) => (
     <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-4">
         <NavBar />
         <div
@@ -22,13 +25,30 @@ const Day: React.SFC<IDayProps> = ({ dayId, dayErrors, noteErrors } ) => (
             <h1 className="h2">{dayId}</h1>
                 <div className="btn-toolbar mb-2 mb-md-0">
                     <div className="btn-group mr-2">
-                        <button className="btn btn-sm btn-outline-secondary">Share</button>
-                        <button className="btn btn-sm btn-outline-secondary">Export</button>
+                        <IconButton
+                            icon="plane"
+                            viewBox="0 0 21 22"
+                            pointer={false}
+                            size={16}
+                            style={{
+                                margin: '.5rem .1rem 0 0',
+                            }}
+                        >
+                        {totalSorties}
+                        </IconButton>
+                        <IconButton
+                            icon="clock"
+                            pointer={false}
+                            size={16}
+                            style={{
+                                margin: '.5rem .1rem 0 .6rem',
+                            }}
+                        >
+                        {totalFlightTime}
+                        </IconButton>
+                        {/* <button className="btn btn-sm btn-outline-secondary">{totalFlightTime}</button>
+                        <button className="btn btn-sm btn-outline-secondary">{totalSorties}</button> */}
                     </div>
-                <button className="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <span data-feather="calendar" />
-                This week
-                </button>
                 </div>
         </div>
         <FlightBoxContainer />
