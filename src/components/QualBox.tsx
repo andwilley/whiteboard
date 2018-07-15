@@ -1,31 +1,26 @@
 import * as React from 'react';
-import { IFilters } from '../types/State';
 
 interface IQualBoxProps {
     qualsList: string[];
-    onInputChange: () => any;
-    filters: IFilters;
+    onToggleQual: (qual: string, selected: boolean) => (e: any) => void;
+    filters: string[];
 }
 
-const QualBox: React.SFC<IQualBoxProps> = ({ qualsList, onInputChange, filters }) => {
+const QualBox: React.SFC<IQualBoxProps> = ({ qualsList, onToggleQual, filters }) => {
     const qualCheckboxList = qualsList.map( (qual: string) => (
-        <li className="nav-item wb-nav-item text-light" key={`s_${qual}`}>
-            <label htmlFor="s_qual">
-                <input
-                    type="checkbox"
-                    name="s_quals"
-                    value={qual}
-                    checked={filters.qualFilter.indexOf(qual) > -1 ? true : false}
-                    onChange={onInputChange}
-                />
-                {qual}
-            </label>
-        </li>
+        <span
+            className={`text-light wb-pointer badge badge-pill${filters.indexOf(qual) > -1 ?
+                ' wb-badge-selected' : ''}`}
+            onClick={onToggleQual(qual, filters.indexOf(qual) > -1)}
+            key={qual}
+        >
+        {qual}
+        </span>
     ));
     return (
-        <ul className="nav flex-column">
+        <div>
             {qualCheckboxList}
-        </ul>
+        </div>
     );
 };
 

@@ -12,6 +12,7 @@ const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
                 [action.payload.flightId]: {
                     id: action.payload.flightId,
                     sim: action.payload.sim,
+                    useExactTimes: false,
                     // flow: 'pit',
                     times: {
                         brief: '',
@@ -47,6 +48,14 @@ const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
                 [action.payload.id]: {
                     ...state[action.payload.id],
                     sim: !state[action.payload.id].sim,
+                },
+            };
+        case getType(actions.toggleFlightExactTimes):
+            return {
+                ...state,
+                [action.payload.flightId]: {
+                    ...state[action.payload.flightId],
+                    useExactTimes: !state[action.payload.flightId].useExactTimes,
                 },
             };
         case getType(actions.addSortie):

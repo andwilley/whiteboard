@@ -6,11 +6,17 @@ import { getShowSnivs, getShowFilters } from '../reducers/crewListUIReducer';
 const { setAircrewSearchForm,
         addQualFilter,
         delQualFilter,
+        addGroupFilter,
+        delGroupFilter,
         toggleShowSnivs,
         toggleShowFilters } = actions;
 
 const getQualsList = (state: IState): string[] => {
-    return state.crewListUI.qualsList;
+    return state.settings.qualsList;
+};
+
+const getGroupsList = (state: IState): string[] => {
+    return state.groups.allIds.map(groupId => state.groups.byId[groupId].name);
 };
 
 const getFilters = (state: IState): IFilters => {
@@ -22,6 +28,7 @@ const getFilters = (state: IState): IFilters => {
 const mapStateToProps = (state: IState) => {
     return {
         qualsList: getQualsList(state),
+        groupsList: getGroupsList(state),
         filters: getFilters(state),
         showSnivs: getShowSnivs(state),
         showFilters: getShowFilters(state),
@@ -30,29 +37,26 @@ const mapStateToProps = (state: IState) => {
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
-        onInputChange: (event: any) => {
-            const target = event.target;
-            const name: string = target.name;
-            const value: string = target.value;
-            switch (name) {
-                case 's_quals':
-                    dispatch(target.checked ? addQualFilter(value) : delQualFilter(value));
-                    break;
-                case 'showAvailable':
-                    dispatch(setAircrewSearchForm({showAvailable: value === 'true' ? true : false}));
-                    break;
-                case 'showSnivs':
-                    dispatch(toggleShowSnivs());
-                    break;
-                default:
-                    dispatch(setAircrewSearchForm({crewSearchInput: value}));
-                    break;
-            }
+        onInputChange: (e: any) => {
+            dispatch(setAircrewSearchForm({crewSearchInput: e.target.value}));
+        },
+        onToggleShowSnivs: (event: any) => {
+            dispatch(toggleShowSnivs());
+        },
+        onToggleShowAvailable: (showAvailable: boolean) => (e: any) => {
+            dispatch(setAircrewSearchForm({showAvailable}));
+        },
+        onToggleQual: (qual: string, selected: boolean) => (e: any) => {
+            dispatch(selected ? delQualFilter(qual) : addQualFilter(qual));
+        },
+        onToggleGroup: (group: string, selected: boolean) => (e: any) => {
+            dispatch(selected ? delGroupFilter(group) : addGroupFilter(group));
         },
         onClearButtonClick: () => {
             dispatch(setAircrewSearchForm({
                 crewSearchInput: '',
                 qualFilter: [],
+                groupFilter: [],
                 rankFilter: [],
             }));
         },

@@ -109,3 +109,11 @@
 .sim-sortie-icon {
   margin-bottom: -16px;
 }
+
+.wb-badge-selected {
+  background-color: #00a963;
+}
+
+.wb-badge-warn {
+  background-color: yellow;
+}

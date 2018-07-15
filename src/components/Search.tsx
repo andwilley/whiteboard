@@ -2,7 +2,7 @@ import * as React from 'react';
 
 interface ISearchProps {
     inputValue: string;
-    onInputChange: () => any;
+    onInputChange: (e: any) => any;
     className?: string;
 }
 

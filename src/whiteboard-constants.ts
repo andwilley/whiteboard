@@ -2,7 +2,7 @@ import { INameLocations, IEditables, IIcons } from './types/WhiteboardTypes';
 import { ITimeTypes, IAddUpdateSnivFormValues, ISnivTimeTypes, INoteEntity } from './types/State';
 
 export const qualsList =
-    ['SL', 'DL', 'MC', 'NSI', 'FAI', 'MDTI', 'WTI', 'FAC(A)', 'FAC(A)I', 'NS', 'ACM', 'LAT', 'PMCF', 'ODO'];
+    ['ODO', 'TXN', 'STK', 'CAS', 'FAC(A)', 'FWT 1', 'FWT 2', 'BFM', 'NS', 'FCF', 'NTPS CK', 'INST CK'];
 
 export const blankAddUpdateAircrewForm = {
     id: '',

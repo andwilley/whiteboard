@@ -11,6 +11,7 @@ interface IFlightBoxProps {
     sims: IFlights[];
     errors: {[id: string]: IErrors[]};
     settings: ISettings;
+    onExactTimesToggle: (id: string) => (e: any) => void;
     onAddFlightClick: (dayId: string, sim: boolean) => void;
     onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => void;
 }
@@ -26,6 +27,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
     flights,
     sims,
     errors,
+    onExactTimesToggle,
     onAddFlightClick,
     onDelFlightClick,
     settings,
@@ -44,6 +46,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
                 key={flight.id}
                 flight={flight}
                 dayId={dayId}
+                onExactTimesToggle={onExactTimesToggle(flight.id)}
                 onDelFlightClick={onDelFlightClick}
                 errors={errors[flight.id] ? errors[flight.id] : []}
             />
@@ -66,6 +69,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
             key={flight.id}
             flight={flight}
             dayId={dayId}
+            onExactTimesToggle={onExactTimesToggle(flight.id)}
             onDelFlightClick={onDelFlightClick}
             errors={errors[flight.id] ? errors[flight.id] : []}
         />

@@ -51,6 +51,7 @@ export interface IFlights {
     readonly id: string;
     readonly sim: boolean;
     readonly times: IFlightTimes;
+    readonly useExactTimes: boolean;
     readonly airspace: string[];
     readonly sorties: string[];
     readonly notes: string[];
@@ -106,12 +107,12 @@ export interface IFilters {
     readonly crewSearchInput: string;
     readonly showAvailable: boolean;
     readonly qualFilter: string[];
+    readonly groupFilter: string[];
     readonly rankFilter: number[];
 }
 
 export interface ICrewListUI {
     readonly currentDay: string;
-    readonly qualsList: string[];
     readonly addUpdateAircrewFormDisplay: boolean;
     readonly addUpdateSnivFormDisplay: boolean;
     readonly filters: IFilters;
@@ -250,10 +251,13 @@ export type IErrors = (IGenericErrors | ISchedErrors | ITimeErrors);
 export interface ISettings {
     readonly minutesBeforeBrief: number;
     readonly minutesBriefToTakeoff: number;
+    readonly minutesBriefToBoxTime: number;
     readonly minutesNoteDuration: number;
     readonly minutesAfterLand: number;
+    readonly minutesAfterBoxTime: number;
     readonly hotPitNoShorterThan: number;
     readonly hotPitNoLongerThan: number;
+    readonly qualsList: string[];
 }
 
 export interface IInputElement {

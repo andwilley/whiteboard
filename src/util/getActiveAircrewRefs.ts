@@ -26,8 +26,12 @@ export const getSchedFromFlightTimes = (currentDayId: string,
      * state.crewListUI.currentDay
      */
     let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
-    let startOffset = settings.minutesBeforeBrief * 60000;
-    let endOffset = settings.minutesAfterLand * 60000;
+    let startOffset = flight.useExactTimes ? 0 : settings.minutesBeforeBrief * 60000;
+    let endOffset = flight.useExactTimes
+    ?   0
+    :   flight.sim
+    ?   settings.minutesAfterBoxTime * 60000
+    :   settings.minutesAfterLand * 60000;
     const briefTime = flight.times.brief.replace(':', '');
     const takeoffTime = flight.times.takeoff.replace(':', '');
     const landTime = flight.times.land.replace(':', '');
@@ -37,7 +41,11 @@ export const getSchedFromFlightTimes = (currentDayId: string,
     } else if (RGX_24HOUR_TIME.test(takeoffTime)) {
         startTimeHr = takeoffTime.slice(0, 2);
         startTimeMn = takeoffTime.slice(2, 4);
-        startOffset += settings.minutesBriefToTakeoff * 60000;
+        startOffset = flight.useExactTimes
+            ?   0
+            :   flight.sim
+            ?   startOffset + (settings.minutesBriefToBoxTime * 60000)
+            :   startOffset + (settings.minutesBriefToTakeoff * 60000);
     } else {
         startTimeHr = '00';
         startTimeMn = '00';

@@ -14,7 +14,7 @@ export const INITIAL_STATE: IState = {
                 last: 'Willey',
                 notes: [],
                 odos: 0,
-                quals: ['FAI', 'SL', 'DL', 'FAC(A)', 'PMCF'],
+                quals: ['TXN', 'STK', 'CAS', 'FWT 1', 'FCF'],
                 rank: 3,
                 seat: 'wso',
                 simPucks: [],
@@ -28,7 +28,7 @@ export const INITIAL_STATE: IState = {
                 last: 'Blank',
                 notes: [],
                 odos: 0,
-                quals: ['SL'],
+                quals: ['TXN', 'STK', 'CAS'],
                 rank: 3,
                 seat: 'pilot',
                 simPucks: [],
@@ -42,7 +42,7 @@ export const INITIAL_STATE: IState = {
                 last: 'Infante',
                 notes: [],
                 odos: 0,
-                quals: ['FAI', 'SL', 'DL'],
+                quals: ['ODO', 'TXN', 'STK', 'FWT 1', 'FCF'],
                 rank: 3,
                 seat: 'pilot',
                 simPucks: [],
@@ -56,7 +56,7 @@ export const INITIAL_STATE: IState = {
                 last: 'Hand',
                 notes: [],
                 odos: 0,
-                quals: ['FAC(A)', 'SL'],
+                quals: ['ODO', 'TXN', 'STK', 'CAS', 'FWT 1', 'FWT 2'],
                 rank: 3,
                 seat: 'wso',
                 simPucks: [],
@@ -99,6 +99,7 @@ export const INITIAL_STATE: IState = {
             a: {
                 id: 'a',
                 sim: true,
+                useExactTimes: false,
                 // flow: 'pit',
                 times: {
                     brief: '',
@@ -112,6 +113,7 @@ export const INITIAL_STATE: IState = {
             b: {
                 id: 'b',
                 sim: false,
+                useExactTimes: false,
                 // flow: 'pit',
                 times: {
                     brief: '',
@@ -162,7 +164,6 @@ export const INITIAL_STATE: IState = {
     },
     crewListUI: {
         currentDay: '2018-01-24',
-        qualsList,
         showSnivs: false,
         showFilters: false,
         addUpdateAircrewFormDisplay: false,
@@ -171,6 +172,7 @@ export const INITIAL_STATE: IState = {
             crewSearchInput: '',
             showAvailable: false,
             qualFilter: [],
+            groupFilter: [],
             rankFilter: [],
         },
     },
@@ -276,11 +278,14 @@ export const INITIAL_STATE: IState = {
     },
     settings: {
         minutesAfterLand: 60,
+        minutesAfterBoxTime: 30,
         minutesBeforeBrief: 29,
         minutesBriefToTakeoff: 120,
+        minutesBriefToBoxTime: 60,
         minutesNoteDuration: 60,
         hotPitNoShorterThan: 45,
         hotPitNoLongerThan: 75,
+        qualsList,
     },
     editor: {
         editorState: EditorState.createEmpty(),

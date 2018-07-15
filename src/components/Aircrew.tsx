@@ -62,6 +62,20 @@ const Aircrew: React.SFC<IAircrewProps> = ({
             </li>
         );
     });
+    let crewDayClass = '';
+    let workDayClass = '';
+    if (crewDayAndWorkDay) {
+        crewDayClass = crewDayAndWorkDay.legalCrewDay >= 12
+            ?   'text-danger'
+            :   crewDayAndWorkDay.legalCrewDay >= 10
+            ?   'text-warning'
+            :   '';
+        workDayClass = crewDayAndWorkDay.workDay >= 11
+            ?   'text-danger'
+            :   crewDayAndWorkDay.workDay >= 9
+            ?   'text-warning'
+            :   '';
+    }
     return (
         <li className="nav-item wb-nav-item text-light">
             <span
@@ -113,6 +127,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                     icon="clock"
                     size={12}
                     svgClass="crew-icons"
+                    className={workDayClass}
                     style={{
                         margin: '0 2px 0 8px',
                     }}
@@ -125,6 +140,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                     icon="warning"
                     size={12}
                     svgClass="crew-icons"
+                    className={crewDayClass}
                     style={{
                         margin: '0 2px 0 8px',
                     }}

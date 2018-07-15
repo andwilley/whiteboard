@@ -6,20 +6,30 @@ import IconButton from './IconButton';
 
 interface ISearchBoxProps {
     qualsList: string[];
+    groupsList: string[];
     filters: IFilters;
     showSnivs: boolean;
     showFilters: boolean;
-    onInputChange: () => any;
-    onClearButtonClick: () => any;
-    onShowFilterClick: () => any;
+    onInputChange: (e: any) => void;
+    onToggleQual: (qual: string, selected: boolean) => (e: any) => void;
+    onToggleGroup: (group: string, selected: boolean) => (e: any) => void;
+    onToggleShowSnivs: () => void;
+    onToggleShowAvailable: (show: boolean) => (e: any) => void;
+    onClearButtonClick: () => void;
+    onShowFilterClick: () => void;
 }
 
 const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
     qualsList,
+    groupsList,
     filters,
     showSnivs,
     showFilters,
     onInputChange,
+    onToggleShowSnivs,
+    onToggleShowAvailable,
+    onToggleQual,
+    onToggleGroup,
     onClearButtonClick,
     onShowFilterClick,
 }) => {
@@ -36,60 +46,72 @@ const CrewSearchBox: React.SFC<ISearchBoxProps> = ({
                     className="form-control form-control-dark col-sm-3 col-md-2 w-100"
                 />
             </nav>
-            {showFilters ?
-                <ul className="nav flex-column">
-                    <li className="nav-item wb-nav-item text-light">
+            <ul className="nav flex-column">
+                <li className="nav-item wb-nav-item text-light">
+                    <span
+                        className={`sidebar-heading mt-4 ml-1 mb-1 text-muted h6`}
+                    >
                         Filters
-                        <IconButton
-                            onClick={onShowFilterClick}
-                            icon="chevron-top"
-                            svgClass="float-right mt-1 mr-1"
-                            size={12}
-                        />
-                    </li>
-                    <li className="nav-item wb-nav-item text-light">
-                        <label htmlFor="showAvailable">
-                            <input
-                                type="checkbox"
-                                name="showAvailable"
-                                value={filters.showAvailable ? 'false' : 'true'}
-                                checked={filters.showAvailable ? true : false}
-                                onChange={onInputChange}
-                            />
-                            Show Only Available Aircrew
-                        </label>
-                    </li>
-                    <li className="nav-item wb-nav-item text-light">
-                        <label htmlFor="showSnivs">
-                            <input
-                                type="checkbox"
-                                name="showSnivs"
-                                value={showSnivs ? 'false' : 'true'}
-                                checked={showSnivs ? true : false}
-                                onChange={onInputChange}
-                            />
-                            Show Snivs
-                        </label>
-                    </li>
-                    <QualBox
-                        qualsList={qualsList}
-                        onInputChange={onInputChange}
-                        filters={filters}
+                    </span>
+                    <IconButton
+                        onClick={onShowFilterClick}
+                        icon={showFilters ? 'chevron-top' : 'chevron-bottom'}
+                        svgClass="float-right mt-1 mr-1"
+                        size={12}
                     />
-                    <button className="btn btn-secondary" onClick={onClearButtonClicked}>Clear</button>
-                </ul>
-                :
-                <ul className="nav flex-column">
+                </li>
+                {showFilters ?
+                (<div>
                     <li className="nav-item wb-nav-item text-light">
-                        Filters
-                        <IconButton
-                            onClick={onShowFilterClick}
-                            icon="chevron-bottom"
-                            svgClass="float-right mt-1 mr-1"
-                            size={12}
+                        <span
+                            className={`text-light wb-pointer badge badge-pill${filters.showAvailable ?
+                                ' wb-badge-selected' : ''}`}
+                            onClick={onToggleShowAvailable(!filters.showAvailable)}
+                        >
+                            Show Only Available Aircrew
+                        </span>
+                        <span
+                            className={`text-light wb-pointer badge badge-pill${showSnivs ?
+                                ' wb-badge-selected' : ''}`}
+                            onClick={onToggleShowSnivs}
+                        >
+                            Show Snivs
+                        </span>
+                    </li>
+                    <li className="nav-item wb-nav-item text-light">
+                        <QualBox
+                            qualsList={qualsList}
+                            onToggleQual={onToggleQual}
+                            filters={filters.qualFilter}
                         />
                     </li>
-                </ul>}
+                    <li className="nav-item wb-nav-item text-light">
+                        <QualBox
+                            qualsList={groupsList}
+                            onToggleQual={onToggleGroup}
+                            filters={filters.groupFilter}
+                        />
+                    </li>
+                    <li className="nav-item wb-nav-item text-light">
+                        <button className="btn btn-secondary mt-2" onClick={onClearButtonClicked}>Clear</button>
+                    </li>
+                </div>
+                ) :
+                (
+                    <li className="nav-item wb-nav-item text-light">
+                        <QualBox
+                            qualsList={filters.qualFilter}
+                            onToggleQual={onToggleQual}
+                            filters={filters.qualFilter}
+                        />
+                        <QualBox
+                            qualsList={filters.groupFilter}
+                            onToggleQual={onToggleGroup}
+                            filters={filters.groupFilter}
+                        />
+                    </li>
+                )}
+            </ul>
         </div>);
 };
 

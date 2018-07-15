@@ -14,7 +14,7 @@ const ErrorList: React.SFC<IErrorListProps> = ({ errors }) => {
                     icon="x"
                     size={10}
                     style={{
-                        margin: '0 5 0 -15',
+                        margin: '0 5px 0 -15px',
                     }}
                     svgClass="align-middle"
                     pointer={false}

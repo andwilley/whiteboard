@@ -13,6 +13,7 @@ interface IFlightProps {
     flight: IFlights;
     errors: IErrors[];
     dayId: string;
+    onExactTimesToggle: (e: any) => void;
     onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => void;
 }
 
@@ -25,7 +26,7 @@ const getFlightTime = (flight: IFlights, dayId: string): string => {
     return Moment.duration(land.diff(takeoff)).asHours().toFixed(1);
 };
 
-const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, dayId }) => (
+const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, onDelFlightClick, dayId }) => (
     <div className="col-xl-3 col-lg-4 col-md-6">
         <div className="card mb-3 box-shadow">
             <div className="card-header bg-dark">
@@ -58,6 +59,13 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onDelFlightClick, day
                     size={14}
                     svgClass="float-right"
                 />
+                <span
+                    className={`float-right mr-3 text-light wb-pointer badge badge-pill${flight.useExactTimes ?
+                        ` badge-warning text-dark` : 'bad'}`}
+                    onClick={onExactTimesToggle}
+                >
+                    Exact Times
+                </span>
             </div>
             <div className="card-body">
                 <TimesBox

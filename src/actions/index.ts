@@ -21,6 +21,8 @@ export const DEL_AIRCREW = 'DEL_AIRCREW';
 export const SET_AIRCREW_SEARCH_FORM = 'SET_AIRCREW_SEARCH_FORM';
 export const ADD_QUAL_FILTER = 'ADD_QUAL_FILTER';
 export const DEL_QUAL_FILTER = 'DEL_QUAL_FILTER';
+export const ADD_GROUP_FILTER = 'ADD_GROUP_FILTER';
+export const DEL_GROUP_FILTER = 'DEL_GROUP_FILTER';
 export const SET_CURRENT_DAY = 'SET_CURRENT_DAY';
 export const TOGGLE_SHOW_SNIVS = 'TOGGLE_SHOW_SNIVS';
 export const ADD_UPDATE_AIRCREW_FORM_DISPLAY = 'ADD_UPDATE_AIRCREW_FORM_DISPLAY';
@@ -29,6 +31,7 @@ export const ADD_FLIGHT = 'ADD_FLIGHT';
 export const DEL_FLIGHT = 'DEL_FLIGHT';
 export const UPDATE_FLIGHT_TIME = 'UPDATE_FLIGHT_TIME';
 export const TOGGLE_FLIGHT_TYPE = 'TOGGLE_FLIGHT_TYPE';
+export const TOGGLE_FLIGHT_EXACT_TIMES = 'TOGGLE_FLIGHT_EXACT_TIMES';
 export const ADD_UPDATE_NOTE = 'ADD_UPDATE_NOTE';
 export const DEL_NOTE = 'DEL_NOTE';
 export const UPDATE_NOTE_CREW_REFS = 'UPDATE_NOTE_CREW_REFS';
@@ -82,6 +85,7 @@ export interface ISetAircrewSearchArgs {
     crewSearchInput?: string;
     showAvailable?: boolean;
     qualFilter?: string[];
+    groupFilter?: string[];
     rankFilter?: string[];
 }
 
@@ -260,6 +264,18 @@ export const actions = {
             qual,
         },
     })),
+    addGroupFilter: createAction(ADD_GROUP_FILTER, (group: string) => ({
+        type: ADD_GROUP_FILTER,
+        payload: {
+            group,
+        },
+    })),
+    delGroupFilter: createAction(DEL_GROUP_FILTER, (group: string) => ({
+        type: DEL_GROUP_FILTER,
+        payload: {
+            group,
+        },
+    })),
     setCurrentDay: createAction(SET_CURRENT_DAY, (day: string) => ({
         type: SET_CURRENT_DAY,
         payload: {
@@ -332,6 +348,12 @@ export const actions = {
         type: TOGGLE_FLIGHT_TYPE,
         payload: {
             id,
+        },
+    })),
+    toggleFlightExactTimes: createAction(TOGGLE_FLIGHT_EXACT_TIMES, (flightId: string) => ({
+        type: TOGGLE_FLIGHT_EXACT_TIMES,
+        payload: {
+            flightId,
         },
     })),
     addUpdateNote: createAction(ADD_UPDATE_NOTE, (args: IAddUpdateNoteArgs) => {

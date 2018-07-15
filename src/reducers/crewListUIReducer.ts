@@ -1,22 +1,24 @@
-import { qualsList } from '../whiteboard-constants';
 import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
 import { ICrewListUI, IState } from '../types/State';
 
-const crewListUIReducer = (state: ICrewListUI = { qualsList,
-                                                  addUpdateAircrewFormDisplay: false,
-                                                  addUpdateSnivFormDisplay: false,
-                                                  currentDay: '',
-                                                  showSnivs: false,
-                                                  showFilters: false,
-                                                  filters: {
-                                                      crewSearchInput: '',
-                                                      showAvailable: false,
-                                                      qualFilter: [],
-                                                      rankFilter: [],
-                                                  },
-                                                },
-                           action: IAction) => {
+const crewListUIReducer = (
+    state: ICrewListUI = {
+        addUpdateAircrewFormDisplay: false,
+        addUpdateSnivFormDisplay: false,
+        currentDay: '',
+        showSnivs: false,
+        showFilters: false,
+        filters: {
+            crewSearchInput: '',
+            showAvailable: false,
+            qualFilter: [],
+            groupFilter: [],
+            rankFilter: [],
+        },
+    },
+    action: IAction
+) => {
     switch (action.type) {
         case getType(actions.setCurrentDay):
             return {
@@ -50,6 +52,22 @@ const crewListUIReducer = (state: ICrewListUI = { qualsList,
                 filters: {
                     ...state.filters,
                     qualFilter: state.filters.qualFilter.filter(qual => qual !== action.payload.qual),
+                },
+            };
+        case getType(actions.addGroupFilter):
+            return {
+                ...state,
+                filters: {
+                    ...state.filters,
+                    groupFilter: state.filters.groupFilter.concat(action.payload.group),
+                },
+            };
+        case getType(actions.delGroupFilter):
+            return {
+                ...state,
+                filters: {
+                    ...state.filters,
+                    groupFilter: state.filters.groupFilter.filter(group => group !== action.payload.group),
                 },
             };
         case getType(actions.toggleShowSnivs):

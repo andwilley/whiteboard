@@ -2,12 +2,13 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { IState, IFlights, ISettings } from '../types/State';
 import FlightBox from '../components/FlightBox';
-import { errorLocs } from '../errors';
+import { errorLocs, errorTypes } from '../errors';
 import { getEntityErrors } from '../reducers/errorReducer';
 import { noteEntity } from '../whiteboard-constants';
 import * as Moment from 'moment';
 import { RGX_24HOUR_TIME } from '../util/regEx';
-const { addFlight, delFlight, delSortie, delNote } = actions;
+import { setErrorsOnFreshState } from './FlexInputContainer';
+const { addFlight, delFlight, delSortie, delNote, toggleFlightExactTimes } = actions;
 
 const getDayId = (state: IState): string => {
     // slices of the state this needs for future optimization reference:
@@ -103,6 +104,10 @@ const mapDispatchToProps = (dispatch: any) => {
             flight.notes.forEach(noteId =>
                 dispatch(delNote({id: noteId, entity: noteEntity.FLIGHT_NOTE, entityId: flight.id})));
             dispatch(delFlight(flight.id, dayId));
+        },
+        onExactTimesToggle: (flightId: string) => (e: any) => {
+            dispatch(toggleFlightExactTimes(flightId));
+            dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
     };
 };

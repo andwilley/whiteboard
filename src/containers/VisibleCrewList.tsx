@@ -5,7 +5,16 @@ import { getErrors } from '../reducers/errorReducer';
 import { getAircrewById } from '../reducers/aircrewReducer';
 import { getShowSnivs } from '../reducers/crewListUIReducer';
 import { setErrorsOnFreshState, flightIsCrewHotPit } from '../containers/FlexInputContainer';
-import { IEntity, IState, IAircrew, IFilters, ISnivs, IErrors, IEntityWithActive, ISettings } from '../types/State';
+import {
+  IEntity,
+  IState,
+  IAircrew,
+  IFilters,
+  ISnivs,
+  IErrors,
+  IEntityWithActive,
+  ISettings,
+  IGroups } from '../types/State';
 import { IAircrewWithPucks,
          IAircrewDayPucks,
          ISchedObject,
@@ -62,15 +71,16 @@ const getDayPucks = (schedBlocks: ISchedObject): IAircrewDayPucks => {
 
 const getFilteredAircrewIds = (
   aircrew: IAircrewEntity,
+  groups: IGroups[],
   filters: IFilters,
-  unavailableAircrewIds: string[],
-  aircrewDayPucks: IAircrewDayPucks
+  unavailableAircrewIds: string[]
 ): string[] => {
   // slices of the state this needs for future optimization reference:
   // state.aircrew
   // state.crewListUI.filters
   const filteredAircrewIds = aircrew.allIds.filter((aircrewId: string) => {
     if (filters.qualFilter.length === 0 &&
+        filters.groupFilter.length === 0 &&
         filters.rankFilter.length === 0 &&
         filters.crewSearchInput === '' &&
         filters.showAvailable === false) {
@@ -85,6 +95,22 @@ const getFilteredAircrewIds = (
             }
         });
         if (!allQualsMatch) {
+            return false;
+        }
+    }
+    console.log(filters.groupFilter.length);
+    /** filter out aircrew that aren't in the selected group */
+    if (filters.groupFilter.length > 0) {
+        let allGroupsMatch = true;
+        filters.groupFilter.forEach((group: string) => {
+          groups.forEach(grp => {
+            console.log(`groupName: ${grp} loopGroup: ${group}`);
+            if (grp.name === group && grp.aircrewIds.indexOf(aircrewId) === -1) {
+              allGroupsMatch = false;
+            }
+          });
+        });
+        if (!allGroupsMatch) {
             return false;
         }
     }
@@ -137,6 +163,7 @@ const getFilteredAircrewIds = (
 const getAircrewList = (
   activeAircrewRefs: ISchedObject,
   aircrew: IEntity<IAircrew>,
+  groups: IGroups[],
   unavailableAircrewIds: string[],
   filters: IFilters
 ): IAircrewWithPucks[] => {
@@ -145,7 +172,12 @@ const getAircrewList = (
   // state.crewListUI.filters
   // anything getDayPucks needs (see above)
   const aircrewDayPucks = getDayPucks(activeAircrewRefs);
-  const filteredAircrewIds = getFilteredAircrewIds(aircrew, filters, unavailableAircrewIds, aircrewDayPucks);
+  const filteredAircrewIds = getFilteredAircrewIds(
+    aircrew,
+    groups,
+    filters,
+    unavailableAircrewIds
+  );
   return filteredAircrewIds.map((aircrewId): IAircrewWithPucks => {
     const aircrewWithPucks: IAircrewWithPucks = Object.assign({},
                                                               aircrew.byId[aircrewId],
@@ -286,6 +318,7 @@ const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
   const aircrewList = getAircrewList(
     activeRefsAndBlock.activeAircrewRefs,
     state.aircrew,
+    state.groups.allIds.map(groupId => state.groups.byId[groupId]),
     unavailableAircrewIds,
     state.crewListUI.filters
   );

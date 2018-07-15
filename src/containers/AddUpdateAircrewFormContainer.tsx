@@ -14,7 +14,7 @@ const getAddUpdateAircrewFormValues = (state: IState) => {
 };
 
 const getQualsList = (state: IState): string[] => {
-  return state.crewListUI.qualsList;
+  return state.settings.qualsList;
 };
 
 const getAddUpdateAircrewFormDisplay = (state: IState): boolean => {

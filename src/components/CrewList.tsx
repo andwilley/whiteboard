@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Aircrew from './Aircrew';
 import { ISnivs } from '../types/State';
-import { errorMessages } from '../errors';
 import { IAddUpdateSnivArgs } from '../actions';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import AddSnivFormContainer from '../containers/AddSnivFormContainer';
@@ -65,7 +64,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
                 Pilots
             </h6>
             <ul className="nav flex-column">
-                {pilotList.length > 0 ? pilotList : errorMessages.ERR_NO_RESULTS_FOUND}
+                {pilotList}
             </ul>
             <hr />
             <h6
@@ -74,7 +73,7 @@ const CrewList: React.SFC<ICrewListProps> = ({
                 WSOs
             </h6>
             <ul className="nav flex-column">
-                {wsoList.length > 0 ? wsoList : errorMessages.ERR_NO_RESULTS_FOUND}
+                {wsoList}
             </ul>
             <hr />
             <AddUpdateAircrewFormContainer />
