@@ -37,28 +37,42 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                                         //   aircrew.pucks.flightNote +
                                         //   aircrew.pucks.dayNote)
                                         // : 0;
-    const aircrewStyle: React.CSSProperties = { cursor: 'pointer',
-                                                color: unavailable ? 'red' : 'inherit' };
+    const aircrewStyle: React.CSSProperties = { cursor: 'pointer' };
+    const aircrewClass = unavailable ? 'text-danger' : '';
     const snivComponentList = snivs.map(sniv => {
-        const delSnivButtons = sniv.aircrewIds.length > 1 ?
+        const delSnivButtons =
         (
             <span>
-                <span onClick={onSnivXClick(sniv.id, aircrew.id)}>[X] </span>
-                <span onClick={onSnivXClick(sniv.id)}>[XX]</span>
-            </span>
-        ) :
-        (
-            <span>
-                <span onClick={onSnivXClick(sniv.id)}>[X]</span>
+                {sniv.aircrewIds.length > 1 ?
+                <IconButton
+                    onClick={onSnivXClick(sniv.id, aircrew.id)}
+                    icon="trash"
+                    svgClass="crew-icons float-right"
+                    size={12}
+                /> : null}
+                <IconButton
+                    onClick={onSnivXClick(sniv.id)}
+                    icon="trash"
+                    svgClass="crew-icons float-right"
+                    size={12}
+                />
             </span>
         );
         return (
-            <li className="nav-item wb-nav-item text-light" key={sniv.id}>
+            <li className="nav-item wb-nav-item text-light wb-only-hover" key={sniv.id}>
                 <span>{sniv.dates[dayId].start.format('HHmm')}</span>-
                 <span>{sniv.dates[dayId].end.format('HHmm')}</span>{': '}
                 <span>{sniv.message} </span>
-                <span onClick={onSnivEditClick(sniv)}>[Edit] </span>
                 {delSnivButtons}
+                <span>
+                    <IconButton
+                        onClick={onSnivEditClick(sniv)}
+                        icon="pencil"
+                        size={12}
+                        hover="only-hover"
+                        svgClass="crew-icons float-right"
+                    />
+                </span>
             </li>
         );
     });
@@ -77,10 +91,11 @@ const Aircrew: React.SFC<IAircrewProps> = ({
             :   '';
     }
     return (
-        <li className="nav-item wb-nav-item text-light">
+        <li className="nav-item wb-nav-item text-light wb-only-hover">
             <span
                 style={aircrewStyle}
                 onClick={onAircrewClick}
+                className={aircrewClass}
             >
                 {aircrew.callsign}
             </span>
@@ -100,7 +115,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
             {aircrew.pucks.sim > 0 &&
                 (<IconButton
                     icon="controller"
-                    size={12}
+                    size={14}
                     svgClass="crew-icons"
                     style={{
                         margin: '0 2px 0 8px',
@@ -152,11 +167,13 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                 onClick={onAircrewXClick}
                 icon="trash"
                 size={12}
+                hover="only-hover"
                 svgClass="float-right crew-icons"
             /><IconButton
                 onClick={onAircrewEditClick}
                 icon="pencil"
                 size={12}
+                hover="only-hover"
                 svgClass="float-right crew-icons"
             />
             {showSnivs && <ul className="nav flex-column">{snivComponentList}</ul>}

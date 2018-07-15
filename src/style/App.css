@@ -1,38 +1,40 @@
 .flexInput {
-  border: 1px solid white;
-  padding: 1px;
+  border-left: 2px solid transparent;
+  border-top: 0px;
+  border-right: 0px;
+  border-bottom: 0px;
 }
 
 .errorWARN {
-  border: 1px solid red;
+  border-left: 2px solid #dc3545;
 }
 
 .errorCAUT {
-  border: 1px solid yellow;
+  border-left: 2px solid #ffc107;
 }
 
 .errorINFO {
-  border: 1px solid blue;
+  border-left: 2px solid #007bff;
 }
 
 .errorSUCCESS {
-  border: 1px solid green;
+  border-left: 2px solid #28a745;
 }
 
 .valErrorWARN {
-  border-bottom: 1px solid red;
+  border-left: 2px solid #dc3545;
 }
 
 .valErrorCAUT {
-  border-bottom: 1px solid yellow;
+  border-left: 2px solid #ffc107;
 }
 
 .valErrorINFO {
-  border-bottom: 1px solid blue;
+  border-left: 2px solid #007bff;
 }
 
 .valErrorSUCCESS {
-  border-bottom: 1px solid green;
+  border-left: 2px solid #28a745;
 }
 
 .pStyle {
@@ -63,7 +65,7 @@
 }
 
 .icon-x {
-  fill: red;
+  fill: #dc3545;
 }
 
 .wb-error-list-item {
@@ -115,5 +117,13 @@
 }
 
 .wb-badge-warn {
-  background-color: yellow;
+  background-color: #ffc107;
+}
+
+.wb-only-hover-element {
+  visibility: hidden;
+}
+
+.wb-only-hover:hover .wb-only-hover-element {
+  visibility: visible;
 }

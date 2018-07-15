@@ -449,7 +449,7 @@ const nameStrategy = (name: string) => (
 const nameSpan = (id: string) => (props: any) => {
     return (
         <span
-            style={{color: 'blue'}}
+            className="text-primary"
             data-offset-key={props.dataOffsetKey}
             onClick={onXClick(id)}
         >

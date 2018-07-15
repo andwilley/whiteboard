@@ -7,6 +7,7 @@ import { IDelNoteArgs } from '../actions';
 
 interface INoteBoxProps {
     className?: string;
+    errorListClassName?: string;
     notes: INotes[];
     errorLoc: UNoteEntity;
     errorLocId: string;
@@ -42,21 +43,19 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
     const noteErrors = errors ? errors : [];
     return (
         <div>
-            <div>
-                <IconButton
-                    onClick={onAddNoteClick}
-                    icon="plus"
-                    size={10}
-                    style={{
-                        margin: '-20px 0px 0px 0px',
-                    }}
-                    svgClass="float-right"
-                />
-            </div>
+            <IconButton
+                onClick={onAddNoteClick}
+                icon="plus"
+                size={10}
+                style={{
+                    margin: '-20px 0px 0px 0px',
+                }}
+                svgClass="float-right"
+            />
             <div className="row">
                 {noteComponentsList}
-                <ErrorList errors={noteErrors} />
             </div>
+            <ErrorList className={className} errors={noteErrors} />
         </div>
     );
 };

@@ -11,6 +11,7 @@ interface IIconButtonProps {
     pointer?: boolean;
     style?: React.CSSProperties;
     viewBox?: string;
+    hover?: 'only-hover' | 'always-visible';
 }
 
 const IconButton: React.SFC<IIconButtonProps> = ({
@@ -23,12 +24,14 @@ const IconButton: React.SFC<IIconButtonProps> = ({
     className = '',
     pointer = true,
     viewBox = '0 0 8 8',
+    hover = 'always-visible',
 }) => {
     return (
-        <span onClick={onClick} className={className}>
+        <span onClick={onClick} className={`${className}`}>
             {icon &&
                 <svg
-                    className={`icon icon-${icon}${svgClass ? ` ${svgClass}` : ''}${pointer ? ' wb-pointer' : ''}`}
+                    className={`icon icon-${icon}${svgClass ? ` ${svgClass}` : ''}
+                        ${pointer ? ' wb-pointer' : ''}${hover === 'only-hover' && ` wb-only-hover-element`}`}
                     xmlns="http://www.w3.org/2000/svg"
                     width={size}
                     height={size}

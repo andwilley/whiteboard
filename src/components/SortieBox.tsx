@@ -18,11 +18,14 @@ const SortieBox: React.SFC<ISortieBoxProps> = ({ flight, sorties, onAddSortieCli
     return (
             <div>
                 {sortieComponents}
-                <IconButton
-                    onClick={() => onAddSortieClick()}
-                    icon="plus"
-                    size={12}
-                />
+                <div className="col-1">
+                    <IconButton
+                        onClick={() => onAddSortieClick()}
+                        icon="plus"
+                        size={12}
+                        svgClass="mt-3"
+                    />
+                </div>
             </div>
     );
 };

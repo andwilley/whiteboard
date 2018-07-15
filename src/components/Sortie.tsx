@@ -11,7 +11,7 @@ interface ISortieProps {
 }
 
 const Sortie: React.SFC<ISortieProps> = ({ sortie, flight, onDelSortieClick }) => (
-    <div>
+    <div className="wb-only-hover">
     <hr / >
     <div className="row">
         {flight.sim
@@ -25,6 +25,7 @@ const Sortie: React.SFC<ISortieProps> = ({ sortie, flight, onDelSortieClick }) =
             <IconButton
                 onClick={onDelSortieClick(sortie.id, flight.id)}
                 icon="trash"
+                hover="only-hover"
                 size={10}
                 svgClass="float-right mt-1"
             />

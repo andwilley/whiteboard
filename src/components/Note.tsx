@@ -17,7 +17,7 @@ interface INoteProps {
 
 const Note: React.SFC<INoteProps> = ({ className = '', note, onDelNoteClick, onInputChange, errorLoc, errorLocId }) => {
     return (
-        <div className="col-md-12">
+        <div className="col-md-12 wb-only-hover">
             <FlexInputContainer
                 placeHolder="Note text."
                 name="flightNote"
@@ -35,6 +35,7 @@ const Note: React.SFC<INoteProps> = ({ className = '', note, onDelNoteClick, onI
             <IconButton
                 onClick={onDelNoteClick({id: note.id, entity: errorLoc, entityId: errorLocId})}
                 icon="trash"
+                hover="only-hover"
                 style={{
                     margin: '-18px 0px 0px 0px',
                 }}

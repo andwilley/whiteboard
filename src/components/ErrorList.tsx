@@ -4,32 +4,34 @@ import IconButton from './IconButton';
 
 interface IErrorListProps {
     errors: IErrors[];
+    className?: string;
 }
 
-const ErrorList: React.SFC<IErrorListProps> = ({ errors }) => {
+const ErrorList: React.SFC<IErrorListProps> = ({ className = '', errors }) => {
     const errorsComps = errors.map(error => {
         return (
-            <li key={error.id} className={`list-group-item error-level-${error.level} wb-error-list-item`}>
+            <p
+                key={error.id}
+                className={`error-level-${error.level} wb-error-list-item${className ? ` ${className}` : ''}`}
+            >
                 <IconButton
                     icon="x"
                     size={10}
                     style={{
-                        margin: '0 5px 0 -15px',
+                        margin: '0 10px 0 0',
                     }}
                     svgClass="align-middle"
                     pointer={false}
                 />
                 {error.message}
-            </li>
+            </p>
         );
     });
     return errors.length > 0 ?
         (
             <div>
-                <h6 className="sidebar-heading text-muted">Conflicts</h6>
-                <ul className="list-group list-group-flush">
-                    {errorsComps}
-                </ul>
+                <h6 className="sidebar-heading text-muted mt-2">Conflicts</h6>
+                {errorsComps}
             </div>
         ) : null;
 };

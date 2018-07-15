@@ -29,15 +29,15 @@ const getFlightTime = (flight: IFlights, dayId: string): string => {
 const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, onDelFlightClick, dayId }) => (
     <div className="col-xl-3 col-lg-4 col-md-6">
         <div className="card mb-3 box-shadow">
-            <div className="card-header bg-dark">
+            <div className="card-header bg-dark wb-only-hover">
                 <IconButton
                     icon={flight.sim ? 'controller' : 'plane'}
                     viewBox={flight.sim ? '0 0 512 512' : '0 0 21 22'}
                     svgClass="crew-icon"
                     pointer={false}
-                    size={12}
+                    size={flight.sim ? 14 : 12}
                     style={{
-                        margin: '0 .2rem 0 0',
+                        margin: `0 .2rem 0 0`,
                     }}
                 >
                 <span className="text-light">{flight.sorties.length}</span>
@@ -57,6 +57,7 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, o
                     onClick={onDelFlightClick(flight, dayId)}
                     icon="trash"
                     size={14}
+                    hover="only-hover"
                     svgClass="float-right"
                 />
                 <span
@@ -82,7 +83,7 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, o
                     entityId={flight.id}
                     entityType={noteEntity.FLIGHT_NOTE}
                 />
-                <ErrorList errors={errors} />
+                <ErrorList errors={errors} className="text-light" />
             </div>
         </div>
     </div>
