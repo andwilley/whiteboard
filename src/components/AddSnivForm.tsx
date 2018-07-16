@@ -88,7 +88,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
         );
     const snivForm = addUpdateSnivFormDisplay ?
         (
-        <form className="col-12" onSubmit={onSubmit}>
+        <form className="col-12 mt-2" onSubmit={onSubmit}>
             <FlexInputContainer
                 placeHolder="Aircrew"
                 name="aircrew"

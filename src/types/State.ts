@@ -135,8 +135,8 @@ export interface IAddUpdateSnivFormValues {
     readonly snivId: string;
     readonly aircrew: string;
     readonly aircrewRefIds: string[];
-    readonly start: Moment | '';
-    readonly end: Moment | '';
+    readonly start: Moment | string;
+    readonly end: Moment | string;
     readonly message: string;
 }
 

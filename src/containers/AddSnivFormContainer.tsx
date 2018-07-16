@@ -6,6 +6,8 @@ import { IErrors, IState, IAddUpdateSnivFormValues } from '../types/State';
 import { errorTypes, errorLocs, errorLevels, errorMessages } from '../errors';
 import { actions, IAddUpdateSnivArgs, IAddErrorArgs } from '../actions';
 import { setErrorsOnFreshState } from './FlexInputContainer';
+import { RGX_24HOUR_TIME } from '../util/regEx';
+import { conv24HrTimeToMoment } from '../types/utilFunctions';
 const { setSnivForm, addUpdateSniv, addUpdateSnivFormDisplay, addError } = actions;
 
 const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => {
@@ -16,7 +18,10 @@ const getAddUpdateSnivFormDisplay = (state: IState): boolean => {
     return state.crewListUI.addUpdateSnivFormDisplay;
 };
 
-const snivTimesAreInOrder = (startTime: Moment.Moment, endTime: Moment.Moment): boolean => {
+const snivTimesAreInOrder = (startTime: Moment.Moment | string, endTime: Moment.Moment | string): boolean => {
+    if (typeof startTime === 'string' || typeof endTime === 'string') {
+        return false;
+    }
     return endTime.isSameOrAfter(startTime);
 };
 
@@ -73,10 +78,10 @@ const mapDispatchToProps = (dispatch: any) => {
     return {
         onSnivSubmit: (sniv: IAddUpdateSnivArgs) => (e: any) => {
             e.preventDefault();
-            if (sniv.start === '' ||
-                sniv.end === '' ||
+            if ((typeof sniv.start === 'string' && !RGX_24HOUR_TIME.test(sniv.start)) ||
+                (typeof sniv.end === 'string' && !RGX_24HOUR_TIME.test(sniv.end)) ||
                 sniv.aircrewIds.length === 0 ||
-                sniv.start.isAfter(sniv.end)) {
+                (typeof sniv.start !== 'string' && sniv.start.isAfter(sniv.end))) {
                 return;
             }
             dispatch(addUpdateSniv({
@@ -87,22 +92,27 @@ const mapDispatchToProps = (dispatch: any) => {
                 message: sniv.message,
             }));
             dispatch(setSnivForm(blankSnivForm));
-            dispatch(addUpdateSnivFormDisplay(false));
             dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         onAircrewInputChange: (input: string) => {
             dispatch(setSnivForm({aircrew: input}));
         },
         onTimeInputChange: (startOrEnd: 'start' | 'end',
-                            compTime: Moment.Moment,
+                            compTime: Moment.Moment | string,
                             errors: IErrors[]
-        ) => (refTime: Moment.Moment) => {
+        ) => (refTime: Moment.Moment | string) => {
             /**
              * @param {'start' | 'end'} startOrEnd label of the element calling the function
              * @param {Moment} compTime moment to compare this elements time to when this element changes
              * @param {Moment} refTime moment that has been updated in element calling the function
              * @return {void} just dispatches required actions.
              */
+            if (typeof compTime === 'string' && RGX_24HOUR_TIME.test(compTime)) {
+                compTime = conv24HrTimeToMoment(compTime, Moment().format('YYYY-MM-DD'));
+            }
+            if (typeof refTime === 'string' && RGX_24HOUR_TIME.test(refTime)) {
+                refTime = conv24HrTimeToMoment(refTime, Moment().format('YYYY-MM-DD'));
+            }
             const timesAreValid = Moment.isMoment(refTime) && Moment.isMoment(compTime);
             clearSnivFormErrors(errors, dispatch);
             switch (startOrEnd) {

@@ -40,7 +40,6 @@ const mapDispatchToProps = (dispatch: any) => {
         dispatch(addUpdateAircrew(aircrew));
       }
       dispatch(setAircrewForm(blankAddUpdateAircrewForm));
-      dispatch(addUpdateAircrewFormDisplay(false));
     },
     // need async action to validate unique callsign on server.
     onInputChange: (event: any) => {
