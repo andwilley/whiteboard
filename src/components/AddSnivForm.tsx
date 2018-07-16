@@ -88,11 +88,13 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
         );
     const snivForm = addUpdateSnivFormDisplay ?
         (
-        <form onSubmit={onSubmit}>
+        <form className="col-12" onSubmit={onSubmit}>
             <FlexInputContainer
                 placeHolder="Aircrew"
                 name="aircrew"
                 value={formValues.aircrew}
+                className="form-control"
+                wrapperClassName="px-0 mt-1 border-left-0"
                 onChange={onAircrewInputChange}
                 errorConfig={{
                     show: [],
@@ -111,7 +113,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 }}
                 isValidDate={dateIsSelectable('before', formValues.end)}
                 value={formValues.start}
-                className={startClassName}
+                className={`mt-1 ${startClassName}`}
                 onChange={onTimeInputChange('start', formValues.end, errors)}
                 timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
@@ -123,13 +125,14 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 }}
                 isValidDate={dateIsSelectable('after', formValues.start)}
                 value={formValues.end || formValues.start}
-                className={endClassName}
+                className={`mt-1 ${endClassName}`}
                 onChange={onTimeInputChange('end', formValues.start, errors)}
                 timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
             <input
                 type="text"
                 name="message"
+                className="form-control mt-1"
                 placeholder="Message"
                 value={formValues.message}
                 onChange={onInputChange}
@@ -139,7 +142,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 name="snivId"
                 value={formValues.snivId}
             />
-            <button type="submit">
+            <button className="btn btn-primary" type="submit">
             Submit
             </button>
         </form>

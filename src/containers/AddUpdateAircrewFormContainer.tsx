@@ -47,15 +47,11 @@ const mapDispatchToProps = (dispatch: any) => {
       const target = event.target;
       const name: string = target.name;
       const value: string = target.value;
-      switch (name) {
-        case 'quals':
-          dispatch(target.checked ? addUpdateAircrewFormAddQual(value) : addUpdateAircrewFormDelQual(value));
-          break;
-        default:
-          dispatch(setAircrewForm({[name]: value}));
-          break;
-      }
+      dispatch(setAircrewForm({[name]: value}));
       dispatch(setAircrewForm({existingAircrewUnchanged: false}));
+    },
+    onToggleQual: (qual: string, selected: boolean) => (e: any) => {
+      dispatch(selected ? addUpdateAircrewFormDelQual(qual) : addUpdateAircrewFormAddQual(qual));
     },
     onAddAircrewFormButtonClick: () => {
       dispatch(addUpdateAircrewFormDisplay(true));

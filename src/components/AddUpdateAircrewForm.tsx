@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { IAddUpdateAircrewFormValues } from '../types/State';
 import IconButton from './IconButton';
+import QualBox from './QualBox';
 
 const parseRank = (rank: string | number): number => {
     const validRanks = {
@@ -23,6 +24,7 @@ const parseRank = (rank: string | number): number => {
         'cap': 3,
         'major': 4,
         'maj': 4,
+        'hinge': 4,
         'lieutenant colonel': 5,
         'lt col': 5,
         'ltcol': 5,
@@ -87,6 +89,7 @@ const intToRank = (rank: string | number): string => {
 
 interface IAddUpdateAircrewFormProps {
     onInputChange: () => any;
+    onToggleQual: (qual: string, selected: boolean) => (e: any) => void;
     onAddUpdateAircrewSubmit: (crew: IAddUpdateAircrewFormValues) => any;
     addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
     qualsList: string[];
@@ -95,13 +98,15 @@ interface IAddUpdateAircrewFormProps {
     onDelAircrewFormButtonClick: () => void;
 }
 
-const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputChange,
-                                                                       onAddUpdateAircrewSubmit,
-                                                                       addUpdateAircrewFormValues,
-                                                                       qualsList,
-                                                                       addUpdateAircrewFormDisplay,
-                                                                       onAddAircrewFormButtonClick,
-                                                                       onDelAircrewFormButtonClick,
+const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({
+    onInputChange,
+    onToggleQual,
+    onAddUpdateAircrewSubmit,
+    addUpdateAircrewFormValues,
+    qualsList,
+    addUpdateAircrewFormDisplay,
+    onAddAircrewFormButtonClick,
+    onDelAircrewFormButtonClick,
 }) => {
     const rankIsValid = addUpdateAircrewFormValues.rank === 0 ? true : parseRank(addUpdateAircrewFormValues.rank);
     const onSubmit = (e: any) => {
@@ -117,18 +122,6 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
             existingAircrewUnchanged: addUpdateAircrewFormValues.existingAircrewUnchanged,
         });
     };
-    const qualCheckboxList = qualsList.map( (qual: string) => (
-        <label htmlFor="qual" key={qual} className="text-light">
-            <input
-                type="checkbox"
-                name="quals"
-                value={qual}
-                checked={addUpdateAircrewFormValues.quals.indexOf(qual) > -1 ? true : false}
-                onChange={onInputChange}
-            />
-            {qual}
-        </label>
-    ));
     const addUpdateAircrewFormDisplayButton = addUpdateAircrewFormDisplay ?
         (
         <ul className="nav flex-column">
@@ -158,8 +151,7 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
         );
     const addAircrewForm = addUpdateAircrewFormDisplay ?
         (
-        <form onSubmit={e => onSubmit(e)}>
-            <p className="text-light">{addUpdateAircrewFormValues.id === '' ? 'Add' : 'Update'} Aircrew:</p>
+        <form className="col-12 mt-2 mb-3" onSubmit={e => onSubmit(e)}>
             <input
                 type="hidden"
                 name="id"
@@ -168,45 +160,60 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({ onInputCh
             <input
                 type="text"
                 placeholder="Callsign*"
+                className="form-control mt-1"
                 name="callsign"
                 value={addUpdateAircrewFormValues.callsign}
                 onChange={onInputChange}
                 required={true}
                 autoFocus={true}
-            /><br />
+            />
             <input
                 type="text"
                 placeholder="First"
+                className="form-control mt-1"
                 name="first"
                 value={addUpdateAircrewFormValues.first}
                 onChange={onInputChange}
-            /><br />
+            />
             <input
                 type="text"
                 placeholder="Last"
+                className="form-control mt-1"
                 name="last"
                 value={addUpdateAircrewFormValues.last}
                 onChange={onInputChange}
-            /><br />
+            />
             <input
                 type="text"
                 placeholder="Rank"
+                className="form-control mt-1"
                 name="rank"
                 style={{borderColor: rankIsValid ? '' : 'red' }}
                 value={intToRank(addUpdateAircrewFormValues.rank)}
                 onChange={onInputChange}
-            /><br />
-            <select name="seat" value={addUpdateAircrewFormValues.seat} onChange={onInputChange}>
+            />
+            <select
+                name="seat"
+                className="form-control mt-1"
+                value={addUpdateAircrewFormValues.seat}
+                onChange={onInputChange}
+            >
                 <option value="pilot">
                     Pilot
                 </option>
                 <option value="wso">
                     WSO
                 </option>
-            </select><br />
-            {qualCheckboxList}<br />
+            </select>
+            <QualBox
+                qualsList={qualsList}
+                onToggleQual={onToggleQual}
+                filters={addUpdateAircrewFormValues.quals}
+                className="mt-2 mb-2"
+            />
             <button
                 type="submit"
+                className={`btn ${addUpdateAircrewFormValues.callsign === '' ? 'btn-secondary' : 'btn-primary'}`}
                 disabled={addUpdateAircrewFormValues.callsign === '' ? true : false}
             >
                 {addUpdateAircrewFormValues.existingAircrewUnchanged ? 'Clear' : 'Submit'}

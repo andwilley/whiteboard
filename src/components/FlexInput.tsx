@@ -7,6 +7,7 @@ import { getHighestErrorLevel } from '../errors';
 interface IFlexInputProps {
     placeHolder: string;
     className?: string;
+    wrapperClassName?: string;
     name: string;
     value: string;
     onChange: (e: EditorState) => void;
@@ -26,6 +27,7 @@ interface IFlexInputProps {
 const FlexInput: React.SFC<IFlexInputProps> = ({
     placeHolder,
     className = '',
+    wrapperClassName = '',
     name,
     value,
     onChange,
@@ -63,13 +65,14 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
         }, 0);
     }
     return (
-        <div className={`form-control wb-form-input flexInput${errorClasses}${className ? ` ${className}` : ''}`}>
+        <div className={`wb-form-input flexInput${errorClasses}${wrapperClassName ? ` ${wrapperClassName}` : ''}`}>
         {showEditor ?
         (
             <Editor
                 editorState={editorState}
                 onChange={onChange}
                 ref={ref}
+                blockStyleFn={() => className}
                 onBlur={onBlur}
                 handleBeforeInput={restrictor ? restrictor.textInput : restrictor}
                 handlePastedText={restrictor ? restrictor.pasteInput : restrictor}
@@ -77,7 +80,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
         ) :
             <p
                 tabIndex={0}
-                className={value.length > 0 ? 'pStyle' : 'pStyleEmpty'}
+                className={`${value.length > 0 ? 'pStyle' : 'pStyleEmpty'}${className ? ` ${className}` : ''}`}
                 onClick={onClick}
                 onFocus={onClick}
             >

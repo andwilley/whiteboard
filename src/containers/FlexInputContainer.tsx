@@ -47,6 +47,7 @@ interface IErrorConfig {
 interface IFlexInputContainerProps {
     placeHolder: string;
     className?: string;
+    wrapperClassName?: string;
     name: string;
     value: string;
     onChange: (e: any) => any;
@@ -593,6 +594,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             dispatchProps.dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         className: ownProps.className,
+        wrapperClassName: ownProps.wrapperClassName,
         errors: stateProps.errors,
         aircrewRefList: stateProps.aircrewRefList,
         editorState: stateProps.editorState,
