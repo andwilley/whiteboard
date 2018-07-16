@@ -31,7 +31,7 @@ const IconButton: React.SFC<IIconButtonProps> = ({
             {icon &&
                 <svg
                     className={`icon icon-${icon}${svgClass ? ` ${svgClass}` : ''}
-                        ${pointer ? ' wb-pointer' : ''}${hover === 'only-hover' && ` wb-only-hover-element`}`}
+                        ${pointer ? ' wb-pointer' : ''}${hover === 'only-hover' ? ` wb-only-hover-element` : ''}`}
                     xmlns="http://www.w3.org/2000/svg"
                     width={size}
                     height={size}

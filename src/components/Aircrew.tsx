@@ -42,37 +42,41 @@ const Aircrew: React.SFC<IAircrewProps> = ({
     const snivComponentList = snivs.map(sniv => {
         const delSnivButtons =
         (
-            <span>
+            <span className="mt-1">
                 {sniv.aircrewIds.length > 1 ?
                 <IconButton
                     onClick={onSnivXClick(sniv.id, aircrew.id)}
                     icon="trash"
+                    hover="only-hover"
                     svgClass="crew-icons float-right"
                     size={12}
                 /> : null}
                 <IconButton
                     onClick={onSnivXClick(sniv.id)}
                     icon="trash"
+                    hover="only-hover"
                     svgClass="crew-icons float-right"
                     size={12}
                 />
             </span>
         );
         return (
-            <li className="nav-item wb-nav-item text-light wb-only-hover" key={sniv.id}>
-                <span>{sniv.dates[dayId].start.format('HHmm')}</span>-
-                <span>{sniv.dates[dayId].end.format('HHmm')}</span>{': '}
-                <span>{sniv.message} </span>
-                {delSnivButtons}
-                <span>
-                    <IconButton
-                        onClick={onSnivEditClick(sniv)}
-                        icon="pencil"
-                        size={12}
-                        hover="only-hover"
-                        svgClass="crew-icons float-right"
-                    />
+            <li className="nav-item wb-nav-item d-flex ml-2 text-light wb-only-hover" key={sniv.id}>
+                <span className="mr-auto">
+                    <span>{sniv.dates[dayId].start.format('HHmm')}</span>-
+                    <span>{sniv.dates[dayId].end.format('HHmm')}</span>{': '}
+                    <span>{sniv.message} </span>
                 </span>
+                    <span className="mt-1">
+                        <IconButton
+                            onClick={onSnivEditClick(sniv)}
+                            icon="pencil"
+                            size={12}
+                            hover="only-hover"
+                            svgClass="crew-icons float-right"
+                        />
+                    </span>
+                {delSnivButtons}
             </li>
         );
     });
@@ -80,18 +84,20 @@ const Aircrew: React.SFC<IAircrewProps> = ({
     let workDayClass = '';
     if (crewDayAndWorkDay) {
         crewDayClass = crewDayAndWorkDay.legalCrewDay >= 12
-            ?   'text-danger'
+            ?   ' text-danger'
             :   crewDayAndWorkDay.legalCrewDay >= 10
-            ?   'text-warning'
+            ?   ' text-warning'
             :   '';
         workDayClass = crewDayAndWorkDay.workDay >= 11
-            ?   'text-danger'
+            ?   ' text-danger'
             :   crewDayAndWorkDay.workDay >= 9
-            ?   'text-warning'
+            ?   ' text-warning'
             :   '';
     }
     return (
-        <li className="nav-item wb-nav-item text-light wb-only-hover">
+        <div>
+        <li className="nav-item wb-nav-item d-flex text-light wb-only-hover">
+            <span className="mr-auto">
             <span
                 style={aircrewStyle}
                 onClick={onAircrewClick}
@@ -104,6 +110,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                     icon="plane"
                     size={12}
                     svgClass="crew-icons"
+                    className="d-inline-block"
                     style={{
                         margin: '0 2px 0 8px',
                     }}
@@ -117,6 +124,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                     icon="controller"
                     size={14}
                     svgClass="crew-icons"
+                    className="d-inline-block"
                     style={{
                         margin: '0 2px 0 8px',
                     }}
@@ -130,6 +138,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                     icon="paperclip"
                     size={12}
                     svgClass="crew-icons"
+                    className="d-inline-block"
                     style={{
                         margin: '0 2px 0 8px',
                     }}
@@ -142,7 +151,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                     icon="clock"
                     size={12}
                     svgClass="crew-icons"
-                    className={workDayClass}
+                    className={`d-inline-block${workDayClass}`}
                     style={{
                         margin: '0 2px 0 8px',
                     }}
@@ -155,7 +164,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                     icon="warning"
                     size={12}
                     svgClass="crew-icons"
-                    className={crewDayClass}
+                    className={`d-inline-block${crewDayClass}`}
                     style={{
                         margin: '0 2px 0 8px',
                     }}
@@ -163,21 +172,24 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                 >
                     {crewDayAndWorkDay.legalCrewDay.toFixed(1)}
                 </IconButton>)}
+            </span>
+            <IconButton
+                onClick={onAircrewEditClick}
+                icon="pencil"
+                size={12}
+                hover="only-hover"
+                svgClass="crew-icons"
+            />
             <IconButton
                 onClick={onAircrewXClick}
                 icon="trash"
                 size={12}
                 hover="only-hover"
-                svgClass="float-right crew-icons"
-            /><IconButton
-                onClick={onAircrewEditClick}
-                icon="pencil"
-                size={12}
-                hover="only-hover"
-                svgClass="float-right crew-icons"
+                svgClass="crew-icons"
             />
-            {showSnivs && <ul className="nav flex-column">{snivComponentList}</ul>}
         </li>
+        {showSnivs && snivComponentList}
+        </div>
     );
 };
 
