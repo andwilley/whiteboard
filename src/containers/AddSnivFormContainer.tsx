@@ -61,9 +61,9 @@ const mapStateToProps = (state: IState) => {
         addUpdateSnivFormDisplay: getAddUpdateSnivFormDisplay(state),
         errors: getSnivFormErrors(state),
         dateIsSelectable: (beforeOrAfter: 'before' | 'after',
-                           referenceDate: Moment.Moment | '') => (currentDate: Moment.Moment,
-                                                                  selectedDate: Moment.Moment): boolean => {
-            if (referenceDate === '') {
+                           referenceDate: Moment.Moment | string) => (currentDate: Moment.Moment,
+                                                                      selectedDate: Moment.Moment): boolean => {
+            if (typeof referenceDate === 'string') {
                 return true;
             }
             if (beforeOrAfter === 'before') {

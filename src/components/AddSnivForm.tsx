@@ -14,12 +14,12 @@ interface IAddSnivFormProps {
     addUpdateSnivFormDisplay: boolean;
     errors: IErrors[];
     dateIsSelectable: (beforeOrAfter: 'before' | 'after',
-                       referenceDate: Moment.Moment | '') => (currentDate: Moment.Moment,
-                                                              selectedDate: Moment.Moment) => boolean;
+                       referenceDate: Moment.Moment | string) => (currentDate: Moment.Moment,
+                                                                  selectedDate: Moment.Moment) => boolean;
     onSnivSubmit: (obj: IAddUpdateSnivArgs) => (e: any) => void;
     onInputChange: () => void;
     onTimeInputChange: (timeType: 'start' | 'end',
-                        compTime: Moment.Moment | '',
+                        compTime: Moment.Moment | string,
                         errors: IErrors[]) => (e: any) => void;
     onAircrewInputChange: () => void;
     onSnivFormAddButtonClick: () => void;

@@ -150,8 +150,8 @@ export interface IAddErrorArgs {
 export interface IAddUpdateSnivArgs {
     snivId?: string;
     aircrewIds: string[];
-    start: moment.Moment | '';
-    end: moment.Moment | '';
+    start: moment.Moment | string;
+    end: moment.Moment | string;
     message: string;
 }
 
@@ -159,15 +159,15 @@ export type ISetSnivFormArgs = {
     [P in keyof IAddUpdateSnivFormValues]?: IAddUpdateSnivFormValues[P];
 };
 
-const breakDateRangeIntoDays = (start: moment.Moment | '',
-                                end: moment.Moment | ''
+const breakDateRangeIntoDays = (start: moment.Moment | string,
+                                end: moment.Moment | string
 ): {[key: string]: {start: moment.Moment; end: moment.Moment}} => {
     /**
      * doesn't work if start and end are 23:59:59.999 on the same day.
      * Use can't set ms. Not a factor, but it is a bug
      * Moments are mutable!! watch the references.
      */
-    if (start === '' || end === '') {
+    if (typeof start === 'string' || typeof end === 'string') {
         return {};
     }
     if (start.isAfter(end)) {
