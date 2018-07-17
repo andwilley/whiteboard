@@ -121,9 +121,17 @@
 }
 
 .wb-only-hover-element {
+  display: none;
+}
+
+.wb-only-hover-element-hold-space {
   visibility: hidden;
 }
 
 .wb-only-hover:hover .wb-only-hover-element {
+  display: flow-root;
+}
+
+.wb-only-hover:hover .wb-only-hover-element-hold-space {
   visibility: visible;
 }

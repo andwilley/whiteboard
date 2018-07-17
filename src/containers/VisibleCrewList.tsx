@@ -98,7 +98,6 @@ const getFilteredAircrewIds = (
             return false;
         }
     }
-    console.log(filters.groupFilter.length);
     /** filter out aircrew that aren't in the selected group */
     if (filters.groupFilter.length > 0) {
         let allGroupsMatch = true;

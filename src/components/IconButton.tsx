@@ -27,11 +27,11 @@ const IconButton: React.SFC<IIconButtonProps> = ({
     hover = 'always-visible',
 }) => {
     return (
-        <span onClick={onClick} className={`${className}`}>
+        <span onClick={onClick} className={`${className}${hover === 'only-hover' ? ` wb-only-hover-element` : ''}`}>
             {icon &&
                 <svg
                     className={`icon icon-${icon}${svgClass ? ` ${svgClass}` : ''}
-                        ${pointer ? ' wb-pointer' : ''}${hover === 'only-hover' ? ` wb-only-hover-element` : ''}`}
+                        ${pointer ? ' wb-pointer' : ''}`}
                     xmlns="http://www.w3.org/2000/svg"
                     width={size}
                     height={size}
