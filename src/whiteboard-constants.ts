@@ -4,7 +4,7 @@ import { ITimeTypes, IAddUpdateSnivFormValues, ISnivTimeTypes, INoteEntity } fro
 export const qualsList =
     ['ODO', 'TXN', 'TXNI', 'IFR', 'IFRI', 'STK', 'STKI', 'LAT', 'LATI', 'CAS', 'CASI', 'FAC(A)',
      'FWT 1', 'FWT 1I', 'FWT 2', 'FWT 2I', 'AI', 'AII', 'BFM', 'BFMI', 'NVG', 'NVGI', 'CQ', 'OCF',
-     'OCFI', 'FCF', 'NTPS CK', 'INST CK'];
+     'OCFI', 'FCF', 'NTPS CK', 'INST CK', 'IP', 'RAC'];
 
 export const blankAddUpdateAircrewForm = {
     id: '',
