@@ -27,7 +27,7 @@ const getFlightTime = (flight: IFlights, dayId: string): string => {
 };
 
 const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, onDelFlightClick, dayId }) => (
-    <div className="col-xl-3 col-lg-4 col-md-6">
+    <div className="wb-col-xxl-2-4 col-xl-3 col-lg-4 col-md-6">
         <div className="card mb-3 box-shadow">
             <div className="card-header d-flex bg-dark wb-only-hover">
                 <span className="mr-auto">

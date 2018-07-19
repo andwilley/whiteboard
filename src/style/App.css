@@ -129,9 +129,17 @@
 }
 
 .wb-only-hover:hover .wb-only-hover-element {
-  display: flow-root;
+  display: inherit;
 }
 
 .wb-only-hover:hover .wb-only-hover-element-hold-space {
   visibility: visible;
+}
+
+@media (min-width: 1500px) {
+  .wb-col-xxl-2-4 {
+    -ms-flex: 0 0 20%;
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
 }
