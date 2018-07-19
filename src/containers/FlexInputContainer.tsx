@@ -23,6 +23,7 @@ import { IState,
          IGroups,
          ISettings} from '../types/State';
 import { IAddErrorArgs } from '../actions';
+import { RGX_FIND_NAME } from '../util/regEx';
 
 type IAircrewEntity = IEntity<IAircrew>;
 
@@ -283,7 +284,11 @@ const getUniqueAircrewIdsFromGroups = (groupRefs: IGroups[]): string[] => {
     return uniqueAircrewIds;
 };
 
-const nameMatch = (
+const nameMatch = (input: string, compareToName: string): RegExpMatchArray | null => {
+    return input.match(RGX_FIND_NAME(compareToName));
+};
+
+const getMatchedNames = (
     aircrewList: IAircrew[],
     groupList: IGroups[],
     inputValue: string
@@ -303,8 +308,10 @@ const nameMatch = (
      */
     const groupRefs = getGroupRefsFromInput(inputValue, groupList);
     const groupAircrewRefsIds = getUniqueAircrewIdsFromGroups(groupRefs);
+    const input = inputValue.toLowerCase();
     return aircrewList.filter(aircrew => {
-        return inputValue.toLowerCase().includes(aircrew.callsign.toLowerCase()) ||
+        const callsign = aircrew.callsign.toLowerCase();
+        return nameMatch(input, callsign) ? true : false ||
             (groupAircrewRefsIds.indexOf(aircrew.id) > -1);
     });
 };
@@ -401,7 +408,7 @@ const getOnChangeWithNameMatch = ({
     }
     return (editorState) => {
         /** update the aircrewRefs state for this input */
-        const matchedAircrew = nameMatch(
+        const matchedAircrew = getMatchedNames(
             aircrewList,
             groupList,
             editorState.getCurrentContent().getPlainText()
@@ -441,9 +448,9 @@ const nameStrategy = (name: string) => (
     contentState: ContentState
 ) => {
     const text = contentBlock.getText().toLowerCase();
-    const start = text.indexOf(name.toLowerCase());
-    if (start > -1) {
-        callback(start, start + name.length);
+    const match = nameMatch(text, name.toLowerCase());
+    if (match && typeof match.index === 'number') {
+        callback(match.index, match.index + name.length);
     }
 };
 
