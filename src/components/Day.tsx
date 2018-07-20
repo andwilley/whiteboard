@@ -4,7 +4,6 @@ import NoteBoxContainer from '../containers/NoteBoxContainer';
 import { noteEntity } from '../whiteboard-constants';
 import { IErrors } from '../types/State';
 import ErrorList from './ErrorList';
-import * as Moment from 'moment';
 import NavBar from './NavBar';
 import IconButton from './IconButton';
 
@@ -17,13 +16,13 @@ interface IDayProps {
 }
 
 const Day: React.SFC<IDayProps> = ({ dayId, totalFlightTime, totalSorties, dayErrors, noteErrors } ) => (
-    <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-4 wb-main">
         <NavBar />
         <div
             className={`d-flex justify-content-between flex-wrap flex-md-nowrap
                 align-items-center pt-3 pb-2 mb-3 border-bottom`}
         >
-            <h1 className="h2">{Moment().add(1, 'day').format('MMM Do, YYYY')/*dayId*/}</h1>
+            <h1 className="h2">{dayId}</h1>
                 <div className="btn-toolbar mb-2 mb-md-0">
                     <div className="btn-group mr-2">
                         <IconButton
@@ -67,7 +66,7 @@ const Day: React.SFC<IDayProps> = ({ dayId, totalFlightTime, totalSorties, dayEr
             <ErrorList errors={dayErrors[dayId] ? dayErrors[dayId] : []} />
         </div>
         <div className="footer pt-5">
-            A footer.
+            Whiteboard is one of many collaborative efforts by Steamboat Willey and Tummy's Mom.
         </div>
     </main>
 );

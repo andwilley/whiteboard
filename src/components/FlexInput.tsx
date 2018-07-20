@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { Editor, EditorState, DraftHandleValue } from 'draft-js';
-import { IUntrackedErrors } from '../types/WhiteboardTypes';
+import { IUntrackedErrors, UEditables } from '../types/WhiteboardTypes';
 import { IErrors, IAircrew } from '../types/State';
 import { getHighestErrorLevel } from '../errors';
+import { IErrorConfig } from '../containers/FlexInputContainer';
+import { ValidatorFn } from '../util/validator';
+import { RestrictorFn } from '../util/restrictor';
 
 interface IFlexInputProps {
     placeHolder: string;
@@ -10,6 +13,12 @@ interface IFlexInputProps {
     wrapperClassName?: string;
     name: string;
     value: string;
+    pvalue: JSX.Element;
+    errorConfig: IErrorConfig;
+    element: UEditables;
+    entityId: string;
+    validatorFns?: ValidatorFn[];
+    restrictorFns?: RestrictorFn[];
     onChange: (e: EditorState) => void;
     onClick: () => void;
     onBlur: (e: any) => void;
@@ -30,6 +39,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     wrapperClassName = '',
     name,
     value,
+    pvalue,
     onChange,
     onClick,
     onBlur,
@@ -84,7 +94,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
                 onClick={onClick}
                 onFocus={onClick}
             >
-                {value || placeHolder}
+                {pvalue || placeHolder}
             </p>}
         </div>
         );

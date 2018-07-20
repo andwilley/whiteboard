@@ -110,6 +110,7 @@
 
 .sim-sortie-icon {
   margin-bottom: -16px;
+  z-index: 1000;
 }
 
 .wb-badge-selected {
@@ -142,4 +143,8 @@
     flex: 0 0 20%;
     max-width: 20%;
   }
+}
+
+.wb-main {
+  min-height: 1000px;
 }

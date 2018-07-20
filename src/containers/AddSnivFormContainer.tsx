@@ -60,6 +60,7 @@ const mapStateToProps = (state: IState) => {
         formValues: getAddUpdateSnivFormValues(state),
         addUpdateSnivFormDisplay: getAddUpdateSnivFormDisplay(state),
         errors: getSnivFormErrors(state),
+        dayId: state.crewListUI.currentDay,
         dateIsSelectable: (beforeOrAfter: 'before' | 'after',
                            referenceDate: Moment.Moment | string) => (currentDate: Moment.Moment,
                                                                       selectedDate: Moment.Moment): boolean => {
@@ -99,7 +100,8 @@ const mapDispatchToProps = (dispatch: any) => {
         },
         onTimeInputChange: (startOrEnd: 'start' | 'end',
                             compTime: Moment.Moment | string,
-                            errors: IErrors[]
+                            errors: IErrors[],
+                            dayId: string
         ) => (refTime: Moment.Moment | string) => {
             /**
              * @param {'start' | 'end'} startOrEnd label of the element calling the function
@@ -108,10 +110,10 @@ const mapDispatchToProps = (dispatch: any) => {
              * @return {void} just dispatches required actions.
              */
             if (typeof compTime === 'string' && RGX_24HOUR_TIME.test(compTime)) {
-                compTime = conv24HrTimeToMoment(compTime, Moment().format('YYYY-MM-DD'));
+                compTime = conv24HrTimeToMoment(compTime, dayId);
             }
             if (typeof refTime === 'string' && RGX_24HOUR_TIME.test(refTime)) {
-                refTime = conv24HrTimeToMoment(refTime, Moment().format('YYYY-MM-DD'));
+                refTime = conv24HrTimeToMoment(refTime, dayId);
             }
             const timesAreValid = Moment.isMoment(refTime) && Moment.isMoment(compTime);
             clearSnivFormErrors(errors, dispatch);

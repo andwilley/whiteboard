@@ -9,7 +9,6 @@ import { createAction } from 'typesafe-actions';
 import { $call } from 'utility-types';
 import { EditorState } from 'draft-js';
 import { UEditables, ISchedBlock } from '../types/WhiteboardTypes';
-import { RGX_FIND_TR_CODES } from '../util/regEx';
 import * as moment from 'moment';
 
 // Action Types
@@ -444,13 +443,12 @@ export const actions = {
          * to be filtered by FlexInput... is this a bad idea? I have to do it there to
          * keep the editor from showing it... if I did it here, we'd be doing it twice.
          */
-        const codesList = args.codes.match(RGX_FIND_TR_CODES);
         return {
             type: UPDATE_PUCK_CODE,
             payload: {
                 sortieId: args.sortieId,
                 crewPosition: args.crewPosition,
-                codes: codesList || [],
+                codes: [args.codes] || [],
             },
         };
     }),

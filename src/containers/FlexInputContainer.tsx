@@ -23,7 +23,7 @@ import { IState,
          IGroups,
          ISettings} from '../types/State';
 import { IAddErrorArgs } from '../actions';
-import { RGX_FIND_NAME } from '../util/regEx';
+import { RGX_FIND_NAME, RGX_HILITE_STRING } from '../util/regEx';
 
 type IAircrewEntity = IEntity<IAircrew>;
 
@@ -38,7 +38,7 @@ type IAircrewEntity = IEntity<IAircrew>;
  * component to dictate its display.
  */
 
-interface IErrorConfig {
+export interface IErrorConfig {
     show: UErrorTypes[];
     update: UErrorTypes[];
     errorLoc: UErrorLocs;
@@ -442,6 +442,29 @@ const isInputActive = (state: IState, ownProps: IFlexInputContainerProps) => {
     return false;
 };
 
+const highlightStrategy = (
+    contentBlock: ContentBlock,
+    callback: (start: number, end: number) => void,
+    contentState: ContentState
+) => {
+    const text = contentBlock.getText().toLowerCase();
+    const match = text.match(RGX_HILITE_STRING);
+    if (match && typeof match.index === 'number') {
+        callback(match.index + 1, match.index + 1 + match[2].length);
+    }
+};
+
+const highlightSpan = (props: any) => {
+    return (
+        <span
+            className="bg-warning"
+            data-offset-key="props.dataOffsetKey"
+        >
+            {props.children}
+        </span>
+    );
+};
+
 const nameStrategy = (name: string) => (
     contentBlock: ContentBlock,
     callback: (start: number, end: number) => void,
@@ -483,6 +506,10 @@ const getDecorators = (aircrewRefList: IAircrew[], groupRefList: IGroups[]): Com
             component: nameSpan(group.id),
         };
     }));
+    decorators = decorators.concat({
+        strategy: highlightStrategy,
+        component: highlightSpan,
+    });
     const compositeDecorators = new CompositeDecorator(decorators);
     return compositeDecorators;
 };
@@ -501,6 +528,17 @@ const getGroupList = (groups: IEntity<IGroups>, aircrewIds: string[]): IGroups[]
         };
     });
     return userGroups.concat(builtInGroups);
+};
+
+const decorateStaticValue = (value: string): JSX.Element => {
+    const match = value.match(RGX_HILITE_STRING);
+    return (
+        <span>
+            {match ? match[1] : ''}
+            <span className="bg-warning">{match ? match[2] : ''}</span>
+            {match ? match[3] : ''}
+        </span>
+    );
 };
 
 interface IFlexInputStateProps {
@@ -611,6 +649,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
                                                 stateProps.editorState.getCurrentContent().getPlainText() :
                                                 ownProps.value,
                                               ownProps.validatorFns),
+        pvalue: decorateStaticValue(ownProps.value),
     });
 };
 

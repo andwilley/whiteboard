@@ -13,6 +13,7 @@ interface IAddSnivFormProps {
     formValues: IAddUpdateSnivFormValues;
     addUpdateSnivFormDisplay: boolean;
     errors: IErrors[];
+    dayId: string;
     dateIsSelectable: (beforeOrAfter: 'before' | 'after',
                        referenceDate: Moment.Moment | string) => (currentDate: Moment.Moment,
                                                                   selectedDate: Moment.Moment) => boolean;
@@ -20,22 +21,25 @@ interface IAddSnivFormProps {
     onInputChange: () => void;
     onTimeInputChange: (timeType: 'start' | 'end',
                         compTime: Moment.Moment | string,
-                        errors: IErrors[]) => (e: any) => void;
+                        errors: IErrors[],
+                        dayId: string) => (e: any) => void;
     onAircrewInputChange: () => void;
     onSnivFormAddButtonClick: () => void;
     onSnivFormDelButtonClick: () => void;
 }
 
-const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
-                                                    addUpdateSnivFormDisplay,
-                                                    errors,
-                                                    dateIsSelectable,
-                                                    onSnivSubmit,
-                                                    onInputChange,
-                                                    onTimeInputChange,
-                                                    onAircrewInputChange,
-                                                    onSnivFormAddButtonClick,
-                                                    onSnivFormDelButtonClick,
+const AddSnivForm: React.SFC<IAddSnivFormProps> = ({
+    formValues,
+    dayId,
+    addUpdateSnivFormDisplay,
+    errors,
+    dateIsSelectable,
+    onSnivSubmit,
+    onInputChange,
+    onTimeInputChange,
+    onAircrewInputChange,
+    onSnivFormAddButtonClick,
+    onSnivFormDelButtonClick,
 }) => {
     const timeFormat = 'HHmm';
     const onSubmit = onSnivSubmit({
@@ -114,7 +118,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 isValidDate={dateIsSelectable('before', formValues.end)}
                 value={formValues.start}
                 className={`mt-1 ${startClassName}`}
-                onChange={onTimeInputChange('start', formValues.end, errors)}
+                onChange={onTimeInputChange('start', formValues.end, errors, dayId)}
                 timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
             <Datetime
@@ -126,7 +130,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({formValues,
                 isValidDate={dateIsSelectable('after', formValues.start)}
                 value={formValues.end || formValues.start}
                 className={`mt-1 ${endClassName}`}
-                onChange={onTimeInputChange('end', formValues.start, errors)}
+                onChange={onTimeInputChange('end', formValues.start, errors, dayId)}
                 timeConstraints={{minutes: {min: 0, max: 59, step: 15}}}
             />
             <input

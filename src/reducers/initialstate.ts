@@ -1,6 +1,20 @@
 import { qualsList } from '../whiteboard-constants';
 import { EditorState } from 'draft-js';
 import { IState } from '../types/State';
+import * as Moment from 'moment';
+
+const daysToAddToSkipWeekend = () => {
+    switch (Moment().day()) {
+        case 6:
+            return 2;
+        case 5:
+            return 3;
+        default:
+            return 1;
+    }
+};
+
+const initialDayId = Moment().add(daysToAddToSkipWeekend(), 'day').format('YYYY-MM-DD');
 
 export const INITIAL_STATE: IState = {
     aircrew: {
@@ -1033,6 +1047,22 @@ export const INITIAL_STATE: IState = {
                 snivs: [],
                 notes: [],
             },
+            cjjsh35dj02e3OK__5e644b3a: {
+                id: 'cjjsh35dj02e3OK__5e644b3a',
+                rank: 3,
+                first: '',
+                last: 'Burt',
+                callsign: 'Burt',
+                seat: 'pilot',
+                quals: [
+                    'RAC',
+                ],
+                flightPucks: [],
+                simPucks: [],
+                odos: 0,
+                snivs: [],
+                notes: [],
+            },
             cjjsh3ih0038sOK__zlbytgcr: {
                 id: 'cjjsh3ih0038sOK__zlbytgcr',
                 rank: 3,
@@ -1569,6 +1599,7 @@ export const INITIAL_STATE: IState = {
             'cjjsh703x0b2dOK__zxi2wz7p',
             'cjjsh7gw40bqeOK__0ld1v6fn',
             'cjjsh7v330cnrOK__s04f55sz',
+            'cjjsh35dj02e3OK__5e644b3a',
             'cjjsh83vq0dd4OK__fonmrrz4',
             'cjjsh8sxt0eftOK__rfu0i9i9',
             'cjjsh97vo0f7uOK__7h03efx2',
@@ -1601,9 +1632,9 @@ export const INITIAL_STATE: IState = {
     },
     days: {
         byId: {
-            '2018-01-24': {
-                flights: ['a', 'b'],
-                id: '2018-01-24',
+            [initialDayId]: {
+                flights: [],
+                id: initialDayId,
                 // flow: {
                 // 	numJets: [],
                 // 	method: [],
@@ -1612,66 +1643,26 @@ export const INITIAL_STATE: IState = {
                 // 	rise: 0710,
                 // 	set: 2031,
                 // },
-                notes: ['b'],
+                notes: [],
                 errors: [],
             },
         },
-        allIds: ['2018-01-24'],
+        allIds: [initialDayId],
     },
     flights: {
-        byId: {
-            a: {
-                id: 'a',
-                sim: true,
-                useExactTimes: false,
-                // flow: 'pit',
-                times: {
-                    brief: '',
-                    takeoff: '',
-                    land: '',
-                },
-                airspace: [],
-                sorties: ['a', 'b'],
-                notes: ['a'],
-            },
-            b: {
-                id: 'b',
-                sim: false,
-                useExactTimes: false,
-                // flow: 'pit',
-                times: {
-                    brief: '',
-                    takeoff: '',
-                    land: '',
-                },
-                airspace: [],
-                sorties: ['c', 'd'],
-                notes: [],
-            },
-        },
-        allIds: ['a', 'b'],
+        byId: {},
+        allIds: [],
     },
     snivs: {
         byId: {},
         allIds: [],
     },
     notes: {
-        byId: {
-            a: {
-                id: 'a',
-                content: 'test flight note',
-                aircrewRefIds: [],
-            },
-            b: {
-                id: 'b',
-                content: 'test day note',
-                aircrewRefIds: [],
-            },
-        },
-        allIds: ['a', 'b'],
+        byId: {},
+        allIds: [],
     },
     crewListUI: {
-        currentDay: '2018-01-24',
+        currentDay: initialDayId,
         showSnivs: false,
         showFilters: false,
         addUpdateAircrewFormDisplay: false,
@@ -1685,77 +1676,8 @@ export const INITIAL_STATE: IState = {
         },
     },
     sorties: {
-        byId: {
-            a: {
-                id: 'a',
-                front: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                back: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                loadout: '',
-                notes: [],
-            },
-            b: {
-                id: 'b',
-                front: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                back: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                loadout: '',
-                notes: [],
-            },
-            c: {
-                id: 'c',
-                front: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                back: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                loadout: '',
-                notes: [],
-            },
-            d: {
-                id: 'd',
-                front: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                back: {
-                    inputName: '',
-                    aircrewRefIds: [],
-                    codes: [],
-                    symbols: '',
-                },
-                loadout: '',
-                notes: [],
-            },
-        },
-        allIds: ['a', 'b', 'c', 'd'],
+        byId: {},
+        allIds: [],
     },
     airspace: {
         byId: {},
