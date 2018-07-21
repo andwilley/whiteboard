@@ -13,7 +13,7 @@ interface IFlexInputProps {
     wrapperClassName?: string;
     name: string;
     value: string;
-    pvalue: JSX.Element;
+    pvalue: JSX.Element | null;
     errorConfig: IErrorConfig;
     element: UEditables;
     entityId: string;
@@ -90,7 +90,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
         ) :
             <p
                 tabIndex={0}
-                className={`${value.length > 0 ? 'pStyle' : 'pStyleEmpty'}${className ? ` ${className}` : ''}`}
+                className={`${pvalue ? 'pStyle' : 'pStyleEmpty'}${className ? ` ${className}` : ''}`}
                 onClick={onClick}
                 onFocus={onClick}
             >

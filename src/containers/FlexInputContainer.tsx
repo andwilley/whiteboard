@@ -530,8 +530,16 @@ const getGroupList = (groups: IEntity<IGroups>, aircrewIds: string[]): IGroups[]
     return userGroups.concat(builtInGroups);
 };
 
-const decorateStaticValue = (value: string): JSX.Element => {
+const decorateStaticValue = (value: string): JSX.Element | null => {
     const match = value.match(RGX_HILITE_STRING);
+    if (!value) {
+        return null;
+    }
+    if (!match) {
+        return (
+            <span>{value}</span>
+        );
+    }
     return (
         <span>
             {match ? match[1] : ''}

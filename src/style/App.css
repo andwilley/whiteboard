@@ -148,3 +148,8 @@
 .wb-main {
   min-height: 1000px;
 }
+
+.wb-hr-narrow {
+  margin-top: .2rem;
+  margin-bottom: .2rem;
+}
