@@ -26,73 +26,70 @@ const getFlightTime = (flight: IFlights, dayId: string): string => {
     return Moment.duration(land.diff(takeoff)).asHours().toFixed(1);
 };
 
-class Flight extends React.PureComponent<IFlightProps> {
-    render() {
-        const { flight, errors, onExactTimesToggle, onDelFlightClick, dayId } = this.props;
-        return (
-            <div className="wb-col-xxl-2-4 col-xl-3 col-lg-4 col-md-6">
-                <div className="card mb-3 box-shadow">
-                    <div className="card-header d-flex bg-dark wb-only-hover">
-                        <span className="mr-auto">
-                            <IconButton
-                                icon={flight.sim ? 'controller' : 'plane'}
-                                viewBox={flight.sim ? '0 0 512 512' : '0 0 21 22'}
-                                svgClass="crew-icon"
-                                pointer={false}
-                                size={flight.sim ? 14 : 12}
-                                style={{
-                                    margin: `0 .2rem 0 0`,
-                                }}
-                            >
-                            <span className="text-light">{flight.sorties.length}</span>
-                            </IconButton>
-                            <IconButton
-                                icon="clock"
-                                svgClass="crew-icon"
-                                pointer={false}
-                                size={12}
-                                style={{
-                                    margin: '0 .2rem 0 .5rem',
-                                }}
-                            >
-                            <span className="text-light">{getFlightTime(flight, dayId)}</span>
-                            </IconButton>
-                        </span>
-                        <span
-                            className={`mr-3 text-light wb-pointer badge badge-pill${flight.useExactTimes ?
-                                ` badge-warning text-dark` : 'bad'}`}
-                            onClick={onExactTimesToggle}
-                        >
-                            Exact Times
-                        </span>
+const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, onDelFlightClick, dayId }) => {
+    return (
+        <div className="wb-col-xxl-2-4 col-xl-3 col-lg-4 col-md-6">
+            <div className="card mb-3 box-shadow">
+                <div className="card-header d-flex bg-dark wb-only-hover">
+                    <span className="mr-auto">
                         <IconButton
-                            onClick={onDelFlightClick(flight, dayId)}
-                            icon="trash"
-                            size={14}
-                            className="wb-only-hover-element-hold-space"
-                        />
-                    </div>
-                    <div className="card-body">
-                        <TimesBox
-                            flightId={flight.id}
-                        />
-                        <SortieBoxContainer flightId={flight.id} />
-                    </div>
-                    <div className="card-footer bg-dark">
-                        <h6 className="sidebar-heading text-muted">
-                            Notes
-                        </h6>
-                        <NoteBoxContainer
-                            className="text-light"
-                            entityId={flight.id}
-                            entityType={noteEntity.FLIGHT_NOTE}
-                        />
-                        <ErrorList errors={errors} className="text-light" />
-                    </div>
+                            icon={flight.sim ? 'controller' : 'plane'}
+                            viewBox={flight.sim ? '0 0 512 512' : '0 0 21 22'}
+                            svgClass="crew-icon"
+                            pointer={false}
+                            size={flight.sim ? 14 : 12}
+                            style={{
+                                margin: `0 .2rem 0 0`,
+                            }}
+                        >
+                        <span className="text-light">{flight.sorties.length}</span>
+                        </IconButton>
+                        <IconButton
+                            icon="clock"
+                            svgClass="crew-icon"
+                            pointer={false}
+                            size={12}
+                            style={{
+                                margin: '0 .2rem 0 .5rem',
+                            }}
+                        >
+                        <span className="text-light">{getFlightTime(flight, dayId)}</span>
+                        </IconButton>
+                    </span>
+                    <span
+                        className={`mr-3 text-light wb-pointer badge badge-pill${flight.useExactTimes ?
+                            ` badge-warning text-dark` : 'bad'}`}
+                        onClick={onExactTimesToggle}
+                    >
+                        Exact Times
+                    </span>
+                    <IconButton
+                        onClick={onDelFlightClick(flight, dayId)}
+                        icon="trash"
+                        size={14}
+                        className="wb-only-hover-element-hold-space"
+                    />
+                </div>
+                <div className="card-body">
+                    <TimesBox
+                        flightId={flight.id}
+                    />
+                    <SortieBoxContainer flightId={flight.id} />
+                </div>
+                <div className="card-footer bg-dark">
+                    <h6 className="sidebar-heading text-muted">
+                        Notes
+                    </h6>
+                    <NoteBoxContainer
+                        className="text-light"
+                        entityId={flight.id}
+                        entityType={noteEntity.FLIGHT_NOTE}
+                    />
+                    <ErrorList errors={errors} className="text-light" />
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
 
 export default Flight;

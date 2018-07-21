@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
-import { IEntity, IErrors, IDays, IState } from '../types/State';
+import { IEntity, IErrors, IDays, IEntityWithActive, UErrorLocs } from '../types/State';
 import { errorLocs } from '../errors';
 
 const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
@@ -96,12 +96,14 @@ const errorReducer = combineReducers<IEntity<IErrors>>({
     allIds: allErrors,
 });
 
+export default errorReducer;
+
 export const getEntityErrors = (errorById: {[id: string]: IErrors},
                                 activeErrorIds: string[],
-                                errorLoc: string
+                                errorLoc: UErrorLocs
 ): {[id: string]: IErrors[]} => {
     /** show sim, flight note and sim note errors with flight errors for now */
-    const errorLocations = errorLoc === errorLocs.FLIGHT ?
+    const errorLocations: UErrorLocs[] = errorLoc === errorLocs.FLIGHT ?
         [errorLocs.FLIGHT, errorLocs.FLIGHT_NOTE, errorLocs.SIM, errorLocs.SIM_NOTE] : [errorLoc];
     return activeErrorIds.reduce((errors, errorId) => {
         if (errorLocations.indexOf(errorById[errorId].location) > -1) {
@@ -113,8 +115,6 @@ export const getEntityErrors = (errorById: {[id: string]: IErrors},
     }, {});
 };
 
-export default errorReducer;
-
 export const getActiveDayErrors = (stateErrorsById: { [id: string]: IErrors }, currentDay: IDays): IErrors[] => {
     /**
      * days.byId[currentDay].errors
@@ -124,6 +124,10 @@ export const getActiveDayErrors = (stateErrorsById: { [id: string]: IErrors }, c
     return dayErrors;
 };
 
-export const getErrors = (state: IState) => {
-    return state.errors;
+export const getErrorsById = (state: IEntityWithActive<IErrors>) => {
+    return state.byId;
+};
+
+export const getActiveErrorIds = (state: IEntityWithActive<IErrors>) => {
+    return state.activeIds;
 };

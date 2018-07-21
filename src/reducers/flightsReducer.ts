@@ -3,6 +3,8 @@ import { getType } from 'typesafe-actions';
 import { IEntity, IFlights } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
+import * as Moment from 'moment';
+import { conv24HrTimeToMoment } from '../types/utilFunctions';
 
 const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
     switch (action.type) {
@@ -147,3 +149,32 @@ const flightsReducer = combineReducers<IEntity<IFlights>>({
 });
 
 export default flightsReducer;
+
+interface ITotalFlightTimeAndSortiesAcc {
+    totalFlightTime: number;
+    totalSorties: number;
+}
+
+export const getTotalFlightTimeAndSorties = (
+    flights: IEntity<IFlights>,
+    dayId: string
+): ITotalFlightTimeAndSortiesAcc => {
+    return flights.allIds.reduce((totalFlightTimeAndSorties: ITotalFlightTimeAndSortiesAcc, flightId) => {
+        const takeoff = conv24HrTimeToMoment(flights.byId[flightId].times.takeoff, dayId);
+        const land = conv24HrTimeToMoment(flights.byId[flightId].times.land, dayId);
+        if (flights.byId[flightId].sim) {
+            return totalFlightTimeAndSorties;
+        }
+        if (!takeoff.isValid() || !land.isValid()) {
+            return {
+                totalFlightTime: totalFlightTimeAndSorties.totalFlightTime,
+                totalSorties: totalFlightTimeAndSorties.totalSorties + flights.byId[flightId].sorties.length,
+            };
+        }
+        return {
+            totalFlightTime: totalFlightTimeAndSorties.totalFlightTime +
+                (Moment.duration(land.diff(takeoff)).asHours()) * flights.byId[flightId].sorties.length,
+            totalSorties: totalFlightTimeAndSorties.totalSorties + flights.byId[flightId].sorties.length,
+        };
+    }, {totalFlightTime: 0, totalSorties: 0});
+};

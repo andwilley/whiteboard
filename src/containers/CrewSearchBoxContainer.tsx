@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { IState, IFilters } from '../types/State';
 import CrewSearchBox from '../components/CrewSearchBox';
-import { getShowSnivs, getShowFilters } from '../reducers/crewListUIReducer';
+import { getShowSnivs, getShowFilters } from '../reducers';
 const { setAircrewSearchForm,
         addQualFilter,
         delQualFilter,

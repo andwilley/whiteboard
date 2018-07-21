@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
 import CrewList from '../components/CrewList';
 import * as Moment from 'moment';
-import { getErrors } from '../reducers/errorReducer';
+import { getErrors } from '../reducers';
 import { getAircrewById } from '../reducers/aircrewReducer';
-import { getShowSnivs } from '../reducers/crewListUIReducer';
+import { getShowSnivs } from '../reducers';
 import { setErrorsOnFreshState, flightIsCrewHotPit } from '../containers/FlexInputContainer';
 import {
   IEntity,

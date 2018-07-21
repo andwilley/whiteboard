@@ -116,3 +116,11 @@ const daysReducer = combineReducers<IEntity<IDays>>({
 });
 
 export default daysReducer;
+
+export const getDaysById = (state: IEntity<IDays>) => {
+    return state.byId;
+};
+
+export const getCurrentDayObj = (state: IEntity<IDays>['byId'], dayId: string) => {
+    return state[dayId];
+};
