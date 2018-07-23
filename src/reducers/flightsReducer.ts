@@ -179,9 +179,10 @@ export const getTotalFlightTimeAndSorties = (
     }, {totalFlightTime: 0, totalSorties: 0});
 };
 
-export const getCurrentDayFlights = (state: IEntity<IFlights>['byId'], currentDayFlightIds: string[]): IFlights[] => {
-    // move this to index reducer
+export const getCurrentDayFlights = (
+    stateFlightsById: IEntity<IFlights>['byId'],
+    currentDayFlightIds: string[]): IFlights[] => {
     return currentDayFlightIds.map(flightId => {
-        return state[flightId];
+        return stateFlightsById[flightId];
     });
 };

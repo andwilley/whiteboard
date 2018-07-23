@@ -6,7 +6,7 @@ import FlightTimes from '../components/FlightTimes';
 import { RGX_24HOUR_TIME } from '../util/regEx';
 import { UTimeTypes } from '../types/State';
 import { timeTypes } from '../whiteboard-constants';
-import { getActiveDayErrors } from '../reducers/errorReducer';
+import { getActiveDayErrors } from '../reducers';
 const { updateFlightTime, addError, delError } = actions;
 
 interface IFlightTimesContainerProps {
@@ -144,7 +144,7 @@ const mapStateToProps = (state: IState, ownProps: IFlightTimesContainerProps) =>
         times: getFlightTimes(state, ownProps.flightId),
         flightId: ownProps.flightId,
         dayId: state.crewListUI.currentDay,
-        errors: getActiveDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]),
+        errors: getActiveDayErrors(state),
     };
 };
 

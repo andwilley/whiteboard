@@ -157,3 +157,31 @@ const sortiesReducer = combineReducers<IEntity<ISorties>>({
 });
 
 export default sortiesReducer;
+
+export const getSortie = (state: IEntity<ISorties>['byId'], sortieId: string) => {
+    return state[sortieId];
+};
+
+export const getFrontSeatName = (state: ISorties) => {
+    return state.front.inputName;
+};
+
+export const getFrontSeatCodes = (state: ISorties) => {
+    return state.front.codes.join(' ');
+};
+
+export const getFrontSeatSymbols = (state: ISorties) => {
+    return state.front.symbols;
+};
+
+export const getBackSeatName = (state: ISorties) => {
+    return state.back.inputName;
+};
+
+export const getBackSeatCodes = (state: ISorties) => {
+    return state.back.codes.join(' ');
+};
+
+export const getBackSeatSymbols = (state: ISorties) => {
+    return state.back.symbols;
+};

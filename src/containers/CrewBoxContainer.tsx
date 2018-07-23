@@ -1,29 +1,28 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { IState, ISorties } from '../types/State';
+import { IState } from '../types/State';
 import CrewBox from '../components/CrewBox';
+import {
+    getFrontSeatName,
+    getFrontSeatCodes,
+    getFrontSeatSymbols,
+    getBackSeatName,
+    getBackSeatCodes,
+    getBackSeatSymbols} from '../reducers';
 
 interface ICrewBoxContainerProps {
     sortieId: string;
 }
 
-const getSortieStrings = (sortie: ISorties) => {
-    return {
-        pilot: sortie.front.inputName,
-        pilotCodes: sortie.front.codes.join(' '),
-        pilotSymbols: sortie.front.symbols,
-        wso: sortie.back.inputName,
-        wsoCodes: sortie.back.codes.join(' '),
-        wsoSymbols: sortie.back.symbols,
-    };
-};
-
 const mapStateToProps = (state: IState, ownProps: ICrewBoxContainerProps) => {
     return {
-        sortieStrings: {
-            sortieId: ownProps.sortieId,
-            ...getSortieStrings(state.sorties.byId[ownProps.sortieId]),
-        },
+        sortieId: ownProps.sortieId,
+        pilot: getFrontSeatName(state, ownProps.sortieId),
+        pilotCodes: getFrontSeatCodes(state, ownProps.sortieId),
+        pilotSymbols: getFrontSeatSymbols(state, ownProps.sortieId),
+        wso: getBackSeatName(state, ownProps.sortieId),
+        wsoCodes: getBackSeatCodes(state, ownProps.sortieId),
+        wsoSymbols: getBackSeatSymbols(state, ownProps.sortieId),
     };
 };
 

@@ -18,8 +18,10 @@ import addUpdateSnivFormValuesReducer from './addUpdateSnivFormValuesReducer';
 
 import * as daysSelectors from './daysReducer';
 import * as flightsSelectors from './flightsReducer';
+import * as sortieSelectors from './sortiesReducer';
 import * as crewListUISelectors from './crewListUIReducer';
 import * as errorsSelectors from './errorReducer';
+import { createSelector } from 'reselect';
 
 const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
@@ -66,14 +68,62 @@ export const getCurrentDayFlightIds = (state: IState) => {
 
 /**
  *
- * Days Selectors
+ * Flights Selectors
  *
  */
 
-export const getCurrentDayFlights = (state: IState) => {
-    return flightsSelectors.getCurrentDayFlights(
-        state.flights.byId,
-        getCurrentDayFlightIds(state)
+export const getCurrentDayFlights = createSelector(
+    (state: IState) => state.flights.byId,
+    getCurrentDayFlightIds,
+    flightsSelectors.getCurrentDayFlights
+);
+
+/**
+ *
+ * Sortie Selectors
+ *
+ */
+
+export const getSortie = (state: IState, sortieId: string) => {
+    return sortieSelectors.getSortie(
+        state.sorties.byId,
+        sortieId
+    );
+};
+
+export const getFrontSeatName = (state: IState, sortieId: string) => {
+    return sortieSelectors.getFrontSeatName(
+        getSortie(state, sortieId)
+    );
+};
+
+export const getFrontSeatCodes = (state: IState, sortieId: string) => {
+    return sortieSelectors.getFrontSeatCodes(
+        getSortie(state, sortieId)
+    );
+};
+
+export const getFrontSeatSymbols = (state: IState, sortieId: string) => {
+    return sortieSelectors.getFrontSeatSymbols(
+        getSortie(state, sortieId)
+    );
+};
+
+export const getBackSeatName = (state: IState, sortieId: string) => {
+    return sortieSelectors.getBackSeatName(
+        getSortie(state, sortieId)
+    );
+};
+
+export const getBackSeatCodes = (state: IState, sortieId: string) => {
+    return sortieSelectors.getBackSeatCodes(
+        getSortie(state, sortieId)
+    );
+};
+
+export const getBackSeatSymbols = (state: IState, sortieId: string) => {
+    return sortieSelectors.getBackSeatSymbols(
+        getSortie(state, sortieId)
     );
 };
 
@@ -131,9 +181,8 @@ export const getEntityErrors = (state: IState, errorLoc: UErrorLocs) => {
     );
 };
 
-export const getActiveDayErrors = (state: IState) => {
-    return errorsSelectors.getActiveDayErrors(
-        getErrorsById(state),
-        getCurrentDayObj(state)
-    );
-};
+export const getActiveDayErrors = createSelector(
+    getErrorsById,
+    getCurrentDayObj,
+    errorsSelectors.getActiveDayErrors
+);

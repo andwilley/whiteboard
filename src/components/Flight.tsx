@@ -71,9 +71,7 @@ const Flight: React.SFC<IFlightProps> = ({ flight, onExactTimesToggle, onDelFlig
                     />
                 </div>
                 <div className="card-body">
-                    <TimesBox
-                        flightId={flight.id}
-                    />
+                    <TimesBox flightId={flight.id} />
                     <SortieBoxContainer flightId={flight.id} />
                 </div>
                 <div className="card-footer bg-dark">

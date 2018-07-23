@@ -8,21 +8,17 @@ import { RGX_24HOUR_TIME } from '../util/regEx';
 import { setErrorsOnFreshState } from './FlexInputContainer';
 import { conv24HrTimeToMoment } from '../types/utilFunctions';
 import { getCurrentDayId, getSettings, getCurrentDayFlights } from '../reducers';
+import { createSelector } from 'reselect';
 const { addFlight, delFlight, delSortie, delNote, toggleFlightExactTimes } = actions;
 
 interface IFlightBoxContainerProps {
     sim: boolean;
 }
 
-const getFlightsOnly = (flights: IFlights[]): IFlights[] => {
-    return flights.filter(flight => !flight.sim);
-};
-
-const getSimsFromFlights = (flights: IFlights[]): IFlights[] => {
-    return flights.filter(flight => flight.sim);
-};
-
-const orderFlights = (flights: IFlights[], currentDayId: string): IFlights[] => {
+const orderFlights = createSelector(
+    getCurrentDayFlights,
+    getCurrentDayId,
+    (flights: IFlights[], currentDayId: string): IFlights[] => {
     /**
      * sort by takeoff, then land times
      */
@@ -55,17 +51,25 @@ const orderFlights = (flights: IFlights[], currentDayId: string): IFlights[] => 
         return 0;
     });
     return sortedFlights;
-};
+});
+
+const getFlightsOnly = createSelector(
+    orderFlights,
+    (flights: IFlights[]): IFlights[] => {
+    return flights.filter(flight => !flight.sim);
+});
+
+const getSimsFromFlights = createSelector(
+    orderFlights,
+    (flights: IFlights[]): IFlights[] => {
+    return flights.filter(flight => flight.sim);
+});
 
 const mapStateToProps = (state: IState, ownProps: IFlightBoxContainerProps) => {
     const currentDayId = getCurrentDayId(state);
-    const flightsAndSims = orderFlights(
-        getCurrentDayFlights(state),
-        currentDayId
-    );
     return {
         dayId: currentDayId,
-        flights: ownProps.sim ? getSimsFromFlights(flightsAndSims) : getFlightsOnly(flightsAndSims),
+        flights: ownProps.sim ? getSimsFromFlights(state) : getFlightsOnly(state),
         settings: getSettings(state),
     };
 };

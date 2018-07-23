@@ -6,15 +6,13 @@ import { noDuplicateCodes } from '../util/restrictor'; // restrictToSymbols, noD
 import { trCodeList } from '../util/validator';
 
 interface ICrewBoxProps {
-    sortieStrings: {
-        sortieId: string;
-        pilot: string;
-        pilotCodes: string;
-        pilotSymbols: string;
-        wso: string;
-        wsoCodes: string;
-        wsoSymbols: string;
-    };
+    sortieId: string;
+    pilot: string;
+    pilotCodes: string;
+    pilotSymbols: string;
+    wso: string;
+    wsoCodes: string;
+    wsoSymbols: string;
     flightId: string;
     onInputChange: {
         onPilotNameChange: (val: string) => void;
@@ -26,13 +24,23 @@ interface ICrewBoxProps {
     };
 }
 
-const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputChange }) => (
+const CrewBox: React.SFC<ICrewBoxProps> = ({
+    sortieId,
+    pilot,
+    pilotCodes,
+    pilotSymbols,
+    wso,
+    wsoCodes,
+    wsoSymbols,
+    flightId,
+    onInputChange,
+}) => (
     <div className="row">
         <div className="col-6">
             <FlexInputContainer
                 placeHolder="Pilot"
                 name="pilot"
-                value={sortieStrings.pilot}
+                value={pilot}
                 onChange={onInputChange.onPilotNameChange}
                 errorConfig={{
                     show: [errorTypes.SCHEDULE_CONFLICT],
@@ -41,27 +49,27 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
                     errorLocId: flightId,
                 }}
                 element={editables.FRONT_SEAT_NAME}
-                entityId={sortieStrings.sortieId}
+                entityId={sortieId}
             />
             <FlexInputContainer
                 placeHolder="Codes"
                 name="pilotCodes"
-                value={sortieStrings.pilotCodes}
+                value={pilotCodes}
                 onChange={onInputChange.onPilotCodeChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.FRONT_SEAT_CODE}
-                entityId={sortieStrings.sortieId}
+                entityId={sortieId}
                 validatorFns={[trCodeList()]}
                 restrictorFns={[noDuplicateCodes]}
             />
             {/* <FlexInputContainer
                 placeHolder="Pilot Symbols"
                 name="pilotSymbols"
-                value={sortieStrings.pilotSymbols}
+                value={pilotSymbols}
                 onChange={onInputChange.onPilotSymbolChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.FRONT_SEAT_SYMBOL}
-                entityId={sortieStrings.sortieId}
+                entityId={sortieId}
                 restrictorFns={[restrictToSymbols, noDuplicateChars]}
             /> */}
         </div>
@@ -69,7 +77,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
             <FlexInputContainer
                 placeHolder="WSO"
                 name="wso"
-                value={sortieStrings.wso}
+                value={wso}
                 onChange={onInputChange.onWSONameChange}
                 errorConfig={{
                     show: [errorTypes.SCHEDULE_CONFLICT],
@@ -78,27 +86,27 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({ sortieStrings, flightId, onInputCha
                     errorLocId: flightId,
                 }}
                 element={editables.BACK_SEAT_NAME}
-                entityId={sortieStrings.sortieId}
+                entityId={sortieId}
             />
             <FlexInputContainer
                 placeHolder="Codes"
                 name="wsoCodes"
-                value={sortieStrings.wsoCodes}
+                value={wsoCodes}
                 onChange={onInputChange.onWSOCodeChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.BACK_SEAT_CODE}
-                entityId={sortieStrings.sortieId}
+                entityId={sortieId}
                 validatorFns={[trCodeList()]}
                 restrictorFns={[noDuplicateCodes]}
             />
             {/* <FlexInputContainer
                 placeHolder="WSO Symbols"
                 name="wsoSymbols"
-                value={sortieStrings.wsoSymbols}
+                value={wsoSymbols}
                 onChange={onInputChange.onWSOSymbolChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.BACK_SEAT_SYMBOL}
-                entityId={sortieStrings.sortieId}
+                entityId={sortieId}
                 restrictorFns={[restrictToSymbols, noDuplicateChars]}
             /> */}
         </div>
