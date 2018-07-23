@@ -1,17 +1,17 @@
 import * as React from 'react';
 import TimesBox from './TimesBox';
-import { IErrors, IFlights } from '../types/State';
+import { IFlights } from '../types/State';
 import { noteEntity } from '../whiteboard-constants';
 import SortieBoxContainer from '../containers/SortieBoxContainer';
 import NoteBoxContainer from '../containers/NoteBoxContainer';
-import ErrorList from './ErrorList';
 import IconButton from './IconButton';
 import { conv24HrTimeToMoment } from '../types/utilFunctions';
 import * as Moment from 'moment';
+import ErrorListContainer from '../containers/ErrorListContainer';
+import { errorLocs } from '../errors';
 
 interface IFlightProps {
     flight: IFlights;
-    errors: IErrors[];
     dayId: string;
     onExactTimesToggle: (e: any) => void;
     onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => void;
@@ -26,7 +26,7 @@ const getFlightTime = (flight: IFlights, dayId: string): string => {
     return Moment.duration(land.diff(takeoff)).asHours().toFixed(1);
 };
 
-const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, onDelFlightClick, dayId }) => {
+const Flight: React.SFC<IFlightProps> = ({ flight, onExactTimesToggle, onDelFlightClick, dayId }) => {
     return (
         <div className="wb-col-xxl-2-4 col-xl-3 col-lg-4 col-md-6">
             <div className="card mb-3 box-shadow">
@@ -85,7 +85,7 @@ const Flight: React.SFC<IFlightProps> = ({ flight, errors, onExactTimesToggle, o
                         entityId={flight.id}
                         entityType={noteEntity.FLIGHT_NOTE}
                     />
-                    <ErrorList errors={errors} className="text-light" />
+                    <ErrorListContainer errorLoc={errorLocs.FLIGHT} errorLocId={flight.id} className="text-light" />
                 </div>
             </div>
         </div>

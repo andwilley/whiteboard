@@ -1,28 +1,18 @@
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { IState, IFlights, ISettings } from '../types/State';
+import { IState, IFlights } from '../types/State';
 import FlightBox from '../components/FlightBox';
-import { errorLocs, errorTypes } from '../errors';
-import { getEntityErrors } from '../reducers/errorReducer';
+import { errorTypes } from '../errors';
 import { noteEntity } from '../whiteboard-constants';
-import * as Moment from 'moment';
 import { RGX_24HOUR_TIME } from '../util/regEx';
 import { setErrorsOnFreshState } from './FlexInputContainer';
+import { conv24HrTimeToMoment } from '../types/utilFunctions';
+import { getCurrentDayId, getSettings, getCurrentDayFlights } from '../reducers';
 const { addFlight, delFlight, delSortie, delNote, toggleFlightExactTimes } = actions;
 
-const getDayId = (state: IState): string => {
-    // slices of the state this needs for future optimization reference:
-    // state.crewListUI.currentDay
-    return state.crewListUI.currentDay;
-};
-
-const getDayFlights = (state: IState, currentDayId: string): IFlights[] => {
-    // slices of the state this needs for future optimization reference:
-    // state.flights.allIds
-    return state.days.byId[currentDayId].flights.map(flightId => {
-        return state.flights.byId[flightId];
-    });
-};
+interface IFlightBoxContainerProps {
+    sim: boolean;
+}
 
 const getFlightsOnly = (flights: IFlights[]): IFlights[] => {
     return flights.filter(flight => !flight.sim);
@@ -32,32 +22,24 @@ const getSimsFromFlights = (flights: IFlights[]): IFlights[] => {
     return flights.filter(flight => flight.sim);
 };
 
-const orderFlights = (flights: IFlights[], currentDayId: string, settings: ISettings): IFlights[] => {
+const orderFlights = (flights: IFlights[], currentDayId: string): IFlights[] => {
     /**
      * sort by takeoff, then land times
-     * this is nasty, clean it up.
      */
+    const endOfCurrentDay = conv24HrTimeToMoment('2359', currentDayId);
     const sortedFlights = flights.concat().sort((a, b) => {
         const takeoffA = RGX_24HOUR_TIME.test(a.times.takeoff) ?
-            Moment(`${currentDayId} ${a.times.takeoff.slice(0, 2)}:${a.times.takeoff.slice(2, 4)}:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS') :
-            Moment(`${currentDayId} 23:59:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS');
+            conv24HrTimeToMoment(a.times.takeoff, currentDayId) :
+            endOfCurrentDay;
         const takeoffB = RGX_24HOUR_TIME.test(b.times.takeoff) ?
-            Moment(`${currentDayId} ${b.times.takeoff.slice(0, 2)}:${b.times.takeoff.slice(2, 4)}:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS') :
-            Moment(`${currentDayId} 23:59:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS');
+            conv24HrTimeToMoment(b.times.takeoff, currentDayId) :
+            endOfCurrentDay;
         const landA = RGX_24HOUR_TIME.test(a.times.land) ?
-            Moment(`${currentDayId} ${a.times.land.slice(0, 2)}:${a.times.land.slice(2, 4)}:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS') :
-            Moment(`${currentDayId} 23:59:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS');
+            conv24HrTimeToMoment(a.times.land, currentDayId) :
+            endOfCurrentDay;
         const landB = RGX_24HOUR_TIME.test(b.times.land) ?
-            Moment(`${currentDayId} ${b.times.land.slice(0, 2)}:${b.times.land.slice(2, 4)}:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS') :
-            Moment(`${currentDayId} 23:59:00.000`,
-                'YYYY-MM-DD HH:mm:ss.SSS');
+            conv24HrTimeToMoment(b.times.land, currentDayId) :
+            endOfCurrentDay;
         if (takeoffA.isBefore(takeoffB)) {
             return -1;
         }
@@ -75,28 +57,23 @@ const orderFlights = (flights: IFlights[], currentDayId: string, settings: ISett
     return sortedFlights;
 };
 
-const mapStateToProps = (state: IState) => {
-    const currentDayId = getDayId(state);
+const mapStateToProps = (state: IState, ownProps: IFlightBoxContainerProps) => {
+    const currentDayId = getCurrentDayId(state);
     const flightsAndSims = orderFlights(
-        getDayFlights(state, currentDayId),
-        state.crewListUI.currentDay,
-        state.settings
+        getCurrentDayFlights(state),
+        currentDayId
     );
     return {
         dayId: currentDayId,
-        flights: getFlightsOnly(flightsAndSims),
-        sims: getSimsFromFlights(flightsAndSims),
-        errors: getEntityErrors(state.errors.byId,
-                                state.days.byId[state.crewListUI.currentDay].errors,
-                                errorLocs.FLIGHT),
-        settings: state.settings,
+        flights: ownProps.sim ? getSimsFromFlights(flightsAndSims) : getFlightsOnly(flightsAndSims),
+        settings: getSettings(state),
     };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: any, ownProps: IFlightBoxContainerProps) => {
     return {
-        onAddFlightClick: (dayId: string, sim: boolean) => {
-            dispatch(addFlight(dayId, sim));
+        onAddFlightClick: (dayId: string) => {
+            dispatch(addFlight(dayId, ownProps.sim));
         },
         onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => {
             flight.sorties.forEach(sortieId =>

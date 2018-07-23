@@ -3,11 +3,11 @@ import { IErrors } from '../types/State';
 import IconButton from './IconButton';
 
 interface IErrorListProps {
-    errors: IErrors[];
+    errors?: IErrors[];
     className?: string;
 }
 
-const ErrorList: React.SFC<IErrorListProps> = ({ className = '', errors }) => {
+const ErrorList: React.SFC<IErrorListProps> = ({ className = '', errors = [] }) => {
     const errorsComps = errors.map(error => {
         return (
             <p

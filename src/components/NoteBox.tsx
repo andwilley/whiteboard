@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Note from './Note';
-import { INotes, IErrors, UNoteEntity } from '../types/State';
+import { INotes, UNoteEntity } from '../types/State';
 import IconButton from './IconButton';
-import ErrorList from './ErrorList';
 import { IDelNoteArgs } from '../actions';
+import ErrorListContainer from '../containers/ErrorListContainer';
 
 interface INoteBoxProps {
     className?: string;
@@ -14,7 +14,6 @@ interface INoteBoxProps {
     onInputChange: (noteId: string) => (e: any) => void;
     onAddNoteClick: () => void;
     onDelNoteClick: (obj: IDelNoteArgs) => (e: any) => void;
-    errors?: IErrors[];
 }
 
 const NoteBox: React.SFC<INoteBoxProps> = ({
@@ -25,7 +24,6 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
     onDelNoteClick,
     errorLoc,
     errorLocId,
-    errors,
 }) => {
     const noteComponentsList = notes.map(note =>
         (
@@ -40,7 +38,6 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
         />
         )
     );
-    const noteErrors = errors ? errors : [];
     return (
         <div>
             <IconButton
@@ -55,7 +52,7 @@ const NoteBox: React.SFC<INoteBoxProps> = ({
             <div className="row">
                 {noteComponentsList}
             </div>
-            <ErrorList className={className} errors={noteErrors} />
+            <ErrorListContainer className={className} errorLoc={errorLoc} errorLocId={errorLocId} />
         </div>
     );
 };

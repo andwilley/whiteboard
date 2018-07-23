@@ -17,6 +17,7 @@ import snivsReducer from './snivReducer';
 import addUpdateSnivFormValuesReducer from './addUpdateSnivFormValuesReducer';
 
 import * as daysSelectors from './daysReducer';
+import * as flightsSelectors from './flightsReducer';
 import * as crewListUISelectors from './crewListUIReducer';
 import * as errorsSelectors from './errorReducer';
 
@@ -56,6 +57,26 @@ export const getCurrentDayObj = (state: IState) => {
     );
 };
 
+export const getCurrentDayFlightIds = (state: IState) => {
+    return daysSelectors.getCurrentDayFlightIds(
+        state.days.byId,
+        getCurrentDayId(state)
+    );
+};
+
+/**
+ *
+ * Days Selectors
+ *
+ */
+
+export const getCurrentDayFlights = (state: IState) => {
+    return flightsSelectors.getCurrentDayFlights(
+        state.flights.byId,
+        getCurrentDayFlightIds(state)
+    );
+};
+
 /**
  *
  * CrewList UI Selectors
@@ -72,6 +93,16 @@ export const getShowSnivs = (state: IState) => {
 
 export const getShowFilters = (state: IState) => {
     return crewListUISelectors.getShowFilters(state.crewListUI);
+};
+
+/**
+ *
+ * Settings Selectors
+ *
+ */
+
+export const getSettings = (state: IState) => {
+    return state.settings;
 };
 
 /**

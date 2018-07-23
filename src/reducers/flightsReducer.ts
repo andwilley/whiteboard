@@ -178,3 +178,10 @@ export const getTotalFlightTimeAndSorties = (
         };
     }, {totalFlightTime: 0, totalSorties: 0});
 };
+
+export const getCurrentDayFlights = (state: IEntity<IFlights>['byId'], currentDayFlightIds: string[]): IFlights[] => {
+    // move this to index reducer
+    return currentDayFlightIds.map(flightId => {
+        return state[flightId];
+    });
+};

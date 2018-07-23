@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Flight from './Flight';
-import { IErrors, IFlights, ISettings } from '../types/State';
+import { IFlights, ISettings } from '../types/State';
 import IconButton from './IconButton';
 import * as Moment from 'moment';
 import { conv24HrTimeToMoment } from '../types/utilFunctions';
@@ -8,11 +8,9 @@ import { conv24HrTimeToMoment } from '../types/utilFunctions';
 interface IFlightBoxProps {
     dayId: string;
     flights: IFlights[];
-    sims: IFlights[];
-    errors: {[id: string]: IErrors[]};
     settings: ISettings;
     onExactTimesToggle: (id: string) => (e: any) => void;
-    onAddFlightClick: (dayId: string, sim: boolean) => void;
+    onAddFlightClick: (dayId: string) => void;
     onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => void;
 }
 
@@ -25,12 +23,10 @@ interface IFlightListAcc {
 const FlightBox: React.SFC<IFlightBoxProps> = ({
     dayId,
     flights,
-    sims,
-    errors,
+    settings,
     onExactTimesToggle,
     onAddFlightClick,
     onDelFlightClick,
-    settings,
 }) => {
     const flightComponents = flights.reduce((acc: IFlightListAcc, flight, i) => {
         /** adds a column break element if flight falls in another "go" */
@@ -48,7 +44,6 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
                 dayId={dayId}
                 onExactTimesToggle={onExactTimesToggle(flight.id)}
                 onDelFlightClick={onDelFlightClick}
-                errors={errors[flight.id] ? errors[flight.id] : []}
             />
         );
         if (flightTakeoffTime.isAfter(acc.goEndTime)) {
@@ -63,41 +58,15 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
         }
         return acc;
     }, {goStartTime: Moment(), goEndTime: Moment(), flightComponents: []}).flightComponents;
-    const simComponents = sims.map(flight =>
-        (
-        <Flight
-            key={flight.id}
-            flight={flight}
-            dayId={dayId}
-            onExactTimesToggle={onExactTimesToggle(flight.id)}
-            onDelFlightClick={onDelFlightClick}
-            errors={errors[flight.id] ? errors[flight.id] : []}
-        />
-        ));
     return (
-        <div className="col-12">
-            <h5>Flights</h5>
-            <div className="row mb-2">
-                {flightComponents}
-                <div className="col-2">
-                    <IconButton
-                        onClick={() => onAddFlightClick(dayId, false)}
-                        icon="plus"
-                        size={14}
-                    />
-                </div>
-            </div>
-            <hr />
-            <h5>Simulators</h5>
-            <div className="row mb-2">
-                {simComponents}
-                <div className="col-2">
-                    <IconButton
-                        onClick={() => onAddFlightClick(dayId, true)}
-                        icon="plus"
-                        size={14}
-                    />
-                </div>
+        <div className="row mb-2">
+            {flightComponents}
+            <div className="col-2">
+                <IconButton
+                    onClick={() => onAddFlightClick(dayId)}
+                    icon="plus"
+                    size={14}
+                />
             </div>
         </div>
     );
