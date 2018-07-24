@@ -22,7 +22,7 @@ interface IFlexInputProps {
     onChange: (e: EditorState) => void;
     onClick: () => void;
     onBlur: (e: any) => void;
-    aircrewRefList: IAircrew[];
+    aircrewRefList?: IAircrew[];
     errors: IErrors[];
     editorState: EditorState;
     showEditor: boolean;
@@ -43,7 +43,7 @@ const FlexInput: React.SFC<IFlexInputProps> = ({
     onChange,
     onClick,
     onBlur,
-    aircrewRefList,
+    aircrewRefList = [],
     editorState,
     showEditor,
     validationErrors,

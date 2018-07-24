@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import CrewList from '../components/CrewList';
 import * as Moment from 'moment';
 import { getErrors } from '../reducers';
-import { getAircrewById } from '../reducers/aircrewReducer';
+import { getAircrewById } from '../reducers';
 import { getShowSnivs } from '../reducers';
 import { setErrorsOnFreshState, flightIsCrewHotPit } from '../containers/FlexInputContainer';
 import {

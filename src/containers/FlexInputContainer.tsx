@@ -9,7 +9,7 @@ import { ISchedBlock } from '../types/WhiteboardTypes';
 import { nameLocation, builtInGroupNames } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
 import restrictor, { RestrictorFn } from '../util/restrictor';
-import { getActiveDayErrors } from '../reducers/errorReducer';
+import { getActiveDayErrors } from '../reducers';
 import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs, errorMessages } from '../errors';
@@ -24,6 +24,8 @@ import { IState,
          ISettings} from '../types/State';
 import { IAddErrorArgs } from '../actions';
 import { RGX_FIND_NAME, RGX_HILITE_STRING } from '../util/regEx';
+import { getAircrewById } from '../reducers';
+import { createSelector } from 'reselect';
 
 type IAircrewEntity = IEntity<IAircrew>;
 
@@ -63,37 +65,34 @@ const getAircrewList = (aircrew: IAircrewEntity): IAircrew[] => {
     return aircrew.allIds.map(id => aircrew.byId[id]);
 };
 
-const getAircrewRefList = (state: IState,
-                           element: UEditables,
-                           entityId: string
-): IAircrew[] => {
-    /**
-     * @param {IState} state The application state
-     * @param {UEditables} element element location
-     * @param {string} entityId id of the element above
-     * @returns {IAircrew[]} Array of aircrew objects or empty array.
-     *
-     * This returns the aircrew that are referenced in the value of the input field for the presentational component to
-     * display as required.
-     *
-     * State it needs:
-     * state.aircrew.byId[entityId]
-     * state.sorties.byId[entityId]
-     * state.notes.byId[entityId]
-     */
-    switch (element) {
+const getRefIdStateSlice = (state: IState, props: IFlexInputContainerProps) => {
+    switch (props.element) {
         case nameLocation.FRONT_SEAT_NAME:
-            return state.sorties.byId[entityId].front.aircrewRefIds.map(id => state.aircrew.byId[id]);
+            return state.sorties.byId[props.entityId].front.aircrewRefIds;
         case nameLocation.BACK_SEAT_NAME:
-            return state.sorties.byId[entityId].back.aircrewRefIds.map(id => state.aircrew.byId[id]);
+            return state.sorties.byId[props.entityId].front.aircrewRefIds;
         case nameLocation.NOTE:
-            return state.notes.byId[entityId].aircrewRefIds.map(id => state.aircrew.byId[id]);
+            return state.notes.byId[props.entityId].aircrewRefIds;
         case nameLocation.SNIV_FORM:
-            return state.addUpdateSnivFormValues.aircrewRefIds.map(id => state.aircrew.byId[id]);
+            return state.addUpdateSnivFormValues.aircrewRefIds;
         default:
-            return [];
+            throw(new TypeError('Invalid Aircrew Reference Element'));
     }
 };
+
+const makeGetAircrewRefList = () => createSelector(
+    getRefIdStateSlice,
+    getAircrewById,
+    (aircrewRefIds: string[], aircrewById: IEntity<IAircrew>['byId']) => {
+        /**
+         * @returns {IAircrew[]} Array of aircrew objects or empty array.
+         *
+         * This returns the aircrew that are referenced in the value of the input
+         * field for the presentational component to display as required.
+         */
+        return aircrewRefIds.map(aircrewId => aircrewById[aircrewId]);
+    }
+);
 
 const getComponentErrors = (dayErrors: IErrors[],
                             errorLoc: UErrorLocs,
@@ -563,9 +562,9 @@ interface IFlexInputStateProps {
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFlexInputStateProps => {
     const hasNames = doesInputHaveNames(ownProps.element);
-    const aircrewRefList = hasNames ? getAircrewRefList(state, ownProps.element, ownProps.entityId) : [];
+    const aircrewRefList = hasNames ? makeGetAircrewRefList()(state, ownProps) : [];
     const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
-    const dayErrors = getActiveDayErrors(state.errors.byId, state.days.byId[state.crewListUI.currentDay]);
+    const dayErrors = getActiveDayErrors(state);
     const componentErrors = getComponentErrors(
         dayErrors,
         ownProps.errorConfig.errorLoc,

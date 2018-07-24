@@ -16,6 +16,7 @@ import editorStateReducer from './editorStateReducer';
 import snivsReducer from './snivReducer';
 import addUpdateSnivFormValuesReducer from './addUpdateSnivFormValuesReducer';
 
+import * as aircrewSelectors from './aircrewReducer';
 import * as daysSelectors from './daysReducer';
 import * as flightsSelectors from './flightsReducer';
 import * as sortieSelectors from './sortiesReducer';
@@ -41,6 +42,20 @@ const whiteboardApp = combineReducers<IState>({
 });
 
 export default whiteboardApp;
+
+/**
+ *
+ * Aircrew Selectors
+ *
+ */
+
+export const getAircrew = (state: IState) => {
+    return state.aircrew;
+};
+
+export const getAircrewById = (state: IState) => {
+    return aircrewSelectors.getAircrewById(getAircrew(state));
+};
 
 /**
  *

@@ -14,14 +14,12 @@ interface ICrewBoxProps {
     wsoCodes: string;
     wsoSymbols: string;
     flightId: string;
-    onInputChange: {
-        onPilotNameChange: (val: string) => void;
-        onPilotCodeChange: (val: string) => void;
-        onPilotSymbolChange: (val: string) => void;
-        onWSONameChange: (val: string) => void;
-        onWSOCodeChange: (val: string) => void;
-        onWSOSymbolChange: (val: string) => void;
-    };
+    onPilotNameChange: (val: string) => void;
+    onPilotCodeChange: (val: string) => void;
+    onPilotSymbolChange: (val: string) => void;
+    onWSONameChange: (val: string) => void;
+    onWSOCodeChange: (val: string) => void;
+    onWSOSymbolChange: (val: string) => void;
 }
 
 const CrewBox: React.SFC<ICrewBoxProps> = ({
@@ -33,7 +31,12 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({
     wsoCodes,
     wsoSymbols,
     flightId,
-    onInputChange,
+    onPilotNameChange,
+    onPilotCodeChange,
+    onPilotSymbolChange,
+    onWSONameChange,
+    onWSOCodeChange,
+    onWSOSymbolChange,
 }) => (
     <div className="row">
         <div className="col-6">
@@ -41,7 +44,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({
                 placeHolder="Pilot"
                 name="pilot"
                 value={pilot}
-                onChange={onInputChange.onPilotNameChange}
+                onChange={onPilotNameChange}
                 errorConfig={{
                     show: [errorTypes.SCHEDULE_CONFLICT],
                     update: [errorTypes.SCHEDULE_CONFLICT],
@@ -55,7 +58,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({
                 placeHolder="Codes"
                 name="pilotCodes"
                 value={pilotCodes}
-                onChange={onInputChange.onPilotCodeChange}
+                onChange={onPilotCodeChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.FRONT_SEAT_CODE}
                 entityId={sortieId}
@@ -66,7 +69,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({
                 placeHolder="Pilot Symbols"
                 name="pilotSymbols"
                 value={pilotSymbols}
-                onChange={onInputChange.onPilotSymbolChange}
+                onChange={onPilotSymbolChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.FRONT_SEAT_SYMBOL}
                 entityId={sortieId}
@@ -78,7 +81,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({
                 placeHolder="WSO"
                 name="wso"
                 value={wso}
-                onChange={onInputChange.onWSONameChange}
+                onChange={onWSONameChange}
                 errorConfig={{
                     show: [errorTypes.SCHEDULE_CONFLICT],
                     update: [errorTypes.SCHEDULE_CONFLICT],
@@ -92,7 +95,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({
                 placeHolder="Codes"
                 name="wsoCodes"
                 value={wsoCodes}
-                onChange={onInputChange.onWSOCodeChange}
+                onChange={onWSOCodeChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.BACK_SEAT_CODE}
                 entityId={sortieId}
@@ -103,7 +106,7 @@ const CrewBox: React.SFC<ICrewBoxProps> = ({
                 placeHolder="WSO Symbols"
                 name="wsoSymbols"
                 value={wsoSymbols}
-                onChange={onInputChange.onWSOSymbolChange}
+                onChange={onWSOSymbolChange}
                 errorConfig={{show: [], update: [], errorLoc: errorLocs.FLIGHT, errorLocId: flightId}}
                 element={editables.BACK_SEAT_SYMBOL}
                 entityId={sortieId}

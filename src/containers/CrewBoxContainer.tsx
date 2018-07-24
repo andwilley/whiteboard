@@ -28,49 +28,47 @@ const mapStateToProps = (state: IState, ownProps: ICrewBoxContainerProps) => {
 
 const mapDispatchToProps = (dispatch: any, ownProps: ICrewBoxContainerProps) => {
     return {
-        onInputChange: {
-            onPilotNameChange: (inputValue: string) => {
-                dispatch(actions.updatePuckName({
-                    sortieId: ownProps.sortieId,
-                    crewPosition: 'front',
-                    name: inputValue,
-                }));
-            },
-            onPilotCodeChange: (inputValue: string) => {
-                dispatch(actions.updatePuckCode({
-                    sortieId: ownProps.sortieId,
-                    crewPosition: 'front',
-                    codes: inputValue,
-                }));
-            },
-            onPilotSymbolChange: (inputValue: string) => {
-                dispatch(actions.updatePuckSymbol({
-                    sortieId: ownProps.sortieId,
-                    crewPosition: 'front',
-                    symbols: inputValue,
-                }));
-            },
-            onWSONameChange: (inputValue: string) => {
-                dispatch(actions.updatePuckName({
-                    sortieId: ownProps.sortieId,
-                    crewPosition: 'back',
-                    name: inputValue,
-                }));
-            },
-            onWSOCodeChange: (inputValue: string) => {
-                dispatch(actions.updatePuckCode({
-                    sortieId: ownProps.sortieId,
-                    crewPosition: 'back',
-                    codes: inputValue,
-                }));
-            },
-            onWSOSymbolChange: (inputValue: string) => {
-                dispatch(actions.updatePuckSymbol({
-                    sortieId: ownProps.sortieId,
-                    crewPosition: 'back',
-                    symbols: inputValue,
-                }));
-            },
+        onPilotNameChange: (inputValue: string) => {
+            dispatch(actions.updatePuckName({
+                sortieId: ownProps.sortieId,
+                crewPosition: 'front',
+                name: inputValue,
+            }));
+        },
+        onPilotCodeChange: (inputValue: string) => {
+            dispatch(actions.updatePuckCode({
+                sortieId: ownProps.sortieId,
+                crewPosition: 'front',
+                codes: inputValue,
+            }));
+        },
+        onPilotSymbolChange: (inputValue: string) => {
+            dispatch(actions.updatePuckSymbol({
+                sortieId: ownProps.sortieId,
+                crewPosition: 'front',
+                symbols: inputValue,
+            }));
+        },
+        onWSONameChange: (inputValue: string) => {
+            dispatch(actions.updatePuckName({
+                sortieId: ownProps.sortieId,
+                crewPosition: 'back',
+                name: inputValue,
+            }));
+        },
+        onWSOCodeChange: (inputValue: string) => {
+            dispatch(actions.updatePuckCode({
+                sortieId: ownProps.sortieId,
+                crewPosition: 'back',
+                codes: inputValue,
+            }));
+        },
+        onWSOSymbolChange: (inputValue: string) => {
+            dispatch(actions.updatePuckSymbol({
+                sortieId: ownProps.sortieId,
+                crewPosition: 'back',
+                symbols: inputValue,
+            }));
         },
         // onInputChange: (e: any) => {
         //     let inputSpecificAction;

@@ -3,6 +3,7 @@ import Flight from './Flight';
 import { IFlights, ISettings } from '../types/State';
 import IconButton from './IconButton';
 import * as Moment from 'moment';
+import * as cuid from 'cuid';
 import { conv24HrTimeToMoment } from '../types/utilFunctions';
 
 interface IFlightBoxProps {
@@ -48,7 +49,7 @@ const FlightBox: React.SFC<IFlightBoxProps> = ({
         );
         if (flightTakeoffTime.isAfter(acc.goEndTime)) {
             acc.flightComponents.push(
-                <div className="w-100" />
+                <div className="w-100" key={cuid()} />
             );
             acc.flightComponents.push(flightComponent);
             acc.goStartTime = flightTakeoffTime;
