@@ -63,7 +63,7 @@ export const validMoment = (args?: IValArgs) => (input: any): IUntrackedErrors |
         };
 };
 
-const validator = (input: any, ...validatorFunctions: ValidatorFn[]): IUntrackedErrors[] => {
+const validator = (input: any, ...validatorFunctions: ValidatorFn[]): IUntrackedErrors[] | undefined => {
     /**
      * @param input Input to be validated
      * @param validatorFunctions Array of functions with the validator signature.
@@ -72,15 +72,16 @@ const validator = (input: any, ...validatorFunctions: ValidatorFn[]): IUntracked
      * Iteratively runs each validation function on the given input.
      */
     if (!input) {
-        return [];
+        return undefined;
     }
-    return  validatorFunctions.reduce((aggregatedErrors: IUntrackedErrors[], valFunc) => {
+    const validationErrors = validatorFunctions.reduce((aggregatedErrors: IUntrackedErrors[], valFunc) => {
         const error = valFunc(input);
         if (error) {
             aggregatedErrors = aggregatedErrors.concat(error);
         }
         return aggregatedErrors;
     }, []);
+    return validationErrors.length > 0 ? validationErrors : undefined;
 };
 
 export default validator;

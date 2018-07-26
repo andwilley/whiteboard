@@ -14,7 +14,7 @@ const LoadoutBox: React.SFC<ILoadoutBoxProps> = ({ loadout, sortieId, onChange }
         placeHolder="Loadout"
         name="loadout"
         value={loadout}
-        onChange={onChange}
+        onInputChange={onChange}
         errorConfig={{
             show: [],
             update: [],

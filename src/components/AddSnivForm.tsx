@@ -99,7 +99,7 @@ const AddSnivForm: React.SFC<IAddSnivFormProps> = ({
                 value={formValues.aircrew}
                 className="form-control"
                 wrapperClassName="px-0 mt-1 border-left-0"
-                onChange={onAircrewInputChange}
+                onInputChange={onAircrewInputChange}
                 errorConfig={{
                     show: [],
                     update: [],

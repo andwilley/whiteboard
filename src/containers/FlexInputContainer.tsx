@@ -53,7 +53,7 @@ interface IFlexInputContainerProps {
     wrapperClassName?: string;
     name: string;
     value: string;
-    onChange: (e: any) => any;
+    onInputChange: (e: any) => any;
     errorConfig: IErrorConfig;
     element: UEditables;
     entityId: string;
@@ -98,8 +98,8 @@ const getComponentErrors = (dayErrors: IErrors[],
                             errorLoc: UErrorLocs,
                             errorLocId: string,
                             errorTypesToGet: string[],
-                            aircrewRefIds: string[]
-): IErrors[] => {
+                            aircrewRefIds: string[] = []
+): IErrors[] | undefined => {
     /**
      * Should collect all the errors specified in errorsTypes.show from ownProps.
      * Right now, there is only one error type.
@@ -109,7 +109,7 @@ const getComponentErrors = (dayErrors: IErrors[],
         getSchedErrors(dayErrors, errorLoc, errorLocId, aircrewRefIds) : [];
     const timeOrderErrors = errorTypesToGet.indexOf(errorTypes.TIME_ORDER) > -1 ?
         getTimeOrderErrors(dayErrors, errorLoc, errorLocId) : [];
-    return [...schedErrors, ...timeOrderErrors];
+    return schedErrors.length > 0 && timeOrderErrors.length > 0 ? [...schedErrors, ...timeOrderErrors] : undefined;
 };
 
 const getSchedErrors = (dayErrors: IErrors[],
@@ -143,7 +143,7 @@ const getTimeOrderErrors = (dayErrors: IErrors[], errorLoc: UErrorLocs, errorLoc
 
 const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
     if (!validatorFns || validatorFns.length === 0) {
-        return [];
+        return undefined;
     }
     return validator(text, ...validatorFns);
 };
@@ -345,8 +345,8 @@ export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
 };
 
 interface IGetOnChangeWithNameMatchArgs {
-    aircrewList: IAircrew[];
-    groupList: IGroups[];
+    aircrewList?: IAircrew[];
+    groupList?: IGroups[];
     dispatch: any;
     hasNames: boolean;
     element: UEditables;
@@ -356,8 +356,8 @@ interface IGetOnChangeWithNameMatchArgs {
 }
 
 const getOnChangeWithNameMatch = ({
-    aircrewList,
-    groupList,
+    aircrewList = [],
+    groupList = [],
     dispatch,
     hasNames,
     element,
@@ -492,7 +492,7 @@ const onXClick = (id: string) => (e: any) => {
     alert(id);
 };
 
-const getDecorators = (aircrewRefList: IAircrew[], groupRefList: IGroups[]): CompositeDecorator => {
+const getDecorators = (aircrewRefList: IAircrew[] = [], groupRefList: IGroups[] = []): CompositeDecorator => {
     let decorators = aircrewRefList.map(aircrew => {
         return {
             strategy: nameStrategy(aircrew.callsign),
@@ -549,21 +549,21 @@ const decorateStaticValue = (value: string): JSX.Element | null => {
 };
 
 interface IFlexInputStateProps {
-    aircrewList: IAircrew[];
-    groupList: IGroups[];
-    aircrewRefList: IAircrew[];
-    state: IState;
-    errors: IErrors[];
-    editorState: EditorState;
+    aircrewList?: IAircrew[];
+    groupList?: IGroups[];
+    aircrewRefList?: IAircrew[];
+    errors: IErrors[] | undefined;
+    editorState: EditorState | undefined;
     elementBeingEdited: IElementBeingEdited;
     isInputActive: boolean;
     hasNames: boolean;
+    pvalue: JSX.Element | null;
 }
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFlexInputStateProps => {
     const hasNames = doesInputHaveNames(ownProps.element);
-    const aircrewRefList = hasNames ? makeGetAircrewRefList()(state, ownProps) : [];
-    const aircrewRefIds = aircrewRefList.map(aircrew => aircrew.id);
+    const aircrewRefList = hasNames ? makeGetAircrewRefList()(state, ownProps) : undefined;
+    const aircrewRefIds = aircrewRefList ? aircrewRefList.map(aircrew => aircrew.id) : undefined;
     const dayErrors = getActiveDayErrors(state);
     const componentErrors = getComponentErrors(
         dayErrors,
@@ -572,16 +572,80 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
         ownProps.errorConfig.show,
         aircrewRefIds
     );
+    const inputIsActive = isInputActive(state, ownProps);
+    const editorState = inputIsActive ? getEditorState(state) : undefined;
     return {
-        aircrewList: hasNames ? getAircrewList(state.aircrew) : [],
-        groupList: hasNames ? getGroupList(state.groups, state.aircrew.allIds) : [],
-        aircrewRefList,
-        state,
+        aircrewList: hasNames ? getAircrewList(state.aircrew) : undefined,
+        groupList: hasNames ? getGroupList(state.groups, state.aircrew.allIds) : undefined,
         errors: componentErrors,
-        editorState: getEditorState(state),
+        editorState,
         elementBeingEdited: getElementBeingEdited(state),
-        isInputActive: isInputActive(state, ownProps),
+        isInputActive: inputIsActive,
         hasNames,
+        pvalue: decorateStaticValue(ownProps.value),
+    };
+};
+
+interface IFlexInputOnClickArgs {
+    inputIsActive: boolean;
+    value: string;
+    decorators: CompositeDecorator;
+    element: UEditables;
+    entityId: string;
+    dispatch: any;
+}
+
+const getOnClickIsInputActive = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.inputIsActive;
+
+const getOnClickValue = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.value;
+
+const getOnClickDecorators = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.decorators;
+
+const getOnClickElement = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.element;
+
+const getOnClickEntityId = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.entityId;
+
+const getOnClickDispatch = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.dispatch;
+
+const makeGetOnClickSelector = () => createSelector(
+    getOnClickIsInputActive,
+    getOnClickValue,
+    getOnClickDecorators,
+    getOnClickElement,
+    getOnClickEntityId,
+    getOnClickDispatch,
+    (inputIsActive, value, decorators, element, entityId, dispatch) => () => {
+        if (inputIsActive) {
+            return;
+        }
+        /** cursor to end of text on mount */
+        const contentState = ContentState.createFromText(value);
+        const initEditorState = EditorState.createWithContent(contentState, decorators);
+        const blockMap = contentState.getBlockMap();
+        const key = blockMap.first().getKey();
+        const offset = blockMap.first().getLength();
+        const selectionState = new SelectionState({
+            anchorKey: key,
+            anchorOffset: offset,
+            focusKey: key,
+            focusOffset: offset,
+        });
+        const editorState = EditorState.forceSelection(initEditorState, selectionState);
+        /** set and dispatchProps.dispatch editorState and elementBeingEdited */
+        dispatch(actions.setEditorState(editorState));
+        dispatch(actions.setEditedElement(element, entityId));
+        dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
+    }
+);
+
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        onBlur: (e: any) => {
+            dispatch(actions.setEditedElement(null, null));
+            dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
+        },
+        onClick: makeGetOnClickSelector(),
+        dispatch,
     };
 };
 
@@ -598,7 +662,8 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      *
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
-    const decorators = getDecorators(stateProps.aircrewRefList, stateProps.groupList);
+    const decorators = stateProps.isInputActive ?
+        getDecorators(stateProps.aircrewRefList, stateProps.groupList) : undefined;
     /** handle text insert and paste. function signatures are different, but function is the same. */
     const restrictorFn = ownProps.restrictorFns && ownProps.restrictorFns.length > 0 ?
         restrictor(...ownProps.restrictorFns) : null;
@@ -608,61 +673,45 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
             pasteInput: (text: string, html: string, editorState: EditorState) =>
                 restrictorFn(text, editorState),
         } : undefined;
-    return Object.assign({}, ownProps, {
-        onChange: getOnChangeWithNameMatch({
-            aircrewList: stateProps.aircrewList,
-            groupList: stateProps.groupList,
-            dispatch: dispatchProps.dispatch,
-            hasNames: stateProps.hasNames,
+    return {
+        onChange: stateProps.isInputActive ?
+            getOnChangeWithNameMatch({
+                aircrewList: stateProps.aircrewList,
+                groupList: stateProps.groupList,
+                dispatch: dispatchProps.dispatch,
+                hasNames: stateProps.hasNames,
+                element: ownProps.element,
+                entityId: ownProps.entityId,
+                errorConfig: ownProps.errorConfig,
+                onChange: ownProps.onInputChange,
+            }) : null,
+        onClick: dispatchProps.onClick({
+            inputIsActive: stateProps.isInputActive,
+            value: ownProps.value,
+            decorators,
             element: ownProps.element,
             entityId: ownProps.entityId,
-            errorConfig: ownProps.errorConfig,
-            onChange: ownProps.onChange,
+            dispatch: dispatchProps.dispatch,
         }),
-        onClick: () => {
-            if (stateProps.isInputActive) {
-                return;
-            }
-            /** cursor to end of text on mount */
-            const contentState = ContentState.createFromText(ownProps.value);
-            const initEditorState = EditorState.createWithContent(contentState, decorators);
-            const blockMap = contentState.getBlockMap();
-            const key = blockMap.first().getKey();
-            const offset = blockMap.first().getLength();
-            const selectionState = new SelectionState({
-                anchorKey: key,
-                anchorOffset: offset,
-                focusKey: key,
-                focusOffset: offset,
-            });
-            const editorState = EditorState.forceSelection(initEditorState, selectionState);
-            /** set and dispatch editorState and elementBeingEdited */
-            dispatchProps.dispatch(actions.setEditorState(editorState));
-            dispatchProps.dispatch(actions.setEditedElement(ownProps.element, ownProps.entityId));
-            dispatchProps.dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
-        },
-        onBlur: (e: any) => {
-            dispatchProps.dispatch(actions.setEditedElement(null, null));
-            dispatchProps.dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
-        },
+        onBlur: dispatchProps.onBlur,
+        placeHolder: ownProps.placeHolder,
         className: ownProps.className,
         wrapperClassName: ownProps.wrapperClassName,
         errors: stateProps.errors,
-        aircrewRefList: stateProps.aircrewRefList,
         editorState: stateProps.editorState,
         showEditor: stateProps.isInputActive,
-        restrictor: inputRestrictor,
-        validationErrors: getValidationErrors(stateProps.isInputActive ?
+        restrictor: stateProps.isInputActive ? inputRestrictor : null,
+        validationErrors: getValidationErrors(stateProps.isInputActive && stateProps.editorState ?
                                                 stateProps.editorState.getCurrentContent().getPlainText() :
                                                 ownProps.value,
                                               ownProps.validatorFns),
-        pvalue: decorateStaticValue(ownProps.value),
-    });
+        pvalue: stateProps.pvalue,
+    };
 };
 
 const FlexInputContainer = connect(
     mapStateToProps,
-    ((dispatch: any) => { return { dispatch: dispatch }; }),
+    mapDispatchToProps,
     mergeProps
 )(FlexInput);
 

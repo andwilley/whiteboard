@@ -28,7 +28,7 @@ const Note: React.SFC<INoteProps> = ({ className = '', note, onDelNoteClick, onI
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc,
                     errorLocId}}
-                onChange={onInputChange}
+                onInputChange={onInputChange}
                 element={editables.NOTE}
                 entityId={note.id}
             />

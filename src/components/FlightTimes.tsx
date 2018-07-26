@@ -33,7 +33,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: errorLocs.BRIEF,
                     errorLocId: flightId}}
-                onChange={(time: string) => onInputChange(timeTypes.BRIEF, time)}
+                onInputChange={(time: string) => onInputChange(timeTypes.BRIEF, time)}
                 element={editables.BRIEF}
                 entityId={flightId}
                 validatorFns={[is24HourTime()]}
@@ -50,7 +50,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: errorLocs.TAKEOFF,
                     errorLocId: flightId}}
-                onChange={(time: string) => onInputChange(timeTypes.TAKEOFF, time)}
+                onInputChange={(time: string) => onInputChange(timeTypes.TAKEOFF, time)}
                 element={editables.TAKEOFF}
                 entityId={flightId}
                 validatorFns={[is24HourTime()]}
@@ -67,7 +67,7 @@ const FlightTimes: React.SFC<IFlightTimesProps> = ({ times, flightId, onInputCha
                     update: [errorTypes.SCHEDULE_CONFLICT],
                     errorLoc: errorLocs.LAND,
                     errorLocId: flightId}}
-                onChange={(time: string) => onInputChange(timeTypes.LAND, time)}
+                onInputChange={(time: string) => onInputChange(timeTypes.LAND, time)}
                 element={editables.LAND}
                 entityId={flightId}
                 validatorFns={[is24HourTime()]}
