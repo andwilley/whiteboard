@@ -3,6 +3,7 @@ import { Editor, EditorState, DraftHandleValue } from 'draft-js';
 import { IUntrackedErrors } from '../types/WhiteboardTypes';
 import { IErrors } from '../types/State';
 import { getHighestErrorLevel } from '../errors';
+import { RGX_HILITE_STRING } from '../util/regEx';
 
 export interface IFlexInputProps {
     onChange: (editorState: EditorState) => void;
@@ -19,8 +20,27 @@ export interface IFlexInputProps {
         pasteInput: ((text: string, html: string, editorState: EditorState) => DraftHandleValue);
     } | undefined;
     validationErrors: IUntrackedErrors[] | undefined;
-    pvalue: JSX.Element | null;
+    value: string;
 }
+
+const decorateStaticValue = (value: string): JSX.Element | null => {
+    const match = value.match(RGX_HILITE_STRING);
+    if (!value) {
+        return null;
+    }
+    if (!match) {
+        return (
+            <span>{value}</span>
+        );
+    }
+    return (
+        <span>
+            {match ? match[1] : ''}
+            <span className="bg-warning">{match ? match[2] : ''}</span>
+            {match ? match[3] : ''}
+        </span>
+    );
+};
 
 class FlexInput extends React.PureComponent<IFlexInputProps> {
     // componentWillReceiveProps(nextProps: any) {
@@ -47,7 +67,7 @@ class FlexInput extends React.PureComponent<IFlexInputProps> {
             placeHolder,
             className = '',
             wrapperClassName = '',
-            pvalue,
+            value,
             editorState,
             showEditor,
             validationErrors = [],
@@ -94,11 +114,11 @@ class FlexInput extends React.PureComponent<IFlexInputProps> {
             ) :
                 <p
                     tabIndex={0}
-                    className={`${pvalue ? 'pStyle' : 'pStyleEmpty'}${className ? ` ${className}` : ''}`}
+                    className={`${value ? 'pStyle' : 'pStyleEmpty'}${className ? ` ${className}` : ''}`}
                     onClick={onClick}
                     onFocus={onClick}
                 >
-                    {pvalue || placeHolder}
+                    {decorateStaticValue(value) || placeHolder}
                 </p>}
             </div>
         );

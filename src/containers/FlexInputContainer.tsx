@@ -529,25 +529,6 @@ const getGroupList = (groups: IEntity<IGroups>, aircrewIds: string[]): IGroups[]
     return userGroups.concat(builtInGroups);
 };
 
-const decorateStaticValue = (value: string): JSX.Element | null => {
-    const match = value.match(RGX_HILITE_STRING);
-    if (!value) {
-        return null;
-    }
-    if (!match) {
-        return (
-            <span>{value}</span>
-        );
-    }
-    return (
-        <span>
-            {match ? match[1] : ''}
-            <span className="bg-warning">{match ? match[2] : ''}</span>
-            {match ? match[3] : ''}
-        </span>
-    );
-};
-
 interface IFlexInputStateProps {
     aircrewList?: IAircrew[];
     groupList?: IGroups[];
@@ -557,7 +538,6 @@ interface IFlexInputStateProps {
     elementBeingEdited: IElementBeingEdited;
     isInputActive: boolean;
     hasNames: boolean;
-    pvalue: JSX.Element | null;
 }
 
 const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFlexInputStateProps => {
@@ -582,7 +562,6 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
         elementBeingEdited: getElementBeingEdited(state),
         isInputActive: inputIsActive,
         hasNames,
-        pvalue: decorateStaticValue(ownProps.value),
     };
 };
 
@@ -705,7 +684,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
                                                 stateProps.editorState.getCurrentContent().getPlainText() :
                                                 ownProps.value,
                                               ownProps.validatorFns),
-        pvalue: stateProps.pvalue,
+        value: ownProps.value,
     };
 };
 
