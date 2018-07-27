@@ -57,6 +57,10 @@ export const getAircrewById = (state: IState) => {
     return aircrewSelectors.getAircrewById(getAircrew(state));
 };
 
+export const getCrewById = (state: IState, aircrewId: string) => {
+    return aircrewSelectors.getCrewById(getAircrewById(state), aircrewId);
+};
+
 /**
  *
  * Days Selectors
@@ -65,6 +69,10 @@ export const getAircrewById = (state: IState) => {
 
 export const getDaysById = (state: IState) => {
     return daysSelectors.getDaysById(state.days);
+};
+
+export const getDayById = (state: IState, dayId: string) => {
+    return daysSelectors.getDayById(getDaysById(state), dayId);
 };
 
 export const getCurrentDayObj = (state: IState) => {
@@ -86,6 +94,13 @@ export const getCurrentDayFlightIds = (state: IState) => {
  * Flights Selectors
  *
  */
+export const getFlightsById = (state: IState) => {
+    return flightsSelectors.getFlightsById(state.flights);
+};
+
+export const getFlightById = (state: IState, flightId: string) => {
+    return flightsSelectors.getFlightById(getFlightsById(state), flightId);
+};
 
 export const getCurrentDayFlights = createSelector(
     (state: IState) => state.flights.byId,
@@ -99,9 +114,13 @@ export const getCurrentDayFlights = createSelector(
  *
  */
 
+export const getSortiesById = (state: IState) => {
+    return sortieSelectors.getSortiesById(state.sorties);
+};
+
 export const getSortie = (state: IState, sortieId: string) => {
     return sortieSelectors.getSortie(
-        state.sorties.byId,
+        getSortiesById(state),
         sortieId
     );
 };

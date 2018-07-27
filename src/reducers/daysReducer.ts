@@ -121,6 +121,10 @@ export const getDaysById = (state: IEntity<IDays>) => {
     return state.byId;
 };
 
+export const getDayById = (state: IEntity<IDays>['byId'], dayId: string) => {
+    return state[dayId];
+};
+
 export const getCurrentDayObj = (state: IEntity<IDays>['byId'], dayId: string) => {
     return state[dayId];
 };

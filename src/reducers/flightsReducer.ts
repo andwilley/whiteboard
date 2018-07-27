@@ -186,3 +186,11 @@ export const getCurrentDayFlights = (
         return stateFlightsById[flightId];
     });
 };
+
+export const getFlightsById = (state: IEntity<IFlights>) => {
+    return state.byId;
+};
+
+export const getFlightById = (state: IEntity<IFlights>['byId'], flightId: string) => {
+    return state[flightId];
+};

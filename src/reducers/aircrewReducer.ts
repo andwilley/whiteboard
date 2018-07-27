@@ -82,4 +82,8 @@ export const getAircrewById = (state: IEntity<IAircrew>) => {
     return state.byId;
 };
 
+export const getCrewById = (state: IEntity<IAircrew>['byId'], aircrewId: string) => {
+    return state[aircrewId];
+};
+
 export default aircrewReducer;

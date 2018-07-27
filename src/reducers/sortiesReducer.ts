@@ -158,6 +158,10 @@ const sortiesReducer = combineReducers<IEntity<ISorties>>({
 
 export default sortiesReducer;
 
+export const getSortiesById = (state: IEntity<ISorties>) => {
+    return state.byId;
+};
+
 export const getSortie = (state: IEntity<ISorties>['byId'], sortieId: string) => {
     return state[sortieId];
 };
