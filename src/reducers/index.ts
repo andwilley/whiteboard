@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { IState, UErrorLocs } from '../types/State';
+import { createSelector } from 'reselect';
 
 import addUpdateAircrewFormValuesReducer from './addUpdateAircrewFormValuesReducer';
 import aircrewReducer from './aircrewReducer';
@@ -20,9 +21,10 @@ import * as aircrewSelectors from './aircrewReducer';
 import * as daysSelectors from './daysReducer';
 import * as flightsSelectors from './flightsReducer';
 import * as sortieSelectors from './sortiesReducer';
+import * as notesSelectors from './notesReducer';
 import * as crewListUISelectors from './crewListUIReducer';
 import * as errorsSelectors from './errorReducer';
-import { createSelector } from 'reselect';
+import * as editorSelectors from './editorStateReducer';
 
 const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
@@ -163,6 +165,16 @@ export const getBackSeatSymbols = (state: IState, sortieId: string) => {
 
 /**
  *
+ * Notes Selectors
+ *
+ */
+
+export const getNotesById = (state: IState) => {
+    return notesSelectors.getNotesById(state.notes);
+};
+
+/**
+ *
  * CrewList UI Selectors
  *
  */
@@ -220,3 +232,13 @@ export const getActiveDayErrors = createSelector(
     getCurrentDayObj,
     errorsSelectors.getActiveDayErrors
 );
+
+/**
+ *
+ * Editor Selectors
+ *
+ */
+
+export const getElementBeingEdited = (state: IState) => {
+    return editorSelectors.getElementBeingEdited(state.editor);
+};

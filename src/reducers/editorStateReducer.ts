@@ -41,3 +41,7 @@ const editorStateReducer = (state: IEditor = {
 };
 
 export default editorStateReducer;
+
+export const getElementBeingEdited = (state: IEditor) => {
+    return state.elementBeingEdited;
+};

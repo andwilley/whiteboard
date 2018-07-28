@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
 import { actions, IAddErrorArgs } from '../actions';
-import { errorTypes, errorLevels, errorMessages } from '../errors';
+import { errorTypes, errorLevels, errorMessages, errorLocs } from '../errors';
 import { IState, IFlightTimes, IErrors } from '../types/State';
 import FlightTimes from '../components/FlightTimes';
 import { RGX_24HOUR_TIME } from '../util/regEx';
 import { UTimeTypes } from '../types/State';
 import { timeTypes } from '../whiteboard-constants';
-import { getActiveDayErrors } from '../reducers';
+import { getActiveDayErrors, getCurrentDayId, getElementBeingEdited } from '../reducers';
 const { updateFlightTime, addError, delError } = actions;
 
 interface IFlightTimesContainerProps {
@@ -132,50 +132,75 @@ const getTimeErrors = (times: IFlightTimes,
     }
 };
 
+const isTimeBoxActive = (state: IState, props: IFlightTimesContainerProps): boolean => {
+    const elementBeingEdited = getElementBeingEdited(state);
+    return elementBeingEdited.entityId === props.flightId &&
+           (elementBeingEdited.element === errorLocs.BRIEF ||
+            elementBeingEdited.element === errorLocs.TAKEOFF ||
+            elementBeingEdited.element === errorLocs.LAND);
+};
+
 interface IFlightTimesContainerStateProps {
     times: IFlightTimes;
-    flightId: string;
     dayId: string;
     errors: IErrors[];
+    isTimeBoxActive: boolean;
 }
 
-const mapStateToProps = (state: IState, ownProps: IFlightTimesContainerProps) => {
+const mapStateToProps = (state: IState, ownProps: IFlightTimesContainerProps): IFlightTimesContainerStateProps => {
     return {
         times: getFlightTimes(state, ownProps.flightId),
-        flightId: ownProps.flightId,
-        dayId: state.crewListUI.currentDay,
+        dayId: getCurrentDayId(state),
         errors: getActiveDayErrors(state),
+        isTimeBoxActive: isTimeBoxActive(state, ownProps),
+    };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        onInputChange: (
+            errors: IErrors[],
+            flightId: string,
+            dayId: string,
+            times: IFlightTimes
+        ) => (timeType: UTimeTypes, time: string) => {
+            /** delete the old errors */
+            errors.forEach(error => {
+                if (error.type === errorTypes.TIME_ORDER &&
+                    error.locationId === flightId) {
+                    dispatch(delError(error.id, dayId));
+                }
+            });
+            /** set the new ones */
+            const timeErrors = getTimeErrors(times, timeType, time, dayId, flightId);
+            if (timeErrors.length > 0) {
+                timeErrors.forEach(timeError => dispatch(addError(timeError)));
+            }
+            dispatch(updateFlightTime(flightId, timeType, time));
+        },
     };
 };
 
 const mergeProps = (stateProps: IFlightTimesContainerStateProps,
-                    dispatchProps: {dispatch: any},
+                    dispatchProps: any,
                     ownProps: IFlightTimesContainerProps
 ) => {
     return {
         times: stateProps.times,
-        flightId: stateProps.flightId,
-        onInputChange: (timeType: UTimeTypes, time: string) => {
-            /** delete the old errors */
-            stateProps.errors.forEach(error => {
-                if (error.type === errorTypes.TIME_ORDER &&
-                    error.locationId === stateProps.flightId) {
-                    dispatchProps.dispatch(delError(error.id, stateProps.dayId));
-                }
-            });
-            /** set the new ones */
-            const timeErrors = getTimeErrors(stateProps.times, timeType, time, stateProps.dayId, stateProps.flightId);
-            if (timeErrors.length > 0) {
-                timeErrors.forEach(timeError => dispatchProps.dispatch(addError(timeError)));
-            }
-            dispatchProps.dispatch(updateFlightTime(ownProps.flightId, timeType, time));
-        },
+        flightId: ownProps.flightId,
+        onInputChange: stateProps.isTimeBoxActive ?
+            dispatchProps.onInputChange(
+                stateProps.errors,
+                ownProps.flightId,
+                stateProps.dayId,
+                stateProps.times
+            ) : undefined,
     };
 };
 
 const FlightTimesContainer = connect(
     mapStateToProps,
-    ((dispatch: any) => { return { dispatch: dispatch }; }),
+    mapDispatchToProps,
     mergeProps
 )(FlightTimes);
 

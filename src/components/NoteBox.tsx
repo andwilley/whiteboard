@@ -6,55 +6,57 @@ import { IDelNoteArgs } from '../actions';
 import ErrorListContainer from '../containers/ErrorListContainer';
 
 interface INoteBoxProps {
-    className?: string;
-    errorListClassName?: string;
-    notes: INotes[];
-    errorLoc: UNoteEntity;
-    errorLocId: string;
+    className: string | undefined;
+    notes: INotes[] | undefined;
+    entityType: UNoteEntity;
+    entityId: string;
     onInputChange: (noteId: string) => (e: any) => void;
     onAddNoteClick: () => void;
     onDelNoteClick: (obj: IDelNoteArgs) => (e: any) => void;
 }
 
-const NoteBox: React.SFC<INoteBoxProps> = ({
-    className = '',
-    notes,
-    onInputChange,
-    onAddNoteClick,
-    onDelNoteClick,
-    errorLoc,
-    errorLocId,
-}) => {
-    const noteComponentsList = notes.map(note =>
-        (
-        <Note
-            className={className}
-            note={note}
-            key={note.id}
-            onDelNoteClick={onDelNoteClick}
-            onInputChange={onInputChange(note.id)}
-            errorLoc={errorLoc}
-            errorLocId={errorLocId}
-        />
-        )
-    );
-    return (
-        <div>
-            <IconButton
-                onClick={onAddNoteClick}
-                icon="plus"
-                size={10}
-                style={{
-                    margin: '-20px 0px 0px 0px',
-                }}
-                svgClass="float-right"
+class NoteBox extends React.PureComponent<INoteBoxProps> {
+    render() {
+        const {
+            className = '',
+            notes = [],
+            entityType,
+            entityId,
+            onInputChange,
+            onAddNoteClick,
+            onDelNoteClick,
+        } = this.props;
+        const noteComponentsList = notes.map(note =>
+            (
+            <Note
+                className={className}
+                note={note}
+                key={note.id}
+                onDelNoteClick={onDelNoteClick}
+                onInputChange={onInputChange(note.id)}
+                errorLoc={entityType}
+                errorLocId={entityId}
             />
-            <div className="row">
-                {noteComponentsList}
+            )
+        );
+        return (
+            <div>
+                <IconButton
+                    onClick={onAddNoteClick}
+                    icon="plus"
+                    size={10}
+                    style={{
+                        margin: '-20px 0px 0px 0px',
+                    }}
+                    svgClass="float-right"
+                />
+                <div className="row">
+                    {noteComponentsList}
+                </div>
+                <ErrorListContainer className={className} errorLoc={entityType} errorLocId={entityId} />
             </div>
-            <ErrorListContainer className={className} errorLoc={errorLoc} errorLocId={errorLocId} />
-        </div>
-    );
-};
+        );
+    }
+}
 
 export default NoteBox;

@@ -61,3 +61,7 @@ const notesReducer = combineReducers<IEntity<INotes>>({
 });
 
 export default notesReducer;
+
+export const getNotesById = (state: IEntity<INotes>) => {
+    return state.byId;
+};

@@ -26,7 +26,7 @@ const DayHeader: React.SFC<IDayHeaderProps> = ({ dayId, totalFlightHours, totalS
                             margin: '.5rem .1rem 0 0',
                         }}
                     >
-                        {totalSorties}
+                        {totalSorties.toFixed()}
                     </IconButton>
                     <IconButton
                         icon="clock"
@@ -37,7 +37,7 @@ const DayHeader: React.SFC<IDayHeaderProps> = ({ dayId, totalFlightHours, totalS
                             margin: '.5rem .1rem 0 .6rem',
                         }}
                     >
-                        {totalFlightHours}
+                        {totalFlightHours.toFixed(1)}
                     </IconButton>
                     {/* <button className="btn btn-sm btn-outline-secondary">{totalFlightTime}</button>
                         <button className="btn btn-sm btn-outline-secondary">{totalSorties}</button> */}

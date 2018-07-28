@@ -1,8 +1,10 @@
 import { connect } from 'react-redux';
 import { actions, IDelNoteArgs } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
-import { IState, INotes, IFlights, IDays, ISorties, IAircrew, UNoteEntity } from '../types/State';
+import { IState, INotes, IFlights, IDays, ISorties, IAircrew, UNoteEntity, IEntity } from '../types/State';
 import NoteBox from '../components/NoteBox';
+import { getFlightById, getDayById, getSortie, getCrewById, getNotesById } from '../reducers';
+import { createSelector } from 'reselect';
 const { addUpdateNote, delNote } = actions;
 
 interface INoteBoxContainerProps {
@@ -11,49 +13,46 @@ interface INoteBoxContainerProps {
     entityId: string;
 }
 
-const getNotes = (entityType: string, entityId: string, state: IState): INotes[] => {
-    /**
-     * @param
-     * @param
-     * @param
-     * @returns array of note entities.
-     *
-     * needs:
-     * state.notes.byId
-     * state.flights.byId
-     * state.days.byId
-     * state.sorties.byId
-     *
-     * could pass the actual entity to this so it can cache the value and just pass notes to this.
-     *  - i.e. do the switch in mapStateToProps
-     */
-    let entity: IFlights | IDays | ISorties | IAircrew;
-    switch (entityType) {
+const getNoteEntitySelector = (
+    state: IState,
+    props: INoteBoxContainerProps
+): IFlights | IDays | ISorties | IAircrew => {
+    switch (props.entityType) {
         case noteEntity.FLIGHT_NOTE:
-            entity = state.flights.byId[entityId];
-            break;
+            return getFlightById(state, props.entityId);
         case noteEntity.DAY_NOTE:
-            entity = state.days.byId[entityId];
-            break;
+            return getDayById(state, props.entityId);
         case noteEntity.SORTIE_NOTE:
-            entity = state.sorties.byId[entityId];
-            break;
+            return getSortie(state, props.entityId);
         case noteEntity.AIRCREW_NOTE:
-            entity = state.aircrew.byId[entityId];
-            break;
+            return getCrewById(state, props.entityId);
         default:
-            return [];
+            throw(new TypeError(`Note entityType: ${props.entityType} is not valid.`));
     }
-
-    return entity.notes.map(noteId => state.notes.byId[noteId]);
 };
+
+const makeGetNotes = () => createSelector(
+    getNoteEntitySelector,
+    getNotesById,
+    (notesEntity: IFlights | IDays | ISorties | IAircrew, notesById: IEntity<INotes>['byId']): INotes[] | undefined => {
+        /**
+         * @returns memoized array of note entities.
+         *
+         */
+        if (notesEntity.notes.length === 0) {
+            return undefined;
+        }
+        return notesEntity.notes.map(noteId => notesById[noteId]);
+    }
+);
 
 const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
     return {
-        className: ownProps.className,
-        notes: getNotes(ownProps.entityType, ownProps.entityId, state),
-        errorLoc: ownProps.entityType,
-        errorLocId: ownProps.entityId,
+        // className: ownProps.className,
+        notes: makeGetNotes()(state, ownProps),
+        // errorLoc: ownProps.entityType,
+        // errorLocId: ownProps.entityId,
+        ...ownProps,
     };
 };
 

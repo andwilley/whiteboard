@@ -1839,7 +1839,6 @@ export const INITIAL_STATE: IState = {
             'cjjs2dybe0nqxOK__cq3t3fo1',
             'cjjs2dybe0nqxOK__cq3t3f9k',
             'cjjs2dybe0nqxOK__cq3t3f71',
-            
         ],
     },
     groups: {
