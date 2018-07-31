@@ -7,7 +7,7 @@ import './style/react-datetime.css';
 import './style/bootstrap.css';
 import './style/dashboard.css';
 import App from './components/App';
-import whiteboardApp from './reducers/index';
+import whiteboardApp from './reducers';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import { createStore, applyMiddleware, compose } from 'redux';

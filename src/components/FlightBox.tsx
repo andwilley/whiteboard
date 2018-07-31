@@ -4,7 +4,7 @@ import { IFlights, ISettings } from '../types/State';
 import IconButton from './IconButton';
 import * as Moment from 'moment';
 import * as cuid from 'cuid';
-import { conv24HrTimeToMoment } from '../types/utilFunctions';
+import { conv24HrTimeToMoment } from '../util/utilFunctions';
 
 interface IFlightBoxProps {
     dayId: string;

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Moment from 'moment';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 import * as cuid from 'cuid';
@@ -8,9 +7,9 @@ import { UEditables, ISchedObject } from '../types/WhiteboardTypes';
 import { ISchedBlock } from '../types/WhiteboardTypes';
 import { nameLocation, builtInGroupNames } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
+import * as _ from 'lodash';
 import restrictor, { RestrictorFn } from '../util/restrictor';
-import { getActiveDayErrors } from '../reducers';
-import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
+import { getActiveDayErrors, getAircrewIds, getGroups } from '../reducers';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs, errorMessages } from '../errors';
 import { IState,
@@ -26,6 +25,8 @@ import { IAddErrorArgs } from '../actions';
 import { RGX_FIND_NAME, RGX_HILITE_STRING } from '../util/regEx';
 import { getAircrewById } from '../reducers';
 import { createSelector } from 'reselect';
+import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
+import { getSchedErrorsFromSchedBlocks } from '../util/utilFunctions';
 
 type IAircrewEntity = IEntity<IAircrew>;
 
@@ -109,7 +110,7 @@ const getComponentErrors = (dayErrors: IErrors[],
         getSchedErrors(dayErrors, errorLoc, errorLocId, aircrewRefIds) : [];
     const timeOrderErrors = errorTypesToGet.indexOf(errorTypes.TIME_ORDER) > -1 ?
         getTimeOrderErrors(dayErrors, errorLoc, errorLocId) : [];
-    return schedErrors.length > 0 && timeOrderErrors.length > 0 ? [...schedErrors, ...timeOrderErrors] : undefined;
+    return schedErrors.length > 0 || timeOrderErrors.length > 0 ? [...schedErrors, ...timeOrderErrors] : undefined;
 };
 
 const getSchedErrors = (dayErrors: IErrors[],
@@ -148,63 +149,60 @@ const getValidationErrors = (text: string, validatorFns?: ValidatorFn[]) => {
     return validator(text, ...validatorFns);
 };
 
-export const flightIsCrewHotPit = (block: ISchedBlock, scblock: ISchedBlock, settings: ISettings): boolean => {
-    if (block.location !== errorLocs.FLIGHT || scblock.location !== errorLocs.FLIGHT) {
-        return false;
+const makeErrorMessage = (location: UErrorLocs): string => {
+    switch (location) {
+        case errorLocs.FLIGHT:
+            return errorMessages.FLIGHT_CONFLICT;
+        case errorLocs.SIM:
+            return errorMessages.SIM_CONFLICT;
+        case errorLocs.FLIGHT_NOTE:
+            return errorMessages.FLIGHT_NOTE_CONFLICT;
+        case errorLocs.SIM_NOTE:
+            return errorMessages.SIM_NOTE_CONFLICT;
+        case errorLocs.SNIVS:
+            return errorMessages.SNIV_CONFLICT;
+        case errorLocs.DAY_NOTE:
+            return errorMessages.NOTE_CONFLICT;
+        default:
+            return 'is scheduled at this time.';
     }
-    const diff1 = Moment.duration(block.hardStart.diff(scblock.hardEnd));
-    const diff2 = Moment.duration(scblock.hardStart.diff(block.hardEnd));
-    if ((diff1 <= Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
-        diff1 >= Moment.duration(settings.hotPitNoShorterThan, 'minutes')) ||
-        (diff2 <= Moment.duration(settings.hotPitNoLongerThan, 'minutes') &&
-        diff2 >= Moment.duration(settings.hotPitNoShorterThan, 'minutes'))) {
-        return true;
-    }
-    return false;
 };
 
-const pushBlockAsError = (
+const pushBlocksOntoErrors = (
     errorArray: IAddErrorArgs[],
     block: ISchedBlock,
     conflictsWithBlock: ISchedBlock,
     aircrew: IAircrew,
     currentDayId: string
-): void => {
-    let message = '';
-    switch (conflictsWithBlock.location) {
-        case errorLocs.FLIGHT:
-            message = errorMessages.FLIGHT_CONFLICT;
-            break;
-        case errorLocs.SIM:
-            message = errorMessages.SIM_CONFLICT;
-            break;
-        case errorLocs.FLIGHT_NOTE:
-            message = errorMessages.FLIGHT_NOTE_CONFLICT;
-            break;
-        case errorLocs.SIM_NOTE:
-            message = errorMessages.SIM_NOTE_CONFLICT;
-            break;
-        case errorLocs.SNIVS:
-            message = errorMessages.SNIV_CONFLICT;
-            break;
-        case errorLocs.DAY_NOTE:
-            message = errorMessages.NOTE_CONFLICT;
-            break;
-        default:
-            message = 'is scheduled at this time.';
-            break;
-    }
-    errorArray.push({
-        dayId: currentDayId,
-        type: errorTypes.SCHEDULE_CONFLICT,
-        location: block.location,
-        locationId: block.locationId,
-        level: errorLevels.WARN,
-        message: `${aircrew.callsign} ${message}`,
-        meta: {
-            aircrewId: aircrew.id,
+): IAddErrorArgs[] => {
+    /**
+     * not pure, modifies errorArray
+     */
+    const conflictMessage = makeErrorMessage(conflictsWithBlock.location);
+    const message = makeErrorMessage(block.location);
+
+    return [...errorArray, {
+            dayId: currentDayId,
+            type: errorTypes.SCHEDULE_CONFLICT,
+            location: block.location,
+            locationId: block.locationId,
+            level: errorLevels.WARN,
+            message: `${aircrew.callsign} ${conflictMessage}`,
+            meta: {
+                aircrewId: aircrew.id,
+            },
         },
-    });
+        {
+            dayId: currentDayId,
+            type: errorTypes.SCHEDULE_CONFLICT,
+            location: conflictsWithBlock.location,
+            locationId: conflictsWithBlock.locationId,
+            level: errorLevels.WARN,
+            message: `${aircrew.callsign} ${message}`,
+            meta: {
+                aircrewId: aircrew.id,
+            },
+        }];
 };
 
 const findSchedErrors = (activeAircrewRefs: ISchedObject,
@@ -226,7 +224,7 @@ const findSchedErrors = (activeAircrewRefs: ISchedObject,
      * state.aircrew.byId
      */
 
-    const errors: IAddErrorArgs[] = [];
+    let errors: IAddErrorArgs[] = [];
     Object.keys(activeAircrewRefs).forEach(aircrewId => {
         activeAircrewRefs[aircrewId]
             .reduce((schedConflictArray: ISchedBlock[], block: ISchedBlock) => {
@@ -244,21 +242,28 @@ const findSchedErrors = (activeAircrewRefs: ISchedObject,
                  * This logic is duplicated in VisibleCrewList ***!
                  * Assumes start and end are actually in order ***!
                  */
-                schedConflictArray.forEach(scblock => {
-                    if ((block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS) ||
-                        flightIsCrewHotPit(block, scblock, settings)) {
-                        return;
-                    } else if (block.start >= scblock.start && block.start <= scblock.end) {
-                        pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                        pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
-                    } else if (block.end >= scblock.start && block.end <= scblock.end) {
-                        pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                        pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
-                    } else if (scblock.start >= block.start && scblock.start <= block.end) {
-                        pushBlockAsError(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                        pushBlockAsError(errors, scblock, block, aircrewById[aircrewId], currentDayId);
-                    }
-                });
+                errors = getSchedErrorsFromSchedBlocks(
+                    schedConflictArray,
+                    aircrewById[aircrewId],
+                    block,
+                    settings,
+                    currentDayId,
+                    errors,
+                    pushBlocksOntoErrors,
+                    true
+                );
+                // schedConflictArray.forEach(scblock => {
+                //     if ((block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS) ||
+                //         flightIsCrewHotPit(block, scblock, settings)) {
+                //         return;
+                //     } else if (block.start >= scblock.start && block.start <= scblock.end) {
+                //         pushBlocksOntoErrors(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                //     } else if (block.end >= scblock.start && block.end <= scblock.end) {
+                //         pushBlocksOntoErrors(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                //     } else if (scblock.start >= block.start && scblock.start <= block.end) {
+                //         pushBlocksOntoErrors(errors, block, scblock, aircrewById[aircrewId], currentDayId);
+                //     }
+                // });
                 return schedConflictArray.concat(block);
             }, []);
     });
@@ -325,13 +330,7 @@ export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
                     dispatch(actions.clearError(errorId, state.crewListUI.currentDay));
                 }
             });
-            const activeRefsAndBlock = getActiveAircrewRefs(state.days.byId[state.crewListUI.currentDay],
-                                                            state.editor.elementBeingEdited,
-                                                            state.settings,
-                                                            state.flights.byId,
-                                                            state.sorties.byId,
-                                                            state.notes.byId,
-                                                            state.snivs);
+            const activeRefsAndBlock = getActiveAircrewRefs(state);
             const newErrors = findSchedErrors(activeRefsAndBlock.activeAircrewRefs,
                                               state.crewListUI.currentDay,
                                               state.aircrew.byId,
@@ -415,7 +414,7 @@ const getOnChangeWithNameMatch = ({
         const matchedAircrewIds = matchedAircrew.map(aircrew => aircrew.id);
         aircrewRefIdDispatch(matchedAircrewIds);
         /** update the editor state and reset the decorators for the editor */
-        const decorator = getDecorators(matchedAircrew, groupList);
+        const decorator = makeGetDecorators()(matchedAircrew, groupList);
         const newEditorState = EditorState.set(editorState, {decorator});
         dispatch(actions.setEditorState(newEditorState));
         /** run the original onChange passed to this container as a prop (update the input value) */
@@ -449,7 +448,7 @@ const highlightStrategy = (
     const text = contentBlock.getText().toLowerCase();
     const match = text.match(RGX_HILITE_STRING);
     if (match && typeof match.index === 'number') {
-        callback(match.index + 1, match.index + 1 + match[2].length);
+        callback(match.index + match[1].length + 1, match.index + match[1].length + 1 + match[3].length);
     }
 };
 
@@ -492,42 +491,56 @@ const onXClick = (id: string) => (e: any) => {
     alert(id);
 };
 
-const getDecorators = (aircrewRefList: IAircrew[] = [], groupRefList: IGroups[] = []): CompositeDecorator => {
-    let decorators = aircrewRefList.map(aircrew => {
-        return {
-            strategy: nameStrategy(aircrew.callsign),
-            component: nameSpan(aircrew.id),
-        };
-    });
-    decorators = decorators.concat(groupRefList.map(group => {
-        return {
-            strategy: nameStrategy(group.name),
-            component: nameSpan(group.id),
-        };
-    }));
-    decorators = decorators.concat({
-        strategy: highlightStrategy,
-        component: highlightSpan,
-    });
-    const compositeDecorators = new CompositeDecorator(decorators);
-    return compositeDecorators;
-};
+const makeGetDecorators = () => _.memoize((
+    aircrewRefList: IAircrew[] | undefined,
+    groupRefList: IGroups[] | undefined
+    ): CompositeDecorator | undefined => {
+        if (!aircrewRefList || !groupRefList) {
+            return undefined;
+        }
+        let decorators = aircrewRefList.map(aircrew => {
+            return {
+                strategy: nameStrategy(aircrew.callsign),
+                component: nameSpan(aircrew.id),
+            };
+        });
+        decorators = decorators.concat(groupRefList.map(group => {
+            return {
+                strategy: nameStrategy(group.name),
+                component: nameSpan(group.id),
+            };
+        }));
+        decorators = decorators.concat({
+            strategy: highlightStrategy,
+            component: highlightSpan,
+        });
+        const compositeDecorators = new CompositeDecorator(decorators);
+        return compositeDecorators;
+    },
+    (...args) => {
+        return JSON.stringify(args);
+    }
+);
 
 const doesInputHaveNames = (editable: UEditables) => {
     return (Object.values(nameLocation).indexOf(editable) > -1);
 };
 
-const getGroupList = (groups: IEntity<IGroups>, aircrewIds: string[]): IGroups[] => {
-    const userGroups = groups.allIds.map(groupId => groups.byId[groupId]);
-    const builtInGroups = builtInGroupNames.map(name => {
-        return {
-            id: cuid(),
-            name: name,
-            aircrewIds,
-        };
-    });
-    return userGroups.concat(builtInGroups);
-};
+const makeGetGroupList = () => createSelector(
+    getGroups,
+    getAircrewIds,
+    (groups: IEntity<IGroups>, aircrewIds: string[]): IGroups[] => {
+        const userGroups = groups.allIds.map(groupId => groups.byId[groupId]);
+        const builtInGroups = builtInGroupNames.map(name => {
+            return {
+                id: cuid(),
+                name: name,
+                aircrewIds,
+            };
+        });
+        return userGroups.concat(builtInGroups);
+    }
+);
 
 interface IFlexInputStateProps {
     aircrewList?: IAircrew[];
@@ -556,7 +569,8 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
     const editorState = inputIsActive ? getEditorState(state) : undefined;
     return {
         aircrewList: hasNames ? getAircrewList(state.aircrew) : undefined,
-        groupList: hasNames ? getGroupList(state.groups, state.aircrew.allIds) : undefined,
+        aircrewRefList,
+        groupList: hasNames ? makeGetGroupList()(state) : undefined,
         errors: componentErrors,
         editorState,
         elementBeingEdited: getElementBeingEdited(state),
@@ -565,35 +579,13 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
     };
 };
 
-interface IFlexInputOnClickArgs {
-    inputIsActive: boolean;
-    value: string;
-    decorators: CompositeDecorator;
-    element: UEditables;
-    entityId: string;
-    dispatch: any;
-}
-
-const getOnClickIsInputActive = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.inputIsActive;
-
-const getOnClickValue = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.value;
-
-const getOnClickDecorators = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.decorators;
-
-const getOnClickElement = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.element;
-
-const getOnClickEntityId = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.entityId;
-
-const getOnClickDispatch = (onClickArgs: IFlexInputOnClickArgs) => onClickArgs.dispatch;
-
-const makeGetOnClickSelector = () => createSelector(
-    getOnClickIsInputActive,
-    getOnClickValue,
-    getOnClickDecorators,
-    getOnClickElement,
-    getOnClickEntityId,
-    getOnClickDispatch,
-    (inputIsActive, value, decorators, element, entityId, dispatch) => () => {
+const makeGetOnClickSelector = () => _.memoize(
+    (entityId: string,
+     value: string,
+     inputIsActive: boolean,
+     decorators: CompositeDecorator,
+     element: UEditables,
+     dispatch: any) => () => {
         if (inputIsActive) {
             return;
         }
@@ -614,6 +606,9 @@ const makeGetOnClickSelector = () => createSelector(
         dispatch(actions.setEditorState(editorState));
         dispatch(actions.setEditedElement(element, entityId));
         dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
+    },
+    (...args) => {
+        return `${args[0]}${args[1]}${args[2] ? 'true' : 'false'}${args[4]}`;
     }
 );
 
@@ -641,9 +636,11 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      *
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
-    const decorators = stateProps.isInputActive ?
-        getDecorators(stateProps.aircrewRefList, stateProps.groupList) : undefined;
     /** handle text insert and paste. function signatures are different, but function is the same. */
+    const decorators = makeGetDecorators()(
+        stateProps.aircrewRefList,
+        stateProps.groupList
+    );
     const restrictorFn = ownProps.restrictorFns && ownProps.restrictorFns.length > 0 ?
         restrictor(...ownProps.restrictorFns) : null;
     const inputRestrictor = restrictorFn ?
@@ -664,14 +661,14 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
                 errorConfig: ownProps.errorConfig,
                 onChange: ownProps.onInputChange,
             }) : null,
-        onClick: dispatchProps.onClick({
-            inputIsActive: stateProps.isInputActive,
-            value: ownProps.value,
+        onClick: dispatchProps.onClick(
+            ownProps.entityId,
+            ownProps.value,
+            stateProps.isInputActive,
             decorators,
-            element: ownProps.element,
-            entityId: ownProps.entityId,
-            dispatch: dispatchProps.dispatch,
-        }),
+            ownProps.element,
+            dispatchProps.dispatch
+        ),
         onBlur: dispatchProps.onBlur,
         placeHolder: ownProps.placeHolder,
         className: ownProps.className,

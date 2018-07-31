@@ -4,7 +4,7 @@ import * as Moment from 'moment';
 import { getErrors } from '../reducers';
 import { getAircrewById } from '../reducers';
 import { getShowSnivs } from '../reducers';
-import { setErrorsOnFreshState, flightIsCrewHotPit } from '../containers/FlexInputContainer';
+import { setErrorsOnFreshState } from './FlexInputContainer';
 import {
   IEntity,
   IState,
@@ -23,6 +23,7 @@ import { IAircrewWithPucks,
 import { actions } from '../actions';
 import { errorTypes, errorLocs } from '../errors';
 import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
+import { flightIsCrewHotPit } from '../util/utilFunctions';
 const { delAircrew,
         delSniv,
         setAircrewForm,
@@ -304,15 +305,7 @@ interface IVisibleCrewListStateProps {
 }
 
 const mapStateToProps = (state: IState): IVisibleCrewListStateProps => {
-  const activeRefsAndBlock = getActiveAircrewRefs(
-    state.days.byId[state.crewListUI.currentDay],
-    state.editor.elementBeingEdited,
-    state.settings,
-    state.flights.byId,
-    state.sorties.byId,
-    state.notes.byId,
-    state.snivs
-  );
+  const activeRefsAndBlock = getActiveAircrewRefs(state);
   const unavailableAircrewIds = getUnavailableAircrewIds(activeRefsAndBlock, state.aircrew.allIds, state.settings);
   const aircrewList = getAircrewList(
     activeRefsAndBlock.activeAircrewRefs,

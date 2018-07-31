@@ -74,9 +74,11 @@ const allAircrew = (state: string[] = [], action: IAction) => {
 };
 
 const aircrewReducer = combineReducers<IEntity<IAircrew>>({
-   byId: aircrewById,
-   allIds: allAircrew,
+    byId: aircrewById,
+    allIds: allAircrew,
 });
+
+export default aircrewReducer;
 
 export const getAircrewById = (state: IEntity<IAircrew>) => {
     return state.byId;
@@ -86,4 +88,6 @@ export const getCrewById = (state: IEntity<IAircrew>['byId'], aircrewId: string)
     return state[aircrewId];
 };
 
-export default aircrewReducer;
+export const getAircrewIds = (state: IEntity<IAircrew>) => {
+    return state.allIds;
+};

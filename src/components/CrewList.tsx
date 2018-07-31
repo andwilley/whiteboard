@@ -1,11 +1,11 @@
 import * as React from 'react';
-import Aircrew from './Aircrew';
 import { ISnivs } from '../types/State';
 import { IAddUpdateSnivArgs } from '../actions';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import AddSnivFormContainer from '../containers/AddSnivFormContainer';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
 import { ICrewDayAcc } from '../containers/VisibleCrewList';
+import AircrewContainer from '../containers/AircrewContainer';
 
 interface ICrewListProps {
     aircrewList: IAircrewWithPucks[];
@@ -23,11 +23,6 @@ interface ICrewListProps {
 
 const CrewList: React.SFC<ICrewListProps> = ({
     aircrewList,
-    crewDayAndWorkDay,
-    unavailableAircrewIds,
-    daySnivs,
-    showSnivs,
-    dayId,
     onAircrewClick,
     onAircrewXClick,
     onAircrewEditClick,
@@ -38,17 +33,12 @@ const CrewList: React.SFC<ICrewListProps> = ({
     const wsoList: JSX.Element[] = [];
     aircrewList.forEach((aircrew: IAircrewWithPucks) => {
         const aircrewComponent = (
-            <Aircrew
+            <AircrewContainer
                 key={aircrew.id}
-                aircrew={aircrew}
-                crewDayAndWorkDay={crewDayAndWorkDay[aircrew.id]}
-                unavailable={unavailableAircrewIds.indexOf(aircrew.id) > -1 ? true : false}
-                snivs={daySnivs.filter(sniv => sniv.aircrewIds.indexOf(aircrew.id) > -1)}
-                showSnivs={showSnivs}
-                dayId={dayId}
-                onAircrewClick={() => onAircrewClick(aircrew)}
-                onAircrewXClick={() => onAircrewXClick(aircrew.id)}
-                onAircrewEditClick={() => onAircrewEditClick(aircrew)}
+                aircrewId={aircrew.id}
+                onAircrewClick={() => onAircrewClick}
+                onAircrewXClick={() => onAircrewXClick}
+                onAircrewEditClick={() => onAircrewEditClick}
                 onSnivXClick={onSnivXClick}
                 onSnivEditClick={onSnivEditClick}
             />

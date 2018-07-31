@@ -5,7 +5,7 @@ import { errorLevels } from '../errors';
 import { errorMessages } from '../errors';
 import { UErrorLevels } from '../types/State';
 import { IUntrackedErrors } from '../types/WhiteboardTypes';
-import { RGX_24HOUR_TIME, RGX_IS_TR_CODE_LIST } from '../util/regEx';
+import { RGX_24HOUR_TIME, RGX_IS_TR_CODE_LIST } from './regEx';
 
 /**
  * Validators - show user input errors (still updates state with invalid input)

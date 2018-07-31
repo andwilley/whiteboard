@@ -4,7 +4,7 @@ import { IEntity, IFlights } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 import * as Moment from 'moment';
-import { conv24HrTimeToMoment } from '../types/utilFunctions';
+import { conv24HrTimeToMoment } from '../util/utilFunctions';
 
 const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
     switch (action.type) {

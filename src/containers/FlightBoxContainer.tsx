@@ -6,7 +6,7 @@ import { errorTypes } from '../errors';
 import { noteEntity } from '../whiteboard-constants';
 import { RGX_24HOUR_TIME } from '../util/regEx';
 import { setErrorsOnFreshState } from './FlexInputContainer';
-import { conv24HrTimeToMoment } from '../types/utilFunctions';
+import { conv24HrTimeToMoment } from '../util/utilFunctions';
 import { getCurrentDayId, getSettings, getCurrentDayFlights } from '../reducers';
 import { createSelector } from 'reselect';
 const { addFlight, delFlight, delSortie, delNote, toggleFlightExactTimes } = actions;

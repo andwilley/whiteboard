@@ -1,4 +1,4 @@
-import { RGX_PARTIAL_TIME, RGX_SYMBOLS, RGX_FIND_TR_CODES } from '../util/regEx';
+import { RGX_PARTIAL_TIME, RGX_SYMBOLS, RGX_FIND_TR_CODES } from './regEx';
 import { EditorState, DraftHandleValue } from 'draft-js';
 
 /**

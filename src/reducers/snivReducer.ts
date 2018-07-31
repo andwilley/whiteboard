@@ -57,3 +57,11 @@ const snivsReducer = combineReducers<IEntity<ISnivs>>({
 });
 
 export default snivsReducer;
+
+export const getSnivsById = (state: IEntity<ISnivs>) => {
+    return state.byId;
+};
+
+export const getAllSnivs = (state: IEntity<ISnivs>) => {
+    return state.allIds;
+};

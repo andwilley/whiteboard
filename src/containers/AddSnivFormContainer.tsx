@@ -7,7 +7,7 @@ import { errorTypes, errorLocs, errorLevels, errorMessages } from '../errors';
 import { actions, IAddUpdateSnivArgs, IAddErrorArgs } from '../actions';
 import { setErrorsOnFreshState } from './FlexInputContainer';
 import { RGX_24HOUR_TIME } from '../util/regEx';
-import { conv24HrTimeToMoment } from '../types/utilFunctions';
+import { conv24HrTimeToMoment } from '../util/utilFunctions';
 const { setSnivForm, addUpdateSniv, addUpdateSnivFormDisplay, addError } = actions;
 
 const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => {

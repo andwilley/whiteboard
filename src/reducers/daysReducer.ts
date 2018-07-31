@@ -132,3 +132,7 @@ export const getCurrentDayObj = (state: IEntity<IDays>['byId'], dayId: string) =
 export const getCurrentDayFlightIds = (state: IEntity<IDays>['byId'], currentDayId: string) => {
     return state[currentDayId].flights;
 };
+
+export const getCurrentDayNoteIds = (state: IEntity<IDays>['byId'], currentDayId: string) => {
+    return state[currentDayId].notes;
+};

@@ -7,7 +7,7 @@ export const RGX_PARTIAL_TIME = /^(?:\d{2}:?)?\d{0,2}$/;
 export const RGX_SYMBOLS = /^[!@#$%^&*?~=+-]*$/;
 export const RGX_FIND_TR_CODES = new RegExp(`${TR_CODE}`, 'g');
 export const RGX_IS_TR_CODE_LIST = new RegExp(`^(?:[ ,-]?(?:${TR_CODE}))*$`);
-export const RGX_HILITE_STRING = /(\*)(.+)(\*)/;
+export const RGX_HILITE_STRING = /(.*)(\*)(.+)(\*)(.*)/;
 
 export const RGX_FIND_NAME = (name: string): RegExp => {
     return new RegExp(`\\b${name}\\b`);

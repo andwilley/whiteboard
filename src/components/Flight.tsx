@@ -5,7 +5,7 @@ import { noteEntity } from '../whiteboard-constants';
 import SortieBoxContainer from '../containers/SortieBoxContainer';
 import NoteBoxContainer from '../containers/NoteBoxContainer';
 import IconButton from './IconButton';
-import { conv24HrTimeToMoment } from '../types/utilFunctions';
+import { conv24HrTimeToMoment } from '../util/utilFunctions';
 import * as Moment from 'moment';
 import ErrorListContainer from '../containers/ErrorListContainer';
 import { errorLocs } from '../errors';

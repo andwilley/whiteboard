@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { IState, UErrorLocs } from '../types/State';
+import { IState, UErrorLocs, ISnivs, IEntity } from '../types/State';
 import { createSelector } from 'reselect';
 
 import addUpdateAircrewFormValuesReducer from './addUpdateAircrewFormValuesReducer';
@@ -18,8 +18,10 @@ import snivsReducer from './snivReducer';
 import addUpdateSnivFormValuesReducer from './addUpdateSnivFormValuesReducer';
 
 import * as aircrewSelectors from './aircrewReducer';
+// import * as groupsSelectors from './groupsReducer';
 import * as daysSelectors from './daysReducer';
 import * as flightsSelectors from './flightsReducer';
+import * as snivsSelectors from './snivReducer';
 import * as sortieSelectors from './sortiesReducer';
 import * as notesSelectors from './notesReducer';
 import * as crewListUISelectors from './crewListUIReducer';
@@ -59,8 +61,22 @@ export const getAircrewById = (state: IState) => {
     return aircrewSelectors.getAircrewById(getAircrew(state));
 };
 
+export const getAircrewIds = (state: IState) => {
+    return aircrewSelectors.getAircrewIds(getAircrew(state));
+};
+
 export const getCrewById = (state: IState, aircrewId: string) => {
     return aircrewSelectors.getCrewById(getAircrewById(state), aircrewId);
+};
+
+/**
+ *
+ * Aircrew Selectors
+ *
+ */
+
+export const getGroups = (state: IState) => {
+    return state.groups;
 };
 
 /**
@@ -86,7 +102,14 @@ export const getCurrentDayObj = (state: IState) => {
 
 export const getCurrentDayFlightIds = (state: IState) => {
     return daysSelectors.getCurrentDayFlightIds(
-        state.days.byId,
+        getDaysById(state),
+        getCurrentDayId(state)
+    );
+};
+
+export const getCurrentDayNoteIds = (state: IState) => {
+    return daysSelectors.getCurrentDayNoteIds(
+        getDaysById(state),
         getCurrentDayId(state)
     );
 };
@@ -96,6 +119,7 @@ export const getCurrentDayFlightIds = (state: IState) => {
  * Flights Selectors
  *
  */
+
 export const getFlightsById = (state: IState) => {
     return flightsSelectors.getFlightsById(state.flights);
 };
@@ -108,6 +132,57 @@ export const getCurrentDayFlights = createSelector(
     (state: IState) => state.flights.byId,
     getCurrentDayFlightIds,
     flightsSelectors.getCurrentDayFlights
+);
+
+/**
+ *
+ * CrewList UI Selectors
+ *
+ */
+
+export const getCurrentDayId = (state: IState) => {
+    return crewListUISelectors.getCurrentDayId(state.crewListUI);
+};
+
+export const getShowSnivs = (state: IState) => {
+    return crewListUISelectors.getShowSnivs(state.crewListUI);
+};
+
+export const getShowFilters = (state: IState) => {
+    return crewListUISelectors.getShowFilters(state.crewListUI);
+};
+
+/**
+ *
+ * Sniv Selectors
+ *
+ */
+
+export const getSnivs = (state: IState) => {
+    return state.snivs;
+};
+
+export const getSnivsById = (state: IState) => {
+    return snivsSelectors.getSnivsById(getSnivs(state));
+};
+
+export const getAllSnivs = (state: IState) => {
+    return snivsSelectors.getAllSnivs(getSnivs(state));
+};
+
+export const makeGetAircrewDaySnivs = () => createSelector(
+    getSnivsById,
+    getAllSnivs,
+    getCurrentDayId,
+    (state: IState, aircrewId: string) => aircrewId,
+    (snivsById: IEntity<ISnivs>['byId'], allSnivs: string[], currentDayId: string, aircrewId: string): ISnivs[] => {
+        return allSnivs.reduce((filteredIds: ISnivs[], currId) => {
+            if (snivsById[currId].aircrewIds.indexOf(aircrewId) > -1 && snivsById[currId].dates[currentDayId]) {
+                filteredIds = filteredIds.concat(snivsById[currId]);
+            }
+            return filteredIds;
+        }, []);
+    }
 );
 
 /**
@@ -171,24 +246,6 @@ export const getBackSeatSymbols = (state: IState, sortieId: string) => {
 
 export const getNotesById = (state: IState) => {
     return notesSelectors.getNotesById(state.notes);
-};
-
-/**
- *
- * CrewList UI Selectors
- *
- */
-
-export const getCurrentDayId = (state: IState) => {
-    return crewListUISelectors.getCurrentDayId(state.crewListUI);
-};
-
-export const getShowSnivs = (state: IState) => {
-    return crewListUISelectors.getShowSnivs(state.crewListUI);
-};
-
-export const getShowFilters = (state: IState) => {
-    return crewListUISelectors.getShowFilters(state.crewListUI);
 };
 
 /**
