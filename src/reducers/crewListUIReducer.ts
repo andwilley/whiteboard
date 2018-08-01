@@ -1,6 +1,6 @@
 import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
-import { ICrewListUI } from '../types/State';
+import { ICrewListUI, IFilters } from '../types/State';
 
 const crewListUIReducer = (
     state: ICrewListUI = {
@@ -92,6 +92,10 @@ const crewListUIReducer = (
 
 export default crewListUIReducer;
 
+export const getFilters = (state: ICrewListUI) => {
+    return state.filters;
+};
+
 export const getShowSnivs = (state: ICrewListUI): boolean => {
     return state.showSnivs;
 };
@@ -102,4 +106,8 @@ export const getShowFilters = (state: ICrewListUI): boolean => {
 
 export const getCurrentDayId = (state: ICrewListUI): string => {
     return state.currentDay;
+};
+
+export const getShowAvailable = (state: IFilters) => {
+    return state.showAvailable;
 };

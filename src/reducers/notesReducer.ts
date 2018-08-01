@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { IEntity, INotes } from '../types/State';
 import { actions, IAction } from '../actions';
+import { RGX_STARTS_WITH_TIME_BLOCK } from '../util/regEx';
 
 const notesById = (state: {[id: string]: INotes} = {}, action: IAction) => {
     switch (action.type) {
@@ -64,4 +65,8 @@ export default notesReducer;
 
 export const getNotesById = (state: IEntity<INotes>) => {
     return state.byId;
+};
+
+export const getTimeFromNotes = (note: INotes) => {
+    return RGX_STARTS_WITH_TIME_BLOCK.exec(note.content);
 };

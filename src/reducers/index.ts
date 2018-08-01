@@ -18,7 +18,7 @@ import snivsReducer from './snivReducer';
 import addUpdateSnivFormValuesReducer from './addUpdateSnivFormValuesReducer';
 
 import * as aircrewSelectors from './aircrewReducer';
-// import * as groupsSelectors from './groupsReducer';
+import * as groupsSelectors from './groupsReducer';
 import * as daysSelectors from './daysReducer';
 import * as flightsSelectors from './flightsReducer';
 import * as snivsSelectors from './snivReducer';
@@ -65,18 +65,30 @@ export const getAircrewIds = (state: IState) => {
     return aircrewSelectors.getAircrewIds(getAircrew(state));
 };
 
+export const getAllAircrew = (state: IState) => {
+    return aircrewSelectors.getAllAircrew(getAircrew(state));
+};
+
 export const getCrewById = (state: IState, aircrewId: string) => {
     return aircrewSelectors.getCrewById(getAircrewById(state), aircrewId);
 };
 
 /**
  *
- * Aircrew Selectors
+ * Group Selectors
  *
  */
 
 export const getGroups = (state: IState) => {
     return state.groups;
+};
+
+export const getAllGroupIds = (state: IState) => {
+    return groupsSelectors.getAllGroupIds(getGroups(state));
+};
+
+export const getAllGroups = (state: IState) => {
+    return groupsSelectors.getAllGroups(getGroups(state));
 };
 
 /**
@@ -148,8 +160,16 @@ export const getShowSnivs = (state: IState) => {
     return crewListUISelectors.getShowSnivs(state.crewListUI);
 };
 
+export const getFilters = (state: IState) => {
+    return crewListUISelectors.getFilters(state.crewListUI);
+};
+
 export const getShowFilters = (state: IState) => {
     return crewListUISelectors.getShowFilters(state.crewListUI);
+};
+
+export const getShowAvailable = (state: IState) => {
+    return crewListUISelectors.getShowAvailable(getFilters(state));
 };
 
 /**

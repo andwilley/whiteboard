@@ -3,6 +3,7 @@ import { getType } from 'typesafe-actions';
 import { IEntity, IAircrew } from '../types/State';
 import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
+import { createSelector } from 'reselect';
 
 const aircrewById = (state: {[id: string]: IAircrew} = {}, action: IAction) => {
     switch (action.type) {
@@ -91,3 +92,10 @@ export const getCrewById = (state: IEntity<IAircrew>['byId'], aircrewId: string)
 export const getAircrewIds = (state: IEntity<IAircrew>) => {
     return state.allIds;
 };
+
+export const getAllAircrew = createSelector(
+    getAircrewById,
+    getAircrewIds,
+    (crewById, allCrew) => {
+    return allCrew.map(aircrewId => crewById[aircrewId]);
+});

@@ -1,46 +1,23 @@
 import * as React from 'react';
-import { ISnivs } from '../types/State';
-import { IAddUpdateSnivArgs } from '../actions';
-import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import AddSnivFormContainer from '../containers/AddSnivFormContainer';
 import AddUpdateAircrewFormContainer from '../containers/AddUpdateAircrewFormContainer';
-import { ICrewDayAcc } from '../containers/VisibleCrewList';
 import AircrewContainer from '../containers/AircrewContainer';
+import { IAircrew } from '../types/State';
 
 interface ICrewListProps {
-    aircrewList: IAircrewWithPucks[];
-    unavailableAircrewIds: string[];
-    crewDayAndWorkDay: {[key: string]: ICrewDayAcc['res']};
-    daySnivs: ISnivs[];
-    showSnivs: boolean;
-    dayId: string;
-    onAircrewClick: (crew: IAircrewWithPucks) => any;
-    onAircrewXClick: (id: string) => any;
-    onAircrewEditClick: (crew: IAircrewWithPucks) => any;
-    onSnivXClick: (id: string) => any;
-    onSnivEditClick: (sniv: IAddUpdateSnivArgs) => any;
+    aircrewList: IAircrew[];
 }
 
 const CrewList: React.SFC<ICrewListProps> = ({
     aircrewList,
-    onAircrewClick,
-    onAircrewXClick,
-    onAircrewEditClick,
-    onSnivXClick,
-    onSnivEditClick,
 }) => {
     const pilotList: JSX.Element[] = [];
     const wsoList: JSX.Element[] = [];
-    aircrewList.forEach((aircrew: IAircrewWithPucks) => {
+    aircrewList.forEach(aircrew => {
         const aircrewComponent = (
             <AircrewContainer
                 key={aircrew.id}
                 aircrewId={aircrew.id}
-                onAircrewClick={() => onAircrewClick}
-                onAircrewXClick={() => onAircrewXClick}
-                onAircrewEditClick={() => onAircrewEditClick}
-                onSnivXClick={onSnivXClick}
-                onSnivEditClick={onSnivEditClick}
             />
         );
         aircrew.seat === 'pilot' ? pilotList.push(aircrewComponent) : wsoList.push(aircrewComponent);

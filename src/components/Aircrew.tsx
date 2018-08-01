@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { ISnivs } from '../types/State';
-import { IAddUpdateSnivArgs } from '../actions';
 import { IAircrewWithPucks } from '../types/WhiteboardTypes';
 import IconButton from './IconButton';
-import { ICrewDayAcc } from '../containers/VisibleCrewList';
+import { ICrewDayAcc } from '../containers/AircrewContainer';
 
 interface IAircrewProps {
     aircrew: IAircrewWithPucks;
@@ -11,12 +10,13 @@ interface IAircrewProps {
     unavailable: boolean;
     snivs: ISnivs[];
     showSnivs: boolean;
+    showOnlyAvailable: boolean;
     dayId: string;
-    onAircrewClick: () => any;
-    onAircrewXClick: () => any;
-    onAircrewEditClick: () => any;
-    onSnivXClick: (snivId: string, aircrewId?: string) => any;
-    onSnivEditClick: (sniv: IAddUpdateSnivArgs) => any;
+    onAircrewClick: (aircrew: IAircrewWithPucks) => (e: any) => void;
+    onAircrewXClick: (id: string, snivs: ISnivs[]) => (e: any) => void;
+    onAircrewEditClick: (aircrew: IAircrewWithPucks) => (e: any) => void;
+    onSnivXClick: (snivId: string, aircrewId?: string) => (e: any) => void;
+    onSnivEditClick: (snivs: ISnivs) => (e: any) => void;
 }
 
 const Aircrew: React.SFC<IAircrewProps> = ({
@@ -25,6 +25,7 @@ const Aircrew: React.SFC<IAircrewProps> = ({
     unavailable,
     snivs,
     showSnivs,
+    showOnlyAvailable,
     dayId,
     onAircrewClick,
     onAircrewXClick,
@@ -94,13 +95,13 @@ const Aircrew: React.SFC<IAircrewProps> = ({
             ?   ' text-warning'
             :   '';
     }
-    return (
+    return showOnlyAvailable && unavailable ? null : (
         <div>
         <li className="nav-item wb-nav-item d-flex text-light wb-only-hover">
             <span className="mr-auto">
             <span
                 style={aircrewStyle}
-                onClick={onAircrewClick}
+                onClick={onAircrewClick(aircrew)}
                 className={aircrewClass}
             >
                 {aircrew.callsign}
