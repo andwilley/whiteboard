@@ -175,14 +175,14 @@ const Aircrew: React.SFC<IAircrewProps> = ({
                 </IconButton>)}
             </span>
             <IconButton
-                onClick={onAircrewEditClick}
+                onClick={onAircrewEditClick(aircrew)}
                 icon="pencil"
                 size={12}
                 hover="only-hover"
                 svgClass="crew-icons"
             />
             <IconButton
-                onClick={onAircrewXClick}
+                onClick={onAircrewXClick(aircrew.id, snivs)}
                 icon="trash"
                 size={12}
                 hover="only-hover"

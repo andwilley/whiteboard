@@ -71,7 +71,7 @@ const getRefIdStateSlice = (state: IState, props: IFlexInputContainerProps) => {
         case nameLocation.FRONT_SEAT_NAME:
             return state.sorties.byId[props.entityId].front.aircrewRefIds;
         case nameLocation.BACK_SEAT_NAME:
-            return state.sorties.byId[props.entityId].front.aircrewRefIds;
+            return state.sorties.byId[props.entityId].back.aircrewRefIds;
         case nameLocation.NOTE:
             return state.notes.byId[props.entityId].aircrewRefIds;
         case nameLocation.SNIV_FORM:
@@ -567,6 +567,7 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
     );
     const inputIsActive = isInputActive(state, ownProps);
     const editorState = inputIsActive ? getEditorState(state) : undefined;
+    console.log('element: ', ownProps.element);
     return {
         aircrewList: hasNames ? getAircrewList(state.aircrew) : undefined,
         aircrewRefList,
