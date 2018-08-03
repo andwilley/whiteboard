@@ -42,9 +42,9 @@ export interface IDays {
 }
 
 export interface IFlightTimes {
-    readonly brief: string;
-    readonly takeoff: string;
-    readonly land: string;
+    readonly brief: string; // moment
+    readonly takeoff: string; // moment
+    readonly land: string; // moment
 }
 
 export interface IFlights {
@@ -78,6 +78,8 @@ export interface ISnivs {
 export interface INotes {
     readonly id: string;
     readonly content: string;
+    // readonly start: moment;
+    // readonly end: moment;
     readonly aircrewRefIds: string[];
 }
 

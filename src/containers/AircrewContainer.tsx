@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import Aircrew from '../components/Aircrew';
 import * as Moment from 'moment';
 import * as _ from 'lodash';
-import { ISchedBlock, IActiveRefsAndBlock, IPucks, IAircrewWithPucks } from '../types/WhiteboardTypes';
+import { ISchedBlock, IActiveRefsAndBlock, IPucks } from '../types/WhiteboardTypes';
 import { errorLocs, errorTypes } from '../errors';
 import { IState, ISettings, IAircrew, ISnivs, IEntity } from '../types/State';
 import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
@@ -17,6 +17,7 @@ import {
 import { getSchedErrorsFromSchedBlocks } from '../util/utilFunctions';
 import { actions } from '../actions';
 import { setErrorsOnFreshState } from './FlexInputContainer';
+import { createSelector } from 'reselect';
 
 const {
     delAircrew,
@@ -39,31 +40,35 @@ const newPuck: IPucks = {
     dayNote: 0,
   };
 
-const makeGetAircrewPucks = () => _.memoize((schedBlocks: ISchedBlock[] = []): IPucks => {
-    const aircrewPucks: IPucks = Object.assign({}, newPuck);
-    schedBlocks.forEach(block => {
-        switch (block.location) {
-            case errorLocs.FLIGHT:
-                aircrewPucks.flight++;
-                break;
-            case errorLocs.FLIGHT_NOTE:
-                aircrewPucks.flightNote++;
-                break;
-            case errorLocs.SIM:
-                aircrewPucks.sim++;
-                break;
-            case errorLocs.SIM_NOTE:
-                aircrewPucks.simNote++;
-                break;
-            case errorLocs.DAY_NOTE:
-                aircrewPucks.dayNote++;
-                break;
-            default:
-                break;
-        }
-    });
-    return aircrewPucks;
-});
+const getAircrewPucks = _.memoize(
+    (schedBlocks: ISchedBlock[] = []): IPucks => {
+        return schedBlocks.reduce((aircrewPucks, block) => {
+            switch (block.location) {
+                case errorLocs.FLIGHT:
+                    aircrewPucks.flight++;
+                    break;
+                case errorLocs.FLIGHT_NOTE:
+                    aircrewPucks.flightNote++;
+                    break;
+                case errorLocs.SIM:
+                    aircrewPucks.sim++;
+                    break;
+                case errorLocs.SIM_NOTE:
+                    aircrewPucks.simNote++;
+                    break;
+                case errorLocs.DAY_NOTE:
+                    aircrewPucks.dayNote++;
+                    break;
+                default:
+                    break;
+            }
+            return aircrewPucks;
+        }, {...newPuck});
+    },
+    (...args) => {
+        return JSON.stringify(args[0]);
+    }
+);
 
 export interface ICrewDayAcc {
     start: Moment.Moment;
@@ -75,7 +80,7 @@ export interface ICrewDayAcc {
     };
 }
 
-const getCrewDay = _.memoize((aircrewRefs: ISchedBlock[] = []): ICrewDayAcc['res'] => {
+const makeGetCrewDay = _.memoize((aircrewRefs: ISchedBlock[] = []): ICrewDayAcc['res'] => {
     let setOnce = true;
     const crewDay = aircrewRefs
         .reduce((acc: ICrewDayAcc, block, i) => {
@@ -116,6 +121,9 @@ const getCrewDay = _.memoize((aircrewRefs: ISchedBlock[] = []): ICrewDayAcc['res
             },
         }).res;
     return crewDay;
+},
+(...args) => {
+    return JSON.stringify(args[0]);
 });
 
 const pushIdOntoUnavailableIds = (
@@ -159,16 +167,12 @@ const aircrewIsUnavailable = (
     return unavailableAircrewIds.length > 0;
 };
 
-const makeAddPucksToAircrew = () => _.memoize((aircrew: IAircrew, pucks: IPucks) => {
-    return {...aircrew, pucks};
-},
-(...args) => JSON.stringify(args));
-
 interface IAicrewContainerStateProps {
-    aircrew: IAircrewWithPucks;
-    aircrewById: IEntity<IAircrew>['byId'];
+    aircrew: IAircrew;
+    pucks: IPucks;
+    state: IState;
     crewDayAndWorkDay: ICrewDayAcc['res'];
-    snivs: ISnivs[];
+    snivs: ISnivs[] | undefined;
     dayId: string;
     showSnivs: boolean;
     showOnlyAvailable: boolean;
@@ -179,14 +183,16 @@ const mapStateToProps = (state: IState, ownProps: IAircrewContainerProps): IAicr
     const activeAircrewRefsAndBlock = getActiveAircrewRefs(state);
     const aircrewRefs = activeAircrewRefsAndBlock.activeAircrewRefs[ownProps.aircrewId];
     const aircrew = getCrewById(state, ownProps.aircrewId);
-    const aircrewWithPucks = makeAddPucksToAircrew()(aircrew, makeGetAircrewPucks()(aircrewRefs));
     const currentDayId = getCurrentDayId(state);
     const settings = getSettings(state);
+    const snivs = makeGetAircrewDaySnivs()(state, ownProps.aircrewId);
+    const crewDayAndWorkDay = makeGetCrewDay(aircrewRefs);
     return {
-        aircrew: aircrewWithPucks,
-        aircrewById: getAircrewById(state),
-        crewDayAndWorkDay: getCrewDay(aircrewRefs),
-        snivs: makeGetAircrewDaySnivs()(state, ownProps.aircrewId),
+        aircrew: getCrewById(state, ownProps.aircrewId),
+        pucks: getAircrewPucks(aircrewRefs),
+        state,
+        crewDayAndWorkDay,
+        snivs: snivs.length > 0 ? snivs : undefined,
         dayId: currentDayId,
         showSnivs: getShowSnivs(state),
         showOnlyAvailable: getShowAvailable(state),
@@ -195,16 +201,16 @@ const mapStateToProps = (state: IState, ownProps: IAircrewContainerProps): IAicr
 };
 
 interface IAicrewContainerDispatchProps {
-    onAircrewClick: (aircrew: IAircrewWithPucks) => (e: any) => void;
+    onAircrewClick: (aircrew: IAircrew) => (e: any) => void;
     onAircrewXClick: (id: string, snivs: ISnivs[]) => (e: any) => void;
-    onAircrewEditClick: (aircrew: IAircrewWithPucks) => (e: any) => void;
+    onAircrewEditClick: (aircrew: IAircrew) => (e: any) => void;
     onSnivXClick: (snivId: string, aircrewId?: string) => (e: any) => void;
-    onSnivEditClick: (aircrewById: IEntity<IAircrew>['byId']) => (snivs: ISnivs) => (e: any) => void;
+    onSnivEditClick: (state: IState) => (snivs: ISnivs) => (e: any) => void;
 }
 
 const mapDispatchToProps = (dispatch: any): IAicrewContainerDispatchProps => {
     return {
-        onAircrewClick: (aircrew: IAircrewWithPucks) => (e: any) => {
+        onAircrewClick: (aircrew: IAircrew) => (e: any) => {
             // dispatch(something(id)); not sure I'm going to need this. below is for test.
             alert(Object.keys(aircrew).map(key => `${key}: ${aircrew[key]}`).join('\r'));
         },
@@ -220,7 +226,7 @@ const mapDispatchToProps = (dispatch: any): IAicrewContainerDispatchProps => {
             // clear and reset the schedConflict errors
             dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
-        onAircrewEditClick: (aircrew: IAircrewWithPucks) => (e: any) => {
+        onAircrewEditClick: (aircrew: IAircrew) => (e: any) => {
             dispatch(setAircrewForm({ existingAircrewUnchanged: true }));
             dispatch(setAircrewForm(aircrew));
             dispatch(addUpdateAircrewFormDisplay(true));
@@ -231,7 +237,9 @@ const mapDispatchToProps = (dispatch: any): IAicrewContainerDispatchProps => {
             // clear and reset the schedConflict errors
             dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
-        onSnivEditClick: (aircrewById: IEntity<IAircrew>['byId']) => (sniv: ISnivs) => (e: any) => {
+        onSnivEditClick: createSelector(
+            getAircrewById,
+            (aircrewById: IEntity<IAircrew>['byId']) => (sniv: ISnivs) => (e: any) => {
             const snivedAircrewCallsigns = sniv.aircrewIds.reduce((resultString, currentAicrewId, currentIndex) => {
                 const spaceOrNot = currentIndex === 0 ? '' : ', ';
                 return `${resultString}${spaceOrNot}${aircrewById[currentAicrewId].callsign}`;
@@ -245,7 +253,7 @@ const mapDispatchToProps = (dispatch: any): IAicrewContainerDispatchProps => {
                 message: sniv.message,
             }));
             dispatch(addUpdateSnivFormDisplay(true));
-        },
+        }),
     };
 };
 
@@ -254,11 +262,11 @@ const mergeProps = (
     dispatchProps: IAicrewContainerDispatchProps,
     ownProps: IAircrewContainerProps
 ) => {
-    const { aircrewById, ...mergeStateProps } = stateProps;
+    const { state, ...mergeStateProps } = stateProps;
     return {
         ...mergeStateProps,
         ...dispatchProps,
-        onSnivEditClick: dispatchProps.onSnivEditClick(aircrewById),
+        onSnivEditClick: dispatchProps.onSnivEditClick(state),
     };
 };
 

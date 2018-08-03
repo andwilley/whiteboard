@@ -1116,7 +1116,7 @@ export const INITIAL_STATE: IState = {
                 rank: 3,
                 first: '',
                 last: 'Dorsch',
-                callsign: 'Dorcsh',
+                callsign: 'Dorsch',
                 seat: 'pilot',
                 quals: [
                     'RAC',
@@ -1725,7 +1725,7 @@ export const INITIAL_STATE: IState = {
                 first: '',
                 last: '',
                 callsign: 'Moskow',
-                seat: 'pilot',
+                seat: 'wso',
                 quals: [
                     'RAC',
                 ],
@@ -1741,7 +1741,7 @@ export const INITIAL_STATE: IState = {
                 first: '',
                 last: '',
                 callsign: 'Aguiano',
-                seat: 'pilot',
+                seat: 'wso',
                 quals: [
                     'RAC',
                 ],
