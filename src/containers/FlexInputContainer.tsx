@@ -567,7 +567,6 @@ const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFl
     );
     const inputIsActive = isInputActive(state, ownProps);
     const editorState = inputIsActive ? getEditorState(state) : undefined;
-    console.log('element: ', ownProps.element);
     return {
         aircrewList: hasNames ? getAircrewList(state.aircrew) : undefined,
         aircrewRefList,
