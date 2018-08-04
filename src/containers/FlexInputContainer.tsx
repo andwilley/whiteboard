@@ -2,12 +2,12 @@ import * as React from 'react';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 import * as cuid from 'cuid';
+import * as _ from 'lodash';
 import FlexInput from '../components/FlexInput';
 import { UEditables, ISchedObject } from '../types/WhiteboardTypes';
 import { ISchedBlock } from '../types/WhiteboardTypes';
 import { nameLocation, builtInGroupNames } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
-import * as _ from 'lodash';
 import restrictor, { RestrictorFn } from '../util/restrictor';
 import { getActiveDayErrors, getAircrewIds, getGroups } from '../reducers';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
@@ -27,6 +27,7 @@ import { getAircrewById } from '../reducers';
 import { createSelector } from 'reselect';
 import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
 import { getSchedErrorsFromSchedBlocks } from '../util/utilFunctions';
+import memoizeOne from 'memoize-one';
 
 type IAircrewEntity = IEntity<IAircrew>;
 
@@ -491,7 +492,33 @@ const onXClick = (id: string) => (e: any) => {
     alert(id);
 };
 
-const makeGetDecorators = () => _.memoize((
+const compareShallowEntitiesInArray = <T extends {}>(oldArgs: T[][], newArgs: T[][]) => {
+    if (!oldArgs && !newArgs) {
+        return true;
+    }
+    if (oldArgs.length !== newArgs.length) {
+        return false;
+    }
+    return oldArgs.every((arg, argIndex) => {
+        if (!arg && !newArgs[argIndex]) {
+            return true;
+        }
+        if (arg === newArgs[argIndex]) {
+            return true;
+        }
+        if ((!arg && newArgs[argIndex]) || (arg && !newArgs[argIndex])) {
+            return false;
+        }
+        if (arg.length !== newArgs[argIndex].length) {
+            return false;
+        }
+        return arg.every((entity, entityIndex) => {
+            return entity === newArgs[argIndex][entityIndex];
+        });
+    });
+};
+
+const makeGetDecorators = () => memoizeOne((
     aircrewRefList: IAircrew[] | undefined,
     groupRefList: IGroups[] | undefined
     ): CompositeDecorator | undefined => {
@@ -517,9 +544,7 @@ const makeGetDecorators = () => _.memoize((
         const compositeDecorators = new CompositeDecorator(decorators);
         return compositeDecorators;
     },
-    (...args) => {
-        return JSON.stringify(args);
-    }
+    compareShallowEntitiesInArray
 );
 
 const doesInputHaveNames = (editable: UEditables) => {
@@ -545,7 +570,7 @@ const makeGetGroupList = () => createSelector(
 interface IFlexInputStateProps {
     aircrewList?: IAircrew[];
     groupList?: IGroups[];
-    aircrewRefList?: IAircrew[];
+    decorators: CompositeDecorator | undefined;
     errors: IErrors[] | undefined;
     editorState: EditorState | undefined;
     elementBeingEdited: IElementBeingEdited;
@@ -553,30 +578,37 @@ interface IFlexInputStateProps {
     hasNames: boolean;
 }
 
-const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFlexInputStateProps => {
-    const hasNames = doesInputHaveNames(ownProps.element);
-    const aircrewRefList = hasNames ? makeGetAircrewRefList()(state, ownProps) : undefined;
-    const aircrewRefIds = aircrewRefList ? aircrewRefList.map(aircrew => aircrew.id) : undefined;
-    const dayErrors = getActiveDayErrors(state);
-    const componentErrors = getComponentErrors(
-        dayErrors,
-        ownProps.errorConfig.errorLoc,
-        ownProps.errorConfig.errorLocId,
-        ownProps.errorConfig.show,
-        aircrewRefIds
-    );
-    const inputIsActive = isInputActive(state, ownProps);
-    const editorState = inputIsActive ? getEditorState(state) : undefined;
-    return {
-        aircrewList: hasNames ? getAircrewList(state.aircrew) : undefined,
-        aircrewRefList,
-        groupList: hasNames ? makeGetGroupList()(state) : undefined,
-        errors: componentErrors,
-        editorState,
-        elementBeingEdited: getElementBeingEdited(state),
-        isInputActive: inputIsActive,
-        hasNames,
+const makeMapStateToProps = () => {
+    const getAircrewRefList = makeGetAircrewRefList();
+    const getGroupList = makeGetGroupList();
+    const getDecorators = makeGetDecorators();
+    const mapStateToProps = (state: IState, ownProps: IFlexInputContainerProps): IFlexInputStateProps => {
+        const hasNames = doesInputHaveNames(ownProps.element);
+        const aircrewRefList = hasNames ? getAircrewRefList(state, ownProps) : undefined;
+        const aircrewRefIds = aircrewRefList ? aircrewRefList.map(aircrew => aircrew.id) : undefined;
+        const dayErrors = getActiveDayErrors(state);
+        const componentErrors = getComponentErrors(
+            dayErrors,
+            ownProps.errorConfig.errorLoc,
+            ownProps.errorConfig.errorLocId,
+            ownProps.errorConfig.show,
+            aircrewRefIds
+        );
+        const inputIsActive = isInputActive(state, ownProps);
+        const editorState = inputIsActive ? getEditorState(state) : undefined;
+        const groupList = getGroupList(state);
+        return {
+            aircrewList: hasNames ? getAircrewList(state.aircrew) : undefined,
+            decorators: getDecorators(aircrewRefList, groupList),
+            groupList: hasNames ? groupList : undefined,
+            errors: componentErrors,
+            editorState,
+            elementBeingEdited: getElementBeingEdited(state),
+            isInputActive: inputIsActive,
+            hasNames,
+        };
     };
+    return mapStateToProps;
 };
 
 const makeGetOnClickSelector = () => _.memoize(
@@ -608,7 +640,7 @@ const makeGetOnClickSelector = () => _.memoize(
         dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
     },
     (...args) => {
-        return `${args[0]}${args[1]}${args[2] ? 'true' : 'false'}${args[4]}`;
+        return JSON.stringify(args);
     }
 );
 
@@ -637,10 +669,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
      * Optimization: definitely don't want to pass the entire state here. Figure out the slices this function needs.
      */
     /** handle text insert and paste. function signatures are different, but function is the same. */
-    const decorators = makeGetDecorators()(
-        stateProps.aircrewRefList,
-        stateProps.groupList
-    );
+    const decorators = stateProps.decorators;
     const restrictorFn = ownProps.restrictorFns && ownProps.restrictorFns.length > 0 ?
         restrictor(...ownProps.restrictorFns) : null;
     const inputRestrictor = restrictorFn ?
@@ -680,13 +709,13 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
         validationErrors: getValidationErrors(stateProps.isInputActive && stateProps.editorState ?
                                                 stateProps.editorState.getCurrentContent().getPlainText() :
                                                 ownProps.value,
-                                              ownProps.validatorFns),
+                                            ownProps.validatorFns),
         value: ownProps.value,
     };
 };
 
 const FlexInputContainer = connect(
-    mapStateToProps,
+    makeMapStateToProps,
     mapDispatchToProps,
     mergeProps
 )(FlexInput);

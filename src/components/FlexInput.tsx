@@ -33,7 +33,6 @@ const decorateStaticValue = (value: string): JSX.Element | null => {
             <span>{value}</span>
         );
     }
-    console.log(match);
     return (
         <span>
             {match ? match[1] : ''}

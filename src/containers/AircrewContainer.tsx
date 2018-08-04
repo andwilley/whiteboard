@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import Aircrew from '../components/Aircrew';
 import * as Moment from 'moment';
-import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import { ISchedBlock, IActiveRefsAndBlock, IPucks } from '../types/WhiteboardTypes';
 import { errorLocs, errorTypes } from '../errors';
 import { IState, ISettings, IAircrew, ISnivs, IEntity } from '../types/State';
@@ -38,9 +38,32 @@ const newPuck: IPucks = {
     flightNote: 0,
     simNote: 0,
     dayNote: 0,
-  };
+};
 
-const getAircrewPucks = _.memoize(
+const compareSchedBlocksDeepEqual = (oldArgs: ISchedBlock[] = [], newArgs: ISchedBlock[] = []) => {
+    if (oldArgs.length !== newArgs.length) {
+        return false;
+    }
+    const returnValue = oldArgs.every((block, i) => {
+        const oldKeys = Object.keys(block);
+        const newKeys = Object.keys(newArgs[i]);
+        return oldKeys.every((oldKey, j) => {
+            if (!block[oldKey] && !newArgs[i][newKeys[j]]) {
+                return true;
+            }
+            if (Moment.isMoment(block[oldKey])) {
+                if (!block[oldKey].isValid() && !newArgs[i][newKeys[j]].isValid()) {
+                    return true;
+                }
+                return block[oldKey].isSame(newArgs[i][newKeys[j]]);
+            }
+            return block[oldKey] === newArgs[i][newKeys[j]];
+        });
+    });
+    return returnValue;
+};
+
+const makeGetAircrewPucks = () => memoizeOne(
     (schedBlocks: ISchedBlock[] = []): IPucks => {
         return schedBlocks.reduce((aircrewPucks, block) => {
             switch (block.location) {
@@ -65,9 +88,7 @@ const getAircrewPucks = _.memoize(
             return aircrewPucks;
         }, {...newPuck});
     },
-    (...args) => {
-        return JSON.stringify(args[0]);
-    }
+    compareSchedBlocksDeepEqual
 );
 
 export interface ICrewDayAcc {
@@ -80,51 +101,51 @@ export interface ICrewDayAcc {
     };
 }
 
-const makeGetCrewDay = _.memoize((aircrewRefs: ISchedBlock[] = []): ICrewDayAcc['res'] => {
-    let setOnce = true;
-    const crewDay = aircrewRefs
-        .reduce((acc: ICrewDayAcc, block, i) => {
-            if (block.location === errorLocs.SNIVS) {
+const makeGetCrewDay = () => memoizeOne(
+    (aircrewRefs: ISchedBlock[] = []): ICrewDayAcc['res'] => {
+        let setOnce = true;
+        const crewDay = aircrewRefs
+            .reduce((acc: ICrewDayAcc, block, i) => {
+                if (block.location === errorLocs.SNIVS) {
+                    return acc;
+                }
+                if (i === 0) {
+                    acc.start = block.start;
+                    acc.workDayEnd = block.end;
+                }
+                if (setOnce && errorLocs.FLIGHT) {
+                    acc.flightEnd = block.hardEnd;
+                    setOnce = false;
+                }
+                if (block.start.isBefore(acc.start)) {
+                    acc.start = block.start;
+                }
+                if (block.end.isAfter(acc.workDayEnd)) {
+                    acc.workDayEnd = block.end;
+                }
+                if (block.location === errorLocs.FLIGHT && block.hardEnd.isAfter(acc.flightEnd)) {
+                    acc.flightEnd = block.hardEnd;
+                }
+                if (acc.start.isValid() && acc.flightEnd.isValid()) {
+                    acc.res.legalCrewDay = Moment.duration(acc.flightEnd.diff(acc.start)).asHours();
+                }
+                if (acc.start.isValid() && acc.workDayEnd.isValid()) {
+                    acc.res.workDay = Moment.duration(acc.workDayEnd.diff(acc.start)).asHours();
+                }
                 return acc;
-            }
-            if (i === 0) {
-                acc.start = block.start;
-                acc.workDayEnd = block.end;
-            }
-            if (setOnce && errorLocs.FLIGHT) {
-                acc.flightEnd = block.hardEnd;
-                setOnce = false;
-            }
-            if (block.start.isBefore(acc.start)) {
-                acc.start = block.start;
-            }
-            if (block.end.isAfter(acc.workDayEnd)) {
-                acc.workDayEnd = block.end;
-            }
-            if (block.location === errorLocs.FLIGHT && block.hardEnd.isAfter(acc.flightEnd)) {
-                acc.flightEnd = block.hardEnd;
-            }
-            if (acc.start.isValid() && acc.flightEnd.isValid()) {
-                acc.res.legalCrewDay = Moment.duration(acc.flightEnd.diff(acc.start)).asHours();
-            }
-            if (acc.start.isValid() && acc.workDayEnd.isValid()) {
-                acc.res.workDay = Moment.duration(acc.workDayEnd.diff(acc.start)).asHours();
-            }
-            return acc;
-        },
-        {start: Moment(NaN),
-            flightEnd: Moment(NaN),
-            workDayEnd: Moment(NaN),
-            res: {
-                workDay: 0,
-                legalCrewDay: 0,
             },
-        }).res;
-    return crewDay;
-},
-(...args) => {
-    return JSON.stringify(args[0]);
-});
+            {start: Moment(NaN),
+                flightEnd: Moment(NaN),
+                workDayEnd: Moment(NaN),
+                res: {
+                    workDay: 0,
+                    legalCrewDay: 0,
+                },
+            }).res;
+        return crewDay;
+    },
+    compareSchedBlocksDeepEqual
+);
 
 const pushIdOntoUnavailableIds = (
     errorArray: string[],
@@ -179,25 +200,30 @@ interface IAicrewContainerStateProps {
     unavailable: boolean;
 }
 
-const mapStateToProps = (state: IState, ownProps: IAircrewContainerProps): IAicrewContainerStateProps => {
-    const activeAircrewRefsAndBlock = getActiveAircrewRefs(state);
-    const aircrewRefs = activeAircrewRefsAndBlock.activeAircrewRefs[ownProps.aircrewId];
-    const aircrew = getCrewById(state, ownProps.aircrewId);
-    const currentDayId = getCurrentDayId(state);
-    const settings = getSettings(state);
-    const snivs = makeGetAircrewDaySnivs()(state, ownProps.aircrewId);
-    const crewDayAndWorkDay = makeGetCrewDay(aircrewRefs);
-    return {
-        aircrew: getCrewById(state, ownProps.aircrewId),
-        pucks: getAircrewPucks(aircrewRefs),
-        state,
-        crewDayAndWorkDay,
-        snivs: snivs.length > 0 ? snivs : undefined,
-        dayId: currentDayId,
-        showSnivs: getShowSnivs(state),
-        showOnlyAvailable: getShowAvailable(state),
-        unavailable: aircrewIsUnavailable(activeAircrewRefsAndBlock, aircrew, currentDayId, settings),
+const makeMapStateToProps = () => {
+    const getAircrewPucks = makeGetAircrewPucks();
+    const crewDayAndWorkDay = makeGetCrewDay();
+    const getAircrewDaySnivs = makeGetAircrewDaySnivs();
+    const mapStateToProps = (state: IState, ownProps: IAircrewContainerProps): IAicrewContainerStateProps => {
+        const activeAircrewRefsAndBlock = getActiveAircrewRefs(state);
+        const aircrewRefs = activeAircrewRefsAndBlock.activeAircrewRefs[ownProps.aircrewId];
+        const aircrew = getCrewById(state, ownProps.aircrewId);
+        const currentDayId = getCurrentDayId(state);
+        const settings = getSettings(state);
+        const snivs = getAircrewDaySnivs(state, ownProps.aircrewId);
+        return {
+            aircrew: getCrewById(state, ownProps.aircrewId),
+            pucks: getAircrewPucks(aircrewRefs),
+            state,
+            crewDayAndWorkDay: crewDayAndWorkDay(aircrewRefs),
+            snivs: snivs.length > 0 ? snivs : undefined,
+            dayId: currentDayId,
+            showSnivs: getShowSnivs(state),
+            showOnlyAvailable: getShowAvailable(state),
+            unavailable: aircrewIsUnavailable(activeAircrewRefsAndBlock, aircrew, currentDayId, settings),
+        };
     };
+    return mapStateToProps;
 };
 
 interface IAicrewContainerDispatchProps {
@@ -271,7 +297,7 @@ const mergeProps = (
 };
 
 const AircrewContainer = connect(
-    mapStateToProps,
+    makeMapStateToProps,
     mapDispatchToProps,
     mergeProps
 )(Aircrew);

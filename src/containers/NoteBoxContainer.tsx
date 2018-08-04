@@ -46,14 +46,18 @@ const makeGetNotes = () => createSelector(
     }
 );
 
-const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
-    return {
-        // className: ownProps.className,
-        notes: makeGetNotes()(state, ownProps),
-        // errorLoc: ownProps.entityType,
-        // errorLocId: ownProps.entityId,
-        ...ownProps,
+const makeMapStateToProps = () => {
+    const getNotes = makeGetNotes();
+    const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
+        return {
+            // className: ownProps.className,
+            notes: getNotes(state, ownProps),
+            // errorLoc: ownProps.entityType,
+            // errorLocId: ownProps.entityId,
+            ...ownProps,
+        };
     };
+    return mapStateToProps;
 };
 
 const mapDispatchToProps = (dispatch: any, ownProps: INoteBoxContainerProps) => {
@@ -79,7 +83,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: INoteBoxContainerProps) => 
 };
 
 const NoteBoxContainer = connect(
-    mapStateToProps,
+    makeMapStateToProps,
     mapDispatchToProps
 )(NoteBox);
 
