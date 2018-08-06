@@ -10,18 +10,13 @@ import App from './components/App';
 import whiteboardApp from './reducers';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
-import { createStore, applyMiddleware, compose } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { createStore, applyMiddleware } from 'redux';
 import registerServiceWorker from './registerServiceWorker';
 import { INITIAL_STATE } from './reducers/initialstate';
 
-declare global {
-    interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
-}
-
 const store = createStore(whiteboardApp, INITIAL_STATE,
-                          compose(applyMiddleware(thunk),
-                                  window.__REDUX_DEVTOOLS_EXTENSION__ &&
-                                  window.__REDUX_DEVTOOLS_EXTENSION__())
+                          composeWithDevTools(applyMiddleware(thunk))
 );
 
 ReactDOM.render(

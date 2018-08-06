@@ -1,4 +1,5 @@
 import * as Moment from 'moment';
+import * as _ from 'lodash';
 import { errorLocs } from '../errors';
 import { seats, nameLocation } from '../whiteboard-constants';
 import { IActiveRefsAndBlock, ISchedBlock } from '../types/WhiteboardTypes';
@@ -17,165 +18,148 @@ import {
     getCurrentDayId,
     getCurrentDayNoteIds} from '../reducers';
 
-export const getSchedFromFlightTimes = (currentDayId: string,
-                                        flight: IFlights,
-                                        settings: ISettings,
-                                        note: INotes | null = null
-): ISchedBlock => {
-    /**
-     * Assumes worst case for flights unless we can deduce it from the settings.
-     * Crew in the seat for a sortie are assumed to be busy from brief to land with an offset on
-     * either end (default 60 min) to account for prep and debrief.
-     * If no brief time is given, its assumed to be the standard time from brief to takeoff (default
-     * is 120 minutes) plus the offset. If no takeoff time is given, assume flight starts at 0000.
-     * If no land time is given, assume flight lands at 2359. (may be smart to use a standard flight
-     * duration for this, so we can go past midnight if thats when the flight takes off)
-     *
-     * NEEDS:
-     * state.settings
-     * state.flights
-     * state.crewListUI.currentDay
-     */
-    let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
-    let startOffset = flight.useExactTimes ? 0 : settings.minutesBeforeBrief * 60000;
-    let endOffset = flight.useExactTimes
-    ?   0
-    :   flight.sim
-    ?   settings.minutesAfterBoxTime * 60000
-    :   settings.minutesAfterLand * 60000;
-    const briefTime = flight.times.brief.replace(':', '');
-    const takeoffTime = flight.times.takeoff.replace(':', '');
-    const landTime = flight.times.land.replace(':', '');
-    if (RGX_24HOUR_TIME.test(briefTime)) {
-        startTimeHr = briefTime.slice(0, 2);
-        startTimeMn = briefTime.slice(2, 4);
-    } else if (RGX_24HOUR_TIME.test(takeoffTime)) {
-        startTimeHr = takeoffTime.slice(0, 2);
-        startTimeMn = takeoffTime.slice(2, 4);
-        startOffset = flight.useExactTimes
-            ?   0
-            :   flight.sim
-            ?   startOffset + (settings.minutesBriefToBoxTime * 60000)
-            :   startOffset + (settings.minutesBriefToTakeoff * 60000);
-    } else {
-        startTimeHr = '00';
-        startTimeMn = '00';
-        startOffset = 0;
-    }
-    if (RGX_24HOUR_TIME.test(landTime)) {
-        endTimeHr = landTime.slice(0, 2);
-        endTimeMn = landTime.slice(2, 4);
-    } else {
-        endTimeHr = '23';
-        endTimeMn = '59';
-        endOffset = 0;
-    }
-    const startDate = Moment(`${currentDayId} ${startTimeHr}:${startTimeMn}:00.000`,
-                             'YYYY-MM-DD HH:mm:ss.SSS');
-    const endDate = Moment(`${currentDayId} ${endTimeHr}:${endTimeMn}:00.000`,
-                           'YYYY-MM-DD HH:mm:ss.SSS');
-    const location = flight.sim ?
-        note ?
-            errorLocs.SIM_NOTE :
-            errorLocs.SIM :
-        note ?
-            errorLocs.FLIGHT_NOTE :
-            errorLocs.FLIGHT;
-    const schedBlock = {
-        start: Moment(startDate.valueOf() - startOffset),
-        end: Moment(endDate.valueOf() + endOffset),
-        brief: conv24HrTimeToMoment(briefTime, currentDayId),
-        hardStart: conv24HrTimeToMoment((startTimeHr + startTimeMn), currentDayId),
-        hardEnd: conv24HrTimeToMoment(endTimeHr + endTimeMn, currentDayId),
-        location, // : note ? errorLocs.FLIGHT_NOTE : errorLocs.FLIGHT,
-        locationId: flight.id,
-    };
-    if (schedBlock.start > schedBlock.end) {
-        const tempStart = schedBlock.start;
-        schedBlock.start = schedBlock.end;
-        schedBlock.end = tempStart;
-
-        const tempHardStart = schedBlock.hardStart;
-        schedBlock.hardStart = schedBlock.hardEnd;
-        schedBlock.hardEnd = tempHardStart;
-    }
-    return schedBlock;
-};
-
-export const getSchedFromNotes = (currentDayId: string,
-                                  note: INotes,
-                                  settings: ISettings,
-                                  flight: IFlights | null = null
-): ISchedBlock => {
-    /**
-     * Gets referenced aircrew start and end times from notes.
-     * if times were specified, uses those. if start time but no end time, uses land time.
-     * If no land time, uses stardard note duration (default 60 min).
-     * If times aren't specified, uses flight times in the same way as above.
-     * If flightNote is false, skips using flight times, defaults to length.
-     *
-     * NEEDS:
-     * state.notes
-     * state.flights
-     * state.settings
-     * state.crewListUI.currentDay
-     */
-    const noteTimes = RGX_STARTS_WITH_TIME_BLOCK.exec(note.content);
-    let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
-    let endOffset = 0;
-    if (noteTimes) {
-        const startTime = noteTimes[1].replace(':', '');
-        startTimeHr = startTime.slice(0, 2);
-        startTimeMn = startTime.slice(2, 4);
-        if (noteTimes[2]) {
-            const endTime = noteTimes[2].replace(':', '');
-            endTimeHr = endTime.slice(0, 2);
-            endTimeMn = endTime.slice(2, 4);
-        } else if (flight &&
-            RGX_24HOUR_TIME.test(flight.times.land) &&
-            flight.times.land > startTime) {
-            endTimeHr = flight.times.land.slice(0, 2);
-            endTimeMn = flight.times.land.slice(2, 4);
+export const getSchedFromFlightTimes = _.memoize(
+    (currentDayId: string,
+     flight: IFlights,
+     settings: ISettings,
+     note: INotes | null = null
+    ): ISchedBlock => {
+        /**
+         * Assumes worst case for flights unless we can deduce it from the settings.
+         * Crew in the seat for a sortie are assumed to be busy from brief to land with an offset on
+         * either end (default 60 min) to account for prep and debrief.
+         * If no brief time is given, its assumed to be the standard time from brief to takeoff (default
+         * is 120 minutes) plus the offset. If no takeoff time is given, assume flight starts at 0000.
+         * If no land time is given, assume flight lands at 2359. (may be smart to use a standard flight
+         * duration for this, so we can go past midnight if thats when the flight takes off)
+         *
+         * NEEDS:
+         * state.settings
+         * state.flights
+         * state.crewListUI.currentDay
+         */
+        let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
+        let startOffset = flight.useExactTimes ? 0 : settings.minutesBeforeBrief * 60000;
+        let endOffset = flight.useExactTimes
+        ?   0
+        :   flight.sim
+        ?   settings.minutesAfterBoxTime * 60000
+        :   settings.minutesAfterLand * 60000;
+        const briefTime = flight.times.brief.replace(':', '');
+        const takeoffTime = flight.times.takeoff.replace(':', '');
+        const landTime = flight.times.land.replace(':', '');
+        if (RGX_24HOUR_TIME.test(briefTime)) {
+            startTimeHr = briefTime.slice(0, 2);
+            startTimeMn = briefTime.slice(2, 4);
+        } else if (RGX_24HOUR_TIME.test(takeoffTime)) {
+            startTimeHr = takeoffTime.slice(0, 2);
+            startTimeMn = takeoffTime.slice(2, 4);
+            startOffset = flight.useExactTimes
+                ?   0
+                :   flight.sim
+                ?   startOffset + (settings.minutesBriefToBoxTime * 60000)
+                :   startOffset + (settings.minutesBriefToTakeoff * 60000);
         } else {
-            endOffset = settings.minutesNoteDuration * 60000;
+            startTimeHr = '00';
+            startTimeMn = '00';
+            startOffset = 0;
+        }
+        if (RGX_24HOUR_TIME.test(landTime)) {
+            endTimeHr = landTime.slice(0, 2);
+            endTimeMn = landTime.slice(2, 4);
+        } else {
+            endTimeHr = '23';
+            endTimeMn = '59';
+            endOffset = 0;
         }
         const startDate = Moment(`${currentDayId} ${startTimeHr}:${startTimeMn}:00.000`,
-                                 'YYYY-MM-DD HH:mm:ss.SSS');
-        const endDate = endOffset === 0 ?
-            /** use 00 seconds to be able to compare this time to the actual end of the day */
-            Moment(`${currentDayId} ${endTimeHr}:${endTimeMn}:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS') :
-            Moment(startDate.valueOf() + endOffset);
+                                'YYYY-MM-DD HH:mm:ss.SSS');
+        const endDate = Moment(`${currentDayId} ${endTimeHr}:${endTimeMn}:00.000`,
+                            'YYYY-MM-DD HH:mm:ss.SSS');
+        const location = flight.sim ?
+            note ?
+                errorLocs.SIM_NOTE :
+                errorLocs.SIM :
+            note ?
+                errorLocs.FLIGHT_NOTE :
+                errorLocs.FLIGHT;
         const schedBlock = {
-            start: startDate,
-            end: endDate,
-            brief: null,
-            hardStart: startDate,
-            hardEnd: endDate,
-            location: flight ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
-            locationId: flight ? flight.id : currentDayId,
+            start: Moment(startDate.valueOf() - startOffset),
+            end: Moment(endDate.valueOf() + endOffset),
+            brief: conv24HrTimeToMoment(briefTime, currentDayId),
+            hardStart: conv24HrTimeToMoment((startTimeHr + startTimeMn), currentDayId),
+            hardEnd: conv24HrTimeToMoment(endTimeHr + endTimeMn, currentDayId),
+            location, // : note ? errorLocs.FLIGHT_NOTE : errorLocs.FLIGHT,
+            locationId: flight.id,
         };
         if (schedBlock.start > schedBlock.end) {
             const tempStart = schedBlock.start;
             schedBlock.start = schedBlock.end;
             schedBlock.end = tempStart;
+
+            const tempHardStart = schedBlock.hardStart;
+            schedBlock.hardStart = schedBlock.hardEnd;
+            schedBlock.hardEnd = tempHardStart;
         }
         return schedBlock;
-    } else {
-        if (flight) {
-            return getSchedFromFlightTimes(currentDayId,
-                                           flight,
-                                           settings,
-                                           note);
-        } else {
-            const schedBlock = {
-                start: Moment(`${currentDayId} 00:00:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+    },
+    (...args) => {
+        return JSON.stringify(args);
+    }
+);
+
+export const getSchedFromNotes = _.memoize(
+    (currentDayId: string,
+     note: INotes,
+     settings: ISettings,
+     flight: IFlights | null = null
+    ): ISchedBlock => {
+        /**
+         * Gets referenced aircrew start and end times from notes.
+         * if times were specified, uses those. if start time but no end time, uses land time.
+         * If no land time, uses stardard note duration (default 60 min).
+         * If times aren't specified, uses flight times in the same way as above.
+         * If flightNote is false, skips using flight times, defaults to length.
+         *
+         * NEEDS:
+         * state.notes
+         * state.flights
+         * state.settings
+         * state.crewListUI.currentDay
+         */
+        const noteTimes = RGX_STARTS_WITH_TIME_BLOCK.exec(note.content);
+        let startTimeHr, startTimeMn, endTimeHr, endTimeMn;
+        let endOffset = 0;
+        if (noteTimes) {
+            const startTime = noteTimes[1].replace(':', '');
+            startTimeHr = startTime.slice(0, 2);
+            startTimeMn = startTime.slice(2, 4);
+            if (noteTimes[2]) {
+                const endTime = noteTimes[2].replace(':', '');
+                endTimeHr = endTime.slice(0, 2);
+                endTimeMn = endTime.slice(2, 4);
+            } else if (flight &&
+                RGX_24HOUR_TIME.test(flight.times.land) &&
+                flight.times.land > startTime) {
+                endTimeHr = flight.times.land.slice(0, 2);
+                endTimeMn = flight.times.land.slice(2, 4);
+            } else {
+                endOffset = settings.minutesNoteDuration * 60000;
+            }
+            const startDate = Moment(`${currentDayId} ${startTimeHr}:${startTimeMn}:00.000`,
+                                    'YYYY-MM-DD HH:mm:ss.SSS');
+            const endDate = endOffset === 0 ?
                 /** use 00 seconds to be able to compare this time to the actual end of the day */
-                end: Moment(`${currentDayId} 23:59:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+                Moment(`${currentDayId} ${endTimeHr}:${endTimeMn}:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS') :
+                Moment(startDate.valueOf() + endOffset);
+            const schedBlock = {
+                start: startDate,
+                end: endDate,
                 brief: null,
-                hardStart: Moment(`${currentDayId} 00:00:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
-                hardEnd: Moment(`${currentDayId} 23:59:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
-                location: errorLocs.DAY_NOTE, // flight ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
-                locationId: currentDayId, // flight ? flight.id : currentDayId,
+                hardStart: startDate,
+                hardEnd: endDate,
+                location: flight ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
+                locationId: flight ? flight.id : currentDayId,
             };
             if (schedBlock.start > schedBlock.end) {
                 const tempStart = schedBlock.start;
@@ -183,23 +167,55 @@ export const getSchedFromNotes = (currentDayId: string,
                 schedBlock.end = tempStart;
             }
             return schedBlock;
+        } else {
+            if (flight) {
+                return getSchedFromFlightTimes(currentDayId,
+                                            flight,
+                                            settings,
+                                            note);
+            } else {
+                const schedBlock = {
+                    start: Moment(`${currentDayId} 00:00:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+                    /** use 00 seconds to be able to compare this time to the actual end of the day */
+                    end: Moment(`${currentDayId} 23:59:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+                    brief: null,
+                    hardStart: Moment(`${currentDayId} 00:00:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+                    hardEnd: Moment(`${currentDayId} 23:59:00.000`, 'YYYY-MM-DD HH:mm:ss.SSS'),
+                    location: errorLocs.DAY_NOTE, // flight ? errorLocs.FLIGHT : errorLocs.DAY_NOTE,
+                    locationId: currentDayId, // flight ? flight.id : currentDayId,
+                };
+                if (schedBlock.start > schedBlock.end) {
+                    const tempStart = schedBlock.start;
+                    schedBlock.start = schedBlock.end;
+                    schedBlock.end = tempStart;
+                }
+                return schedBlock;
+            }
         }
+    },
+    (...args) => {
+        return JSON.stringify(args);
     }
-};
+);
 
-export const getSchedFromSnivs = (sniv: ISnivs,
-                                  dayId: string
-): ISchedBlock => {
-    return {
-        start: sniv.dates[dayId].start,
-        end: sniv.dates[dayId].end,
-        brief: null,
-        hardStart: sniv.dates[dayId].start,
-        hardEnd: sniv.dates[dayId].end,
-        location: errorLocs.SNIVS,
-        locationId: sniv.id,
-    };
-};
+export const getSchedFromSnivs = _.memoize(
+    (sniv: ISnivs,
+     dayId: string
+    ): ISchedBlock => {
+        return {
+            start: sniv.dates[dayId].start,
+            end: sniv.dates[dayId].end,
+            brief: null,
+            hardStart: sniv.dates[dayId].start,
+            hardEnd: sniv.dates[dayId].end,
+            location: errorLocs.SNIVS,
+            locationId: sniv.id,
+        };
+    },
+    (...args) => {
+        return JSON.stringify(args);
+    }
+);
 
 const getActiveAircrewRefs = createSelector(
     getCurrentDayFlightIds,
