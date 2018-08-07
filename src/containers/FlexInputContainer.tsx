@@ -492,29 +492,16 @@ const onXClick = (id: string) => (e: any) => {
     alert(id);
 };
 
-const compareShallowEntitiesInArray = <T extends {}>(oldArgs: T[][], newArgs: T[][]) => {
-    if (!oldArgs && !newArgs) {
+const compareShallowEntitiesInArray = <T extends {}>(oldArg: T[], newArg: T[]) => {
+    // return true if both are undefined
+    if (!oldArg && !newArg) {
         return true;
     }
-    if (oldArgs.length !== newArgs.length) {
+    if (oldArg.length !== newArg.length) {
         return false;
     }
-    return oldArgs.every((arg, argIndex) => {
-        if (!arg && !newArgs[argIndex]) {
-            return true;
-        }
-        if (arg === newArgs[argIndex]) {
-            return true;
-        }
-        if ((!arg && newArgs[argIndex]) || (arg && !newArgs[argIndex])) {
-            return false;
-        }
-        if (arg.length !== newArgs[argIndex].length) {
-            return false;
-        }
-        return arg.every((entity, entityIndex) => {
-            return entity === newArgs[argIndex][entityIndex];
-        });
+    return oldArg.every((arg, argIndex) => {
+        return arg === newArg[argIndex];
     });
 };
 
