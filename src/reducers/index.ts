@@ -141,7 +141,7 @@ export const getFlightById = (state: IState, flightId: string) => {
 };
 
 export const getCurrentDayFlights = createSelector(
-    (state: IState) => state.flights.byId,
+    getFlightsById,
     getCurrentDayFlightIds,
     flightsSelectors.getCurrentDayFlights
 );
@@ -211,8 +211,30 @@ export const makeGetAircrewDaySnivs = () => createSelector(
  *
  */
 
+export const getSorties = (state: IState) => {
+    return state.sorties;
+};
+
 export const getSortiesById = (state: IState) => {
     return sortieSelectors.getSortiesById(state.sorties);
+};
+
+export const getAllSortieIds = (state: IState) => {
+    return sortieSelectors.getAllSortieIds(getSorties(state));
+};
+
+export const getSortieList = createSelector(
+    getSortiesById,
+    (__: IState, sortieIds: string[]) => sortieIds,
+    sortieSelectors.getSortieList
+);
+
+export const getAllSortieList = (state: IState) => {
+    return getSortieList(state, getAllSortieIds(state));
+};
+
+export const getSortieCrewRefsBySortieId = (state: IState) => {
+    return sortieSelectors.getSortieCrewRefsBySortieId(getAllSortieList(state));
 };
 
 export const getSortie = (state: IState, sortieId: string) => {

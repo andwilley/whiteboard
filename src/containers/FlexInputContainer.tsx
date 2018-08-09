@@ -9,7 +9,7 @@ import { ISchedBlock } from '../types/WhiteboardTypes';
 import { nameLocation, builtInGroupNames } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
 import restrictor, { RestrictorFn } from '../util/restrictor';
-import { getActiveDayErrors, getAircrewIds, getGroups } from '../reducers';
+import { getActiveDayErrors, getAircrewIds, getGroups, getCurrentDayId, getSettings } from '../reducers';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs, errorMessages } from '../errors';
 import { IState,
@@ -326,16 +326,16 @@ export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
         const state = getState();
         /** clear and recalc schedule conflict errors */
         if (errorTypesToCheck.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1) {
-            state.days.byId[state.crewListUI.currentDay].errors.forEach(errorId => {
+            state.days.byId[getCurrentDayId(state)].errors.forEach(errorId => {
                 if (state.errors.byId[errorId].type === errorTypes.SCHEDULE_CONFLICT) {
-                    dispatch(actions.clearError(errorId, state.crewListUI.currentDay));
+                    dispatch(actions.clearError(errorId, getCurrentDayId(state)));
                 }
             });
             const activeRefsAndBlock = getActiveAircrewRefs(state);
             const newErrors = findSchedErrors(activeRefsAndBlock.activeAircrewRefs,
-                                              state.crewListUI.currentDay,
-                                              state.aircrew.byId,
-                                              state.settings);
+                                              getCurrentDayId(state),
+                                              getAircrewById(state),
+                                              getSettings(state));
             newErrors.forEach(error => {
                 dispatch(actions.addError(error));
             });

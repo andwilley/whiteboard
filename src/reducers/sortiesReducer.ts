@@ -3,6 +3,7 @@ import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
 import { IEntity, ISorties } from '../types/State';
 import { noteEntity } from '../whiteboard-constants';
+import memoizeOne from 'memoize-one';
 
 const sortiesById = (state: {[id: string]: ISorties} = {}, action: IAction) => {
     switch (action.type) {
@@ -161,6 +162,48 @@ export default sortiesReducer;
 export const getSortiesById = (state: IEntity<ISorties>) => {
     return state.byId;
 };
+
+export const getAllSortieIds = (state: IEntity<ISorties>) => {
+    return state.allIds;
+};
+
+export const getSortieList = (sortieById: IEntity<ISorties>['byId'], sortieIds: string[]) => {
+    return sortieIds.map(sortieId => sortieById[sortieId]);
+};
+
+export interface ISortieCrewRefsBySortieId {
+    [key: string]: {
+        front: string[];
+        back: string[];
+    };
+}
+
+export const getSortieCrewRefsBySortieId = memoizeOne(
+    /**
+     * @returns object keyed by sortieId of just the sortie's aircrewRefsIds
+     * memoized, recalcs only if aircrewRefIds property of the sortie object changes.
+     */
+    (sortieList: ISorties[]): ISortieCrewRefsBySortieId => {
+        return sortieList.reduce((sortieCrewRefsBySortieId, sortie) => {
+            return {
+                ...sortieCrewRefsBySortieId,
+                [sortie.id]: {
+                    front: sortie.front.aircrewRefIds,
+                    back: sortie.back.aircrewRefIds,
+                },
+            };
+        }, {});
+    },
+    (newSortieList: ISorties[], oldSortieList: ISorties[]) => {
+        if (newSortieList === oldSortieList) {
+            return true;
+        }
+        return newSortieList.every((newSortie, i) => {
+            return newSortie.front.aircrewRefIds === oldSortieList[i].front.aircrewRefIds &&
+                   newSortie.back.aircrewRefIds === oldSortieList[i].back.aircrewRefIds;
+        });
+    }
+);
 
 export const getSortie = (state: IEntity<ISorties>['byId'], sortieId: string) => {
     return state[sortieId];

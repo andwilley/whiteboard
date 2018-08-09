@@ -2,21 +2,23 @@ import * as Moment from 'moment';
 import * as _ from 'lodash';
 import { errorLocs } from '../errors';
 import { seats, nameLocation } from '../whiteboard-constants';
-import { IActiveRefsAndBlock, ISchedBlock } from '../types/WhiteboardTypes';
-import { ISnivs, IFlights, ISorties, INotes, IEntity, ISettings, IElementBeingEdited } from '../types/State';
+import { IActiveRefsAndBlock, ISchedBlock, ISchedObject } from '../types/WhiteboardTypes';
+import { ISnivs, IFlights, INotes, IEntity, ISettings, IElementBeingEdited } from '../types/State';
 import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from './regEx';
 import { conv24HrTimeToMoment } from './utilFunctions';
 import { createSelector } from 'reselect';
 import {
     getElementBeingEdited,
     getFlightsById,
-    getSortiesById,
     getNotesById,
     getSettings,
     getSnivs,
     getCurrentDayFlightIds,
     getCurrentDayId,
-    getCurrentDayNoteIds} from '../reducers';
+    getCurrentDayNoteIds,
+    getSortieCrewRefsBySortieId} from '../reducers';
+import { ISortieCrewRefsBySortieId } from '../reducers/sortiesReducer';
+import memoizeOne from 'memoize-one';
 
 export const getSchedFromFlightTimes = _.memoize(
     (currentDayId: string,
@@ -217,6 +219,174 @@ export const getSchedFromSnivs = _.memoize(
     }
 );
 
+const getActiveRefsFromFlight = memoizeOne(
+    (sortieCrewRefsBySortieId: ISortieCrewRefsBySortieId,
+     sortieIds: string[],
+     flight: IFlights,
+     currentDayId: string,
+     settings: ISettings
+    ) => {
+        let schedBlock;
+        const activeAircrewRefs = {};
+        sortieIds.forEach(sortieId => {
+            seats.forEach(seat => {
+                sortieCrewRefsBySortieId[sortieId][seat].forEach((aircrewId: string) => {
+                    /** Get all the referenced aircrew from sorties in the current day */
+                    schedBlock = getSchedFromFlightTimes(currentDayId,
+                                                         flight,
+                                                         settings);
+                    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+                        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+                });
+            });
+        });
+        return activeAircrewRefs;
+    }
+);
+
+const getActiveAircrewRefsFromFlights = createSelector(
+    getCurrentDayFlightIds,
+    getFlightsById,
+    getSortieCrewRefsBySortieId,
+    getCurrentDayId,
+    getSettings,
+    (flightIds: string[],
+     flightsById: IEntity<IFlights>['byId'],
+     sortieCrewRefsBySortieId: ISortieCrewRefsBySortieId,
+     currentDayId: string,
+     settings: ISettings
+    ): ISchedObject => {
+        let activeAircrewRefs = {};
+        flightIds.forEach(flightId => {
+            activeAircrewRefs = {
+                ...activeAircrewRefs,
+                ...getActiveRefsFromFlight(
+                    sortieCrewRefsBySortieId,
+                    flightsById[flightId].sorties,
+                    flightsById[flightId],
+                    currentDayId,
+                    settings
+                ),
+            };
+        });
+        return activeAircrewRefs;
+    }
+);
+
+const getActiveRefsFromFlightNote = memoizeOne(
+    (notesById: IEntity<INotes>['byId'],
+     flight: IFlights,
+     currentDayId: string,
+     settings: ISettings
+    ): ISchedObject => {
+        let schedBlock;
+        const activeAircrewRefs = {};
+        flight.notes.forEach(noteId => {
+            notesById[noteId].aircrewRefIds.forEach(aircrewId => {
+                /** Get all the referenced aircrew from flight notes in the current day */
+                schedBlock = getSchedFromNotes(currentDayId,
+                                               notesById[noteId],
+                                               settings,
+                                               flight);
+                activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+                    [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+            });
+        });
+        return activeAircrewRefs;
+    }
+);
+
+const getActiveAircrewRefsFromFlightNotes = createSelector(
+    getCurrentDayFlightIds,
+    getFlightsById,
+    getNotesById,
+    getCurrentDayId,
+    getSettings,
+    (flightIds: string[],
+     flightsById: IEntity<IFlights>['byId'],
+     notesById: IEntity<INotes>['byId'],
+     currentDayId: string,
+     settings: ISettings
+    ): ISchedObject => {
+        let activeAircrewRefs = {};
+        flightIds.forEach(flightId => {
+            activeAircrewRefs = {
+                ...activeAircrewRefs,
+                ...getActiveRefsFromFlightNote(
+                    notesById,
+                    flightsById[flightId],
+                    currentDayId,
+                    settings
+                ),
+            };
+        });
+        return activeAircrewRefs;
+    }
+);
+
+const getActiveRefsFromNote = memoizeOne(
+    (note: INotes,
+     currentDayId,
+     settings
+    ): ISchedObject => {
+        let schedBlock;
+        const activeAircrewRefs = {};
+        note.aircrewRefIds.forEach(aircrewId => {
+            /** Get all the referenced aircrew from day notes in the current day */
+            schedBlock = getSchedFromNotes(currentDayId,
+                                           note,
+                                           settings);
+            activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+                [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+        });
+        return activeAircrewRefs;
+    }
+);
+
+const getActiveAircrewRefsFromNotes = createSelector(
+    getCurrentDayNoteIds,
+    getNotesById,
+    getCurrentDayId,
+    getSettings,
+    (noteIds: string[],
+     notesById: IEntity<INotes>['byId'],
+     currentDayId: string,
+     settings: ISettings
+    ) => {
+        let activeAircrewRefs = {};
+        noteIds.forEach(noteId => {
+            activeAircrewRefs = {
+                ...activeAircrewRefs,
+                ...getActiveRefsFromNote(
+                    notesById[noteId],
+                    currentDayId,
+                    settings
+                ),
+            };
+        });
+        return activeAircrewRefs;
+    }
+);
+
+const getActiveAircrewRefsFromSnivs = createSelector(
+    params,
+    () => {
+        return args;
+    }
+);
+
+const combineActiveAircrewRefs = memoizeOne(
+    (
+    ): ISchedObject => {
+        return {
+            ...getActiveAircrewRefsFromFlightNotes(),
+            ...getActiveAircrewRefsFromFlights(),
+            ...getActiveAircrewRefsFromNotes(),
+            ...getActiveAircrewRefsFromSnivs(),
+        };
+    }
+);
+
 const getActiveAircrewRefs = createSelector(
     getCurrentDayFlightIds,
     getCurrentDayNoteIds,
@@ -224,7 +394,7 @@ const getActiveAircrewRefs = createSelector(
     getElementBeingEdited,
     getSettings,
     getFlightsById,
-    getSortiesById,
+    getSortieCrewRefsBySortieId,
     getNotesById,
     getSnivs,
     (currentDayFlightIds: string[],
@@ -233,7 +403,7 @@ const getActiveAircrewRefs = createSelector(
      elementBeingEdited: IElementBeingEdited,
      settings: ISettings,
      flightsById: IEntity<IFlights>['byId'],
-     sortiesById: IEntity<ISorties>['byId'],
+     sortieCrewRefsBySortieId: ISortieCrewRefsBySortieId,
      notesById: IEntity<INotes>['byId'],
      snivs: IEntity<ISnivs>
     ): IActiveRefsAndBlock => {
@@ -280,7 +450,7 @@ const getActiveAircrewRefs = createSelector(
                                                             settings);
                 }
                 seats.forEach(seat => {
-                    sortiesById[sortieId][seat].aircrewRefIds.forEach((aircrewId: string) => {
+                    sortieCrewRefsBySortieId[sortieId][seat].forEach((aircrewId: string) => {
                         /** Get all the referenced aircrew from sorties in the current day */
                         schedBlock = getSchedFromFlightTimes(currentDayId,
                                                             flightsById[flightId],
