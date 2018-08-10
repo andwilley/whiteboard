@@ -2,10 +2,10 @@ import { connect } from 'react-redux';
 import Aircrew from '../components/Aircrew';
 import * as Moment from 'moment';
 import memoizeOne from 'memoize-one';
-import { ISchedBlock, IActiveRefsAndBlock, IPucks } from '../types/WhiteboardTypes';
+import { ISchedBlock, IPucks } from '../types/WhiteboardTypes';
 import { errorLocs, errorTypes } from '../errors';
 import { IState, ISettings, IAircrew, ISnivs, IEntity } from '../types/State';
-import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
+import getActiveAircrewRefs, { getActiveTimeBlock } from '../util/getActiveAircrewRefs';
 import {
     getCrewById,
     makeGetAircrewDaySnivs,
@@ -158,16 +158,16 @@ const pushIdOntoUnavailableIds = (
 };
 
 const aircrewIsUnavailable = (
-    activeRefsAndBlock: IActiveRefsAndBlock,
+    activeRefs: ISchedBlock[],
+    timeBlock: ISchedBlock | null,
     aircrew: IAircrew,
     currentDayId: string,
     settings: ISettings
 ): boolean => {
-    const timeBlock = activeRefsAndBlock.activeTimeblock;
     let unavailableAircrewIds: string[] = [];
-    if (activeRefsAndBlock.activeAircrewRefs[aircrew.id] && timeBlock) {
+    if (activeRefs && timeBlock) {
         unavailableAircrewIds = getSchedErrorsFromSchedBlocks(
-            activeRefsAndBlock.activeAircrewRefs[aircrew.id],
+            activeRefs,
             aircrew,
             timeBlock,
             settings,
@@ -202,11 +202,12 @@ interface IAicrewContainerStateProps {
 
 const makeMapStateToProps = () => {
     const getAircrewPucks = makeGetAircrewPucks();
-    const crewDayAndWorkDay = makeGetCrewDay();
+    const getCrewDayAndWorkDay = makeGetCrewDay();
     const getAircrewDaySnivs = makeGetAircrewDaySnivs();
     const mapStateToProps = (state: IState, ownProps: IAircrewContainerProps): IAicrewContainerStateProps => {
-        const activeAircrewRefsAndBlock = getActiveAircrewRefs(state);
-        const aircrewRefs = activeAircrewRefsAndBlock.activeAircrewRefs[ownProps.aircrewId];
+        const activeAircrewRefs = getActiveAircrewRefs(state);
+        const activeTimeBlock = getActiveTimeBlock(state);
+        const aircrewRefs = activeAircrewRefs[ownProps.aircrewId];
         const aircrew = getCrewById(state, ownProps.aircrewId);
         const currentDayId = getCurrentDayId(state);
         const settings = getSettings(state);
@@ -215,12 +216,12 @@ const makeMapStateToProps = () => {
             aircrew: getCrewById(state, ownProps.aircrewId),
             pucks: getAircrewPucks(aircrewRefs),
             state,
-            crewDayAndWorkDay: crewDayAndWorkDay(aircrewRefs),
+            crewDayAndWorkDay: getCrewDayAndWorkDay(aircrewRefs),
             snivs: snivs.length > 0 ? snivs : undefined,
             dayId: currentDayId,
             showSnivs: getShowSnivs(state),
             showOnlyAvailable: getShowAvailable(state),
-            unavailable: aircrewIsUnavailable(activeAircrewRefsAndBlock, aircrew, currentDayId, settings),
+            unavailable: aircrewIsUnavailable(aircrewRefs, activeTimeBlock, aircrew, currentDayId, settings),
         };
     };
     return mapStateToProps;

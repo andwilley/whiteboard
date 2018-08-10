@@ -2,8 +2,8 @@ import * as Moment from 'moment';
 import * as _ from 'lodash';
 import { errorLocs } from '../errors';
 import { seats, nameLocation } from '../whiteboard-constants';
-import { IActiveRefsAndBlock, ISchedBlock, ISchedObject } from '../types/WhiteboardTypes';
-import { ISnivs, IFlights, INotes, IEntity, ISettings, IElementBeingEdited } from '../types/State';
+import { ISchedBlock, ISchedObject } from '../types/WhiteboardTypes';
+import { ISnivs, IFlights, INotes, IEntity, ISettings } from '../types/State';
 import { RGX_24HOUR_TIME, RGX_STARTS_WITH_TIME_BLOCK } from './regEx';
 import { conv24HrTimeToMoment } from './utilFunctions';
 import { createSelector } from 'reselect';
@@ -12,11 +12,11 @@ import {
     getFlightsById,
     getNotesById,
     getSettings,
-    getSnivs,
     getCurrentDayFlightIds,
     getCurrentDayId,
     getCurrentDayNoteIds,
-    getSortieCrewRefsBySortieId} from '../reducers';
+    getSortieCrewRefsBySortieId,
+    getAllSnivs} from '../reducers';
 import { ISortieCrewRefsBySortieId } from '../reducers/sortiesReducer';
 import memoizeOne from 'memoize-one';
 
@@ -232,9 +232,11 @@ const getActiveRefsFromFlight = memoizeOne(
             seats.forEach(seat => {
                 sortieCrewRefsBySortieId[sortieId][seat].forEach((aircrewId: string) => {
                     /** Get all the referenced aircrew from sorties in the current day */
-                    schedBlock = getSchedFromFlightTimes(currentDayId,
-                                                         flight,
-                                                         settings);
+                    schedBlock = getSchedFromFlightTimes(
+                        currentDayId,
+                        flight,
+                        settings
+                    );
                     activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
                         [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
                 });
@@ -250,11 +252,11 @@ const getActiveAircrewRefsFromFlights = createSelector(
     getSortieCrewRefsBySortieId,
     getCurrentDayId,
     getSettings,
-    (flightIds: string[],
-     flightsById: IEntity<IFlights>['byId'],
-     sortieCrewRefsBySortieId: ISortieCrewRefsBySortieId,
-     currentDayId: string,
-     settings: ISettings
+    (flightIds,
+     flightsById,
+     sortieCrewRefsBySortieId,
+     currentDayId,
+     settings
     ): ISchedObject => {
         let activeAircrewRefs = {};
         flightIds.forEach(flightId => {
@@ -352,7 +354,7 @@ const getActiveAircrewRefsFromNotes = createSelector(
      notesById: IEntity<INotes>['byId'],
      currentDayId: string,
      settings: ISettings
-    ) => {
+    ): ISchedObject => {
         let activeAircrewRefs = {};
         noteIds.forEach(noteId => {
             activeAircrewRefs = {
@@ -368,152 +370,159 @@ const getActiveAircrewRefsFromNotes = createSelector(
     }
 );
 
-const getActiveAircrewRefsFromSnivs = createSelector(
-    params,
-    () => {
-        return args;
-    }
-);
-
-const combineActiveAircrewRefs = memoizeOne(
-    (
+const getActiveRefsFromSniv = memoizeOne(
+    (sniv: ISnivs,
+     currentDayId: string
     ): ISchedObject => {
-        return {
-            ...getActiveAircrewRefsFromFlightNotes(),
-            ...getActiveAircrewRefsFromFlights(),
-            ...getActiveAircrewRefsFromNotes(),
-            ...getActiveAircrewRefsFromSnivs(),
-        };
+        let schedBlock;
+        const activeAircrewRefs = {};
+        sniv.aircrewIds.forEach(aircrewId => {
+            /** Get all the referenced aircrew from snivs in the current day */
+            schedBlock = getSchedFromSnivs(sniv, currentDayId);
+            activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
+                [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
+            /** Don't set timeblock here. Snivs won't affect avail crew highlights. */
+        });
+        return activeAircrewRefs;
     }
 );
 
-const getActiveAircrewRefs = createSelector(
-    getCurrentDayFlightIds,
-    getCurrentDayNoteIds,
+const getActiveAircrewRefsFromSnivs = createSelector(
+    getAllSnivs,
     getCurrentDayId,
+    (snivs, currentDayId): ISchedObject => {
+        let activeAircrewRefs = {};
+        snivs.forEach(sniv => {
+            activeAircrewRefs = {
+                ...activeAircrewRefs,
+                ...getActiveRefsFromSniv(
+                    sniv,
+                    currentDayId
+                ),
+            };
+        });
+        return activeAircrewRefs;
+    }
+);
+
+export const getActiveTimeBlock = createSelector(
     getElementBeingEdited,
-    getSettings,
+    getCurrentDayFlightIds,
     getFlightsById,
-    getSortieCrewRefsBySortieId,
+    getCurrentDayNoteIds,
     getNotesById,
-    getSnivs,
-    (currentDayFlightIds: string[],
-     currentDayNoteIds: string[],
-     currentDayId: string,
-     elementBeingEdited: IElementBeingEdited,
-     settings: ISettings,
-     flightsById: IEntity<IFlights>['byId'],
-     sortieCrewRefsBySortieId: ISortieCrewRefsBySortieId,
-     notesById: IEntity<INotes>['byId'],
-     snivs: IEntity<ISnivs>
-    ): IActiveRefsAndBlock => {
-        /**
-         * @returns {object} keyed by aircrewId with values set to an array of the timespans associated with each ref
-         * This checks all the places aircrew Ids can be referenced in the current day, aggregates them into an object
-         * and includes the times they are scheduled for, so we can check for conflicts in another function.
-         * Looks for names in:
-         * state.days.byId[currentDay].flights (to find flights)
-         *  for each state.flights.byId[flightId].sorties (to find sorties)
-         *   for each state.sorites.byId[sortieId].front/back (to read the seats)
-         *  for each state.flights.byId[fligthId].notes (to find flight notes)
-         * state.days.byId[currentDay].notes (to find day notes)
-         * state.notes.byId[.allIds] (to read the notes)
-         * NEEDS:
-         * state.crewListUI.currentDay
-         * state.days
-         * state.flights
-         * state.sorties
-         * state.notes
-         * state.snivs
-         *
-         * Optimization: as it is, this will run EVERY TIME THE STATE CHANGES, even if memoized.
-         * For sure, just passing the needed slices will make the app faster. That way, for example, if crewList is
-         * updated, this won't recalc. As of now, it will. However...
-         * If all that changes is the one currently active value... it still updates because the value changed in
-         * the state, even though an aircrewRef may not have changed. We update the aircrew ref every time anyway,
-         * so even if a it is the same by value, it will be shallow compared and not the same every time in reselect.
-         * We could break this up by section, get sorties, flight notes and day notes separately, so if say flight Notes
-         * change, we don't have to recompute all the other ones, but we'd still have to go all the way through flight
-         * Notes...
-         */
-        const activeAircrewRefs = {};
-        let activeTimeblock = null;
-        let schedBlock;
-        currentDayFlightIds.forEach(flightId => {
-            flightsById[flightId].sorties.forEach(sortieId => {
-                /** Set the timeblock for where the editor currently is */
+    getCurrentDayId,
+    getSettings,
+    (elementBeingEdited,
+     flightIds,
+     flightsById,
+     noteIds,
+     notesById,
+     currentDayId,
+     settings
+    ): ISchedBlock | null => {
+        for (const flightId of flightIds) {
+            for (const sortieId of flightsById[flightId].sorties) {
                 if ((elementBeingEdited.element === nameLocation.FRONT_SEAT_NAME ||
                     elementBeingEdited.element === nameLocation.BACK_SEAT_NAME) &&
                     elementBeingEdited.entityId === sortieId) {
-                    activeTimeblock = getSchedFromFlightTimes(currentDayId,
-                                                            flightsById[flightId],
-                                                            settings);
-                }
-                seats.forEach(seat => {
-                    sortieCrewRefsBySortieId[sortieId][seat].forEach((aircrewId: string) => {
-                        /** Get all the referenced aircrew from sorties in the current day */
-                        schedBlock = getSchedFromFlightTimes(currentDayId,
-                                                            flightsById[flightId],
-                                                            settings);
-                        activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-                            [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-                    });
-                });
-            });
-            flightsById[flightId].notes.forEach(noteId => {
+                    return getSchedFromFlightTimes(
+                        currentDayId,
+                        flightsById[flightId],
+                        settings
+                    );
+               }
+            }
+            for (const noteId of flightsById[flightId].notes) {
                 /** Set the timeblock for where the editor currently is */
                 if (elementBeingEdited.element === nameLocation.NOTE &&
                     elementBeingEdited.entityId === noteId) {
-                    activeTimeblock = getSchedFromNotes(currentDayId,
-                                                        notesById[noteId],
-                                                        settings,
-                                                        flightsById[flightId]);
+                    return getSchedFromNotes(
+                        currentDayId,
+                        notesById[noteId],
+                        settings,
+                        flightsById[flightId]);
                 }
-                notesById[noteId].aircrewRefIds.forEach(aircrewId => {
-                    /** Get all the referenced aircrew from flight notes in the current day */
-                    schedBlock = getSchedFromNotes(currentDayId,
-                                                        notesById[noteId],
-                                                        settings,
-                                                        flightsById[flightId]);
-                    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-                        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-                });
-            });
-        });
-        currentDayNoteIds.forEach(noteId => {
+            }
+        }
+        for (const noteId of noteIds) {
             /** Set the timeblock for where the editor currently is */
             if (elementBeingEdited.element === nameLocation.NOTE &&
                 elementBeingEdited.entityId === noteId) {
-                activeTimeblock = getSchedFromNotes(currentDayId,
-                                                    notesById[noteId],
-                                                    settings);
+                return getSchedFromNotes(
+                    currentDayId,
+                    notesById[noteId],
+                    settings
+                );
             }
-            notesById[noteId].aircrewRefIds.forEach(aircrewId => {
-                /** Get all the referenced aircrew from day notes in the current day */
-                schedBlock = getSchedFromNotes(currentDayId,
-                                            notesById[noteId],
-                                            settings);
-                activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-                    [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-            });
-        });
-        snivs.allIds.forEach(snivId => {
-            if (snivs.byId[snivId].dates[currentDayId]) {
-                snivs.byId[snivId].aircrewIds.forEach(aircrewId => {
-                    /** Get all the referenced aircrew from snivs in the current day */
-                    schedBlock = getSchedFromSnivs(snivs.byId[snivId],
-                                                currentDayId);
-                    activeAircrewRefs[aircrewId] = activeAircrewRefs[aircrewId] ?
-                        [...activeAircrewRefs[aircrewId], schedBlock] : [schedBlock];
-                    /** Don't set timeblock here. Snivs won't affect avail crew highlights. */
-                });
-            }
-        });
-        return {
-            activeAircrewRefs,
-            activeTimeblock,
-        };
+        }
+        return null;
     }
 );
+
+const mergeRefs = (accumRefs: ISchedObject, addRefs: ISchedObject): ISchedObject => {
+    const mergedRefs = {
+        ...accumRefs,
+    };
+    const mergeKeys = Object.keys(addRefs);
+    mergeKeys.forEach(key => {
+        mergedRefs[key] ?
+            mergedRefs[key] = [...mergedRefs[key], ...addRefs[key]] :
+            mergedRefs[key] = addRefs[key];
+    });
+    return mergedRefs;
+};
+
+const getActiveAircrewRefs = createSelector(
+    getActiveAircrewRefsFromFlights,
+    getActiveAircrewRefsFromFlightNotes,
+    getActiveAircrewRefsFromNotes,
+    getActiveAircrewRefsFromSnivs,
+    (flightRefs,
+     flightNoteRefs,
+     noteRefs,
+     snivRefs
+    ): ISchedObject => {
+        let allRefs = {};
+        allRefs = mergeRefs(allRefs, flightRefs);
+        allRefs = mergeRefs(allRefs, flightNoteRefs);
+        allRefs = mergeRefs(allRefs, noteRefs);
+        allRefs = mergeRefs(allRefs, snivRefs);
+        return allRefs;
+    }
+);
+
+/**
+ * @returns {object} keyed by aircrewId with values set to an array of the timespans associated with each ref
+ * This checks all the places aircrew Ids can be referenced in the current day, aggregates them
+ * into an object
+ * and includes the times they are scheduled for, so we can check for conflicts in another function.
+ * Looks for names in:
+ * state.days.byId[currentDay].flights (to find flights)
+ *  for each state.flights.byId[flightId].sorties (to find sorties)
+ *   for each state.sorites.byId[sortieId].front/back (to read the seats)
+ *  for each state.flights.byId[fligthId].notes (to find flight notes)
+ * state.days.byId[currentDay].notes (to find day notes)
+ * state.notes.byId[.allIds] (to read the notes)
+ * NEEDS:
+ * state.crewListUI.currentDay
+ * state.days
+ * state.flights
+ * state.sorties
+ * state.notes
+ * state.snivs
+ *
+ * Optimization: as it is, this will run EVERY TIME THE STATE CHANGES, even if memoized.
+ * For sure, just passing the needed slices will make the app faster. That way, for example, if crewList is
+ * updated, this won't recalc. As of now, it will. However...
+ * If all that changes is the one currently active value... it still updates because the value changed in
+ * the state, even though an aircrewRef may not have changed. We update the aircrew ref every time anyway,
+ * so even if a it is the same by value, it will be shallow compared and not the same every time in reselect.
+ * We could break this up by section, get sorties, flight notes and day notes separately, so if say
+ * flight Notes
+ * change, we don't have to recompute all the other ones, but we'd still have to go all the way through
+ * flight
+ * Notes...
+ */
 
 export default getActiveAircrewRefs;

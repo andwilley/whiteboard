@@ -186,13 +186,17 @@ export const getSnivsById = (state: IState) => {
     return snivsSelectors.getSnivsById(getSnivs(state));
 };
 
+export const getAllSnivIds = (state: IState) => {
+    return snivsSelectors.getAllSnivIds(getSnivs(state));
+};
+
 export const getAllSnivs = (state: IState) => {
     return snivsSelectors.getAllSnivs(getSnivs(state));
 };
 
 export const makeGetAircrewDaySnivs = () => createSelector(
     getSnivsById,
-    getAllSnivs,
+    getAllSnivIds,
     getCurrentDayId,
     (state: IState, aircrewId: string) => aircrewId,
     (snivsById: IEntity<ISnivs>['byId'], allSnivs: string[], currentDayId: string, aircrewId: string): ISnivs[] => {

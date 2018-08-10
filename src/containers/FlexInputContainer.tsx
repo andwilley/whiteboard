@@ -25,7 +25,7 @@ import { IAddErrorArgs } from '../actions';
 import { RGX_FIND_NAME, RGX_HILITE_STRING } from '../util/regEx';
 import { getAircrewById } from '../reducers';
 import { createSelector } from 'reselect';
-import getActiveAircrewRefs from '../util/getActiveAircrewRefs';
+import getActiveAircrewRefs, { getActiveTimeBlock } from '../util/getActiveAircrewRefs';
 import { getSchedErrorsFromSchedBlocks } from '../util/utilFunctions';
 import memoizeOne from 'memoize-one';
 
@@ -331,15 +331,16 @@ export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
                     dispatch(actions.clearError(errorId, getCurrentDayId(state)));
                 }
             });
-            const activeRefsAndBlock = getActiveAircrewRefs(state);
-            const newErrors = findSchedErrors(activeRefsAndBlock.activeAircrewRefs,
+            const activeAircrewRefs = getActiveAircrewRefs(state);
+            const activeTimeBlock = getActiveTimeBlock(state);
+            const newErrors = findSchedErrors(activeAircrewRefs,
                                               getCurrentDayId(state),
                                               getAircrewById(state),
                                               getSettings(state));
             newErrors.forEach(error => {
                 dispatch(actions.addError(error));
             });
-            dispatch(actions.setEditedElementTimeblock(activeRefsAndBlock.activeTimeblock));
+            dispatch(actions.setEditedElementTimeblock(activeTimeBlock));
         }
     };
 };

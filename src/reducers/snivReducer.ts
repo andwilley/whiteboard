@@ -62,6 +62,10 @@ export const getSnivsById = (state: IEntity<ISnivs>) => {
     return state.byId;
 };
 
-export const getAllSnivs = (state: IEntity<ISnivs>) => {
+export const getAllSnivIds = (state: IEntity<ISnivs>) => {
     return state.allIds;
+};
+
+export const getAllSnivs = (state: IEntity<ISnivs>) => {
+    return state.allIds.map(snivId => state.byId[snivId]);
 };

@@ -198,6 +198,12 @@ export const getSortieCrewRefsBySortieId = memoizeOne(
         if (newSortieList === oldSortieList) {
             return true;
         }
+        if (newSortieList.length === 0 && oldSortieList.length === 0) {
+            return true;
+        }
+        if (newSortieList.length !== oldSortieList.length) {
+            return false;
+        }
         return newSortieList.every((newSortie, i) => {
             return newSortie.front.aircrewRefIds === oldSortieList[i].front.aircrewRefIds &&
                    newSortie.back.aircrewRefIds === oldSortieList[i].back.aircrewRefIds;
