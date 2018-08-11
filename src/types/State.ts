@@ -7,12 +7,6 @@ export interface IEntity<E> {
     readonly allIds: string[];
 }
 
-export interface IEntityWithActive<E> {
-    readonly byId: { readonly [id: string]: E };
-    readonly activeIds: string[];
-    readonly allIds: string[];
-}
-
 export interface IAircrew {
     readonly id: string;
     readonly callsign: string;
@@ -38,7 +32,6 @@ export interface IDays {
     readonly id: string;
     readonly flights: string[];
     readonly notes: string[];
-    readonly errors: string[];
 }
 
 export interface IFlightTimes {
@@ -201,9 +194,6 @@ export type UGenericErrorTypes = Exclude<keyof IErrorTypes,
 export type UErrorTypes = IErrorTypes[keyof IErrorTypes];
 
 export interface IBaseErrorMeta {
-    // readonly aircrewId?: string;
-    readonly timeHiddenToggled: Date[];
-    readonly timeInactive: Date | null;
 }
 
 export interface ISchedErrorMeta extends IBaseErrorMeta {
@@ -288,6 +278,6 @@ export interface IState {
     readonly addUpdateAircrewFormValues: IAddUpdateAircrewFormValues;
     readonly addUpdateSnivFormValues: IAddUpdateSnivFormValues;
     readonly settings: ISettings;
-    readonly errors: IEntityWithActive<IErrors>;
+    readonly errors: IEntity<IErrors>;
     readonly editor: IEditor;
 }

@@ -9,12 +9,13 @@ import { restrictToTimeChars } from '../util/restrictor';
 interface IFlightTimesProps {
     times: IFlightTimes;
     flightId: string;
+    exactTimes: boolean;
     onInputChange: (timeType: string, time: string) => any;
 }
 
 class FlightTimes extends React.PureComponent<IFlightTimesProps> {
     render() {
-        const { times, flightId, onInputChange } = this.props;
+        const { times, flightId, onInputChange, exactTimes } = this.props;
         const timeIsValid = {
             brief: true,
             takeoff: true,
@@ -40,6 +41,7 @@ class FlightTimes extends React.PureComponent<IFlightTimesProps> {
                     entityId={flightId}
                     validatorFns={[is24HourTime()]}
                     restrictorFns={[restrictToTimeChars]}
+                    className={exactTimes && !times.brief ? 'text-danger' : ''}
                 />
                 </div>
                 <div className="col-4 pr-1 pl-1">

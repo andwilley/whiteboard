@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { getType } from 'typesafe-actions';
 import { actions, IAction } from '../actions';
-import { IEntity, IErrors, IDays, IEntityWithActive, UErrorLocs } from '../types/State';
+import { IEntity, IErrors, UErrorLocs } from '../types/State';
 import { errorLocs } from '../errors';
 
 const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
@@ -9,68 +9,14 @@ const errorsById = (state: {[id: string]: IErrors} = {}, action: IAction) => {
         case getType(actions.addError):
             return {
                 ...state,
-                [action.payload.errorId]: {
-                    id: action.payload.errorId,
-                    time: action.payload.time,
-                    dayId: action.payload.dayId,
-                    type: action.payload.type,
-                    location: action.payload.location,
-                    locationId: action.payload.locationId,
-                    level: action.payload.level,
-                    message: action.payload.message,
-                    display: true,
-                    active: true,
-                    meta: {
-                        ...action.meta,
-                        timeHiddenToggled: [],
-                        timeInactive: null,
-                    },
-                },
-            };
-        case getType(actions.toggleShowError):
-            return {
-                ...state,
-                [action.payload.errorId]: {
-                    ...state[action.payload.errorId],
-                    display: !state[action.payload.errorId].display,
-                    meta: {
-                        ...state[action.payload.errorId].meta,
-                        timeHiddenToggled: state[action.payload.errorId].meta
-                            .timeHiddenToggled.concat(action.meta.timeHiddenToggled),
-                    },
-                },
-            };
-        case getType(actions.clearError):
-            return {
-                ...state,
-                [action.payload.errorId]: {
-                    ...state[action.payload.errorId],
-                    active: false,
-                    meta: {
-                        ...state[action.payload.errorId].meta,
-                        timeInactive: action.meta.timeInactive,
-                    },
-                },
+                ...action.payload.errorsById,
             };
         case getType(actions.delError):
             const rest = Object.assign({}, state);
-            delete rest[action.payload.errorId];
+            action.payload.errorIds.forEach(errorId => {
+                delete rest[errorId];
+            });
             return rest;
-        default:
-            return state;
-    }
-};
-
-const activeErrors = (state: string[] = [], action: IAction) => {
-    switch (action.type) {
-        case getType(actions.addError):
-            if (state.indexOf(action.payload.errorId) > -1) {
-                return state;
-            }
-            return state.concat(action.payload.errorId);
-        case getType(actions.delError):
-        case getType(actions.clearError):
-            return state.filter(id => id !== action.payload.errorId);
         default:
             return state;
     }
@@ -79,12 +25,10 @@ const activeErrors = (state: string[] = [], action: IAction) => {
 const allErrors = (state: string[] = [], action: IAction) => {
     switch (action.type) {
         case getType(actions.addError):
-            if (state.indexOf(action.payload.errorId) > -1) {
-                return state;
-            }
-            return state.concat(action.payload.errorId);
+            const newErrorIds = Object.keys(action.payload.errorsById);
+            return state.concat(newErrorIds);
         case getType(actions.delError):
-            return state.filter(id => id !== action.payload.errorId);
+            return state.filter(id => action.payload.errorIds.indexOf(id) === -1);
         default:
             return state;
     }
@@ -92,7 +36,6 @@ const allErrors = (state: string[] = [], action: IAction) => {
 
 const errorReducer = combineReducers<IEntity<IErrors>>({
     byId: errorsById,
-    activeIds: activeErrors,
     allIds: allErrors,
 });
 
@@ -115,19 +58,14 @@ export const getEntityErrors = (errorById: {[id: string]: IErrors},
     }, {});
 };
 
-export const getActiveDayErrors = (stateErrorsById: { [id: string]: IErrors }, currentDay: IDays): IErrors[] => {
-    /**
-     * days.byId[currentDay].errors
-     * state.errors.byId
-     */
-    const dayErrors = currentDay.errors.map(errorId => stateErrorsById[errorId]).filter(error => error.display);
-    return dayErrors;
-};
-
-export const getErrorsById = (state: IEntityWithActive<IErrors>) => {
+export const getErrorsById = (state: IEntity<IErrors>) => {
     return state.byId;
 };
 
-export const getActiveErrorIds = (state: IEntityWithActive<IErrors>) => {
-    return state.activeIds;
+export const getAllErrorIds = (state: IEntity<IErrors>) => {
+    return state.allIds;
+};
+
+export const getAllErrors = (state: IEntity<IErrors>) => {
+    return state.allIds.map(errorId => state.byId[errorId]);
 };

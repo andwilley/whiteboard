@@ -6,7 +6,7 @@ import FlightTimes from '../components/FlightTimes';
 import { RGX_24HOUR_TIME } from '../util/regEx';
 import { UTimeTypes } from '../types/State';
 import { timeTypes } from '../whiteboard-constants';
-import { getActiveDayErrors, getCurrentDayId, getElementBeingEdited } from '../reducers';
+import { getAllErrors, getCurrentDayId, getElementBeingEdited, getFlightById } from '../reducers';
 const { updateFlightTime, addError, delError } = actions;
 
 interface IFlightTimesContainerProps {
@@ -144,14 +144,17 @@ interface IFlightTimesContainerStateProps {
     times: IFlightTimes;
     dayId: string;
     errors: IErrors[];
+    exactTimes: boolean;
     isTimeBoxActive: boolean;
 }
 
 const mapStateToProps = (state: IState, ownProps: IFlightTimesContainerProps): IFlightTimesContainerStateProps => {
+    const exactTimes = getFlightById(state, ownProps.flightId).useExactTimes;
     return {
         times: getFlightTimes(state, ownProps.flightId),
         dayId: getCurrentDayId(state),
-        errors: getActiveDayErrors(state),
+        errors: getAllErrors(state),
+        exactTimes,
         isTimeBoxActive: isTimeBoxActive(state, ownProps),
     };
 };
@@ -168,7 +171,7 @@ const mapDispatchToProps = (dispatch: any) => {
             errors.forEach(error => {
                 if (error.type === errorTypes.TIME_ORDER &&
                     error.locationId === flightId) {
-                    dispatch(delError(error.id, dayId));
+                    dispatch(delError([error.id]));
                 }
             });
             /** set the new ones */
@@ -188,6 +191,7 @@ const mergeProps = (stateProps: IFlightTimesContainerStateProps,
     return {
         times: stateProps.times,
         flightId: ownProps.flightId,
+        exactTimes: stateProps.exactTimes,
         onInputChange: stateProps.isTimeBoxActive ?
             dispatchProps.onInputChange(
                 stateProps.errors,

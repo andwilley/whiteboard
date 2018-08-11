@@ -68,31 +68,30 @@ const daysById = (state: {[id: string]: IDays} = {}, action: IAction) => {
                         .filter((noteId: string) => noteId !== action.payload.id),
                 },
             };
-        case getType(actions.addError):
-            if (action.payload.dayId === '' ||
-                state[action.payload.dayId].errors.indexOf(action.payload.errorId) > -1) {
-                return state;
-            }
-            return {
-                ...state,
-                [action.payload.dayId]: {
-                    ...state[action.payload.dayId],
-                    errors: state[action.payload.dayId].errors.concat(action.payload.errorId),
-                },
-            };
-        case getType(actions.delError):
-        case getType(actions.clearError):
-            if (action.payload.dayId === '') {
-                return state;
-            }
-            return {
-                ...state,
-                [action.payload.dayId]: {
-                    ...state[action.payload.dayId],
-                    errors: state[action.payload.dayId].errors
-                        .filter((errorId: string) => errorId !== action.payload.errorId),
-                },
-            };
+        // case getType(actions.addError):
+        //     if (action.payload.dayId === '' ||
+        //         state[action.payload.dayId].errors.indexOf(action.payload.errorId) > -1) {
+        //         return state;
+        //     }
+        //     return {
+        //         ...state,
+        //         [action.payload.dayId]: {
+        //             ...state[action.payload.dayId],
+        //             errors: state[action.payload.dayId].errors.concat(action.payload.errorId),
+        //         },
+        //     };
+        // case getType(actions.delError):
+        //     if (action.payload.dayId === '') {
+        //         return state;
+        //     }
+        //     return {
+        //         ...state,
+        //         [action.payload.dayId]: {
+        //             ...state[action.payload.dayId],
+        //             errors: state[action.payload.dayId].errors
+        //                 .filter((errorId: string) => errorId !== action.payload.errorId),
+        //         },
+        //     };
         default:
             return state;
     }

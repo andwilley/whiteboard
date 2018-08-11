@@ -42,7 +42,7 @@ const getSnivOrderError = (snivTimeType: 'start' | 'end'): IAddErrorArgs => {
 };
 
 const getSnivFormErrors = (state: IState): IErrors[] => {
-    return state.errors.activeIds.filter(errorId => {
+    return state.errors.allIds.filter(errorId => {
         return state.errors.byId[errorId].location === errorLocs.SNIV_FORM;
     }).map(errorId => state.errors.byId[errorId]);
 };
@@ -50,7 +50,7 @@ const getSnivFormErrors = (state: IState): IErrors[] => {
 const clearSnivFormErrors = (errors: IErrors[], dispatch: any) => {
     errors.forEach(error => {
         if (error.type === errorTypes.TIME_ORDER) {
-            dispatch(actions.clearError(error.id, ''));
+            dispatch(actions.delError([error.id]));
         }
     });
 };

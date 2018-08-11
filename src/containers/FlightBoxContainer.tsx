@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { actions } from '../actions';
+import { actions, IAction } from '../actions';
 import { IState, IFlights } from '../types/State';
 import FlightBox from '../components/FlightBox';
 import { errorTypes } from '../errors';
@@ -80,11 +80,14 @@ const mapDispatchToProps = (dispatch: any, ownProps: IFlightBoxContainerProps) =
             dispatch(addFlight(dayId, ownProps.sim));
         },
         onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => {
+            const delFlightActions: IAction[] = [];
             flight.sorties.forEach(sortieId =>
-                dispatch(delSortie(sortieId, flight.id)));
+                delFlightActions.push(delSortie(sortieId, flight.id)));
             flight.notes.forEach(noteId =>
-                dispatch(delNote({id: noteId, entity: noteEntity.FLIGHT_NOTE, entityId: flight.id})));
-            dispatch(delFlight(flight.id, dayId));
+                delFlightActions.push(delNote({id: noteId, entity: noteEntity.FLIGHT_NOTE, entityId: flight.id})));
+            delFlightActions.push(delFlight(flight.id, dayId));
+            dispatch(actions.batchActions(...delFlightActions));
+            dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         onExactTimesToggle: (flightId: string) => (e: any) => {
             dispatch(toggleFlightExactTimes(flightId));

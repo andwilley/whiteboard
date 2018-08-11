@@ -9,7 +9,7 @@ import { ISchedBlock } from '../types/WhiteboardTypes';
 import { nameLocation, builtInGroupNames } from '../whiteboard-constants';
 import validator, { ValidatorFn } from '../util/validator';
 import restrictor, { RestrictorFn } from '../util/restrictor';
-import { getActiveDayErrors, getAircrewIds, getGroups, getCurrentDayId, getSettings } from '../reducers';
+import { getAircrewIds, getGroups, getCurrentDayId, getSettings, getAllErrors } from '../reducers';
 import { EditorState, ContentState, CompositeDecorator, ContentBlock, SelectionState } from 'draft-js';
 import { errorLevels, errorTypes, errorLocs, errorMessages } from '../errors';
 import { IState,
@@ -28,6 +28,7 @@ import { createSelector } from 'reselect';
 import getActiveAircrewRefs, { getActiveTimeBlock } from '../util/getActiveAircrewRefs';
 import { getSchedErrorsFromSchedBlocks } from '../util/utilFunctions';
 import memoizeOne from 'memoize-one';
+import { getAllErrorIds } from '../reducers';
 
 type IAircrewEntity = IEntity<IAircrew>;
 
@@ -170,7 +171,6 @@ const makeErrorMessage = (location: UErrorLocs): string => {
 };
 
 const pushBlocksOntoErrors = (
-    errorArray: IAddErrorArgs[],
     block: ISchedBlock,
     conflictsWithBlock: ISchedBlock,
     aircrew: IAircrew,
@@ -182,7 +182,7 @@ const pushBlocksOntoErrors = (
     const conflictMessage = makeErrorMessage(conflictsWithBlock.location);
     const message = makeErrorMessage(block.location);
 
-    return [...errorArray, {
+    return [{
             dayId: currentDayId,
             type: errorTypes.SCHEDULE_CONFLICT,
             location: block.location,
@@ -243,28 +243,15 @@ const findSchedErrors = (activeAircrewRefs: ISchedObject,
                  * This logic is duplicated in VisibleCrewList ***!
                  * Assumes start and end are actually in order ***!
                  */
-                errors = getSchedErrorsFromSchedBlocks(
+                errors = errors.concat(getSchedErrorsFromSchedBlocks(
                     schedConflictArray,
                     aircrewById[aircrewId],
                     block,
                     settings,
                     currentDayId,
-                    errors,
                     pushBlocksOntoErrors,
                     true
-                );
-                // schedConflictArray.forEach(scblock => {
-                //     if ((block.location === errorLocs.SNIVS && scblock.location === errorLocs.SNIVS) ||
-                //         flightIsCrewHotPit(block, scblock, settings)) {
-                //         return;
-                //     } else if (block.start >= scblock.start && block.start <= scblock.end) {
-                //         pushBlocksOntoErrors(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                //     } else if (block.end >= scblock.start && block.end <= scblock.end) {
-                //         pushBlocksOntoErrors(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                //     } else if (scblock.start >= block.start && scblock.start <= block.end) {
-                //         pushBlocksOntoErrors(errors, block, scblock, aircrewById[aircrewId], currentDayId);
-                //     }
-                // });
+                ));
                 return schedConflictArray.concat(block);
             }, []);
     });
@@ -321,25 +308,39 @@ const getMatchedNames = (
     });
 };
 
-export const setErrorsOnFreshState = (errorTypesToCheck: string[]) => {
+export const setErrorsOnFreshState = (errorTypesToCheck: UErrorTypes[]) => {
     return (dispatch: any, getState: () => IState) => {
         const state = getState();
+        const currentDayId = getCurrentDayId(state);
         /** clear and recalc schedule conflict errors */
         if (errorTypesToCheck.indexOf(errorTypes.SCHEDULE_CONFLICT) > -1) {
-            state.days.byId[getCurrentDayId(state)].errors.forEach(errorId => {
+            const clearErrorIds: string[] = [];
+            const addErrorArgsList: IAddErrorArgs[] = [];
+            getAllErrorIds(state).forEach(errorId => {
                 if (state.errors.byId[errorId].type === errorTypes.SCHEDULE_CONFLICT) {
-                    dispatch(actions.clearError(errorId, getCurrentDayId(state)));
+                    clearErrorIds.push(errorId);
                 }
             });
+            performance.mark('Clear Errors Start');
+            dispatch(actions.delError(clearErrorIds));
+            performance.mark('Clear Errors End');
+            performance.measure('Clear Errors Perf', 'Clear Errors Start', 'Clear Errors End');
             const activeAircrewRefs = getActiveAircrewRefs(state);
             const activeTimeBlock = getActiveTimeBlock(state);
-            const newErrors = findSchedErrors(activeAircrewRefs,
-                                              getCurrentDayId(state),
-                                              getAircrewById(state),
-                                              getSettings(state));
+            const newErrors = findSchedErrors(
+                activeAircrewRefs,
+                currentDayId,
+                getAircrewById(state),
+                getSettings(state)
+            );
+
             newErrors.forEach(error => {
-                dispatch(actions.addError(error));
+                addErrorArgsList.push(error);
             });
+            performance.mark('Set Errors Start');
+            dispatch(actions.addError(addErrorArgsList));
+            performance.mark('Set Errors End');
+            performance.measure('Set Errors Perf', 'Set Errors Start', 'Set Errors End');
             dispatch(actions.setEditedElementTimeblock(activeTimeBlock));
         }
     };
@@ -574,7 +575,7 @@ const makeMapStateToProps = () => {
         const hasNames = doesInputHaveNames(ownProps.element);
         const aircrewRefList = hasNames ? getAircrewRefList(state, ownProps) : undefined;
         const aircrewRefIds = aircrewRefList ? aircrewRefList.map(aircrew => aircrew.id) : undefined;
-        const dayErrors = getActiveDayErrors(state);
+        const dayErrors = getAllErrors(state);
         const componentErrors = getComponentErrors(
             dayErrors,
             ownProps.errorConfig.errorLoc,

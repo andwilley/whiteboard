@@ -12,6 +12,7 @@ import { UEditables, ISchedBlock } from '../types/WhiteboardTypes';
 import * as moment from 'moment';
 
 // Action Types
+export const BATCH_ACTIONS = 'BATCH_ACTIONS';
 export const ADD_UPDATE_AIRCREW_FORM_ADD_QUAL = 'ADD_UPDATE_AIRCREW_FORM_ADD_QUAL';
 export const ADD_UPDATE_AIRCREW_FORM_DEL_QUAL = 'ADD_UPDATE_AIRCREW_FORM_DEL_QUAL';
 export const SET_AIRCREW_FORM = 'SET_AIRCREW_FORM';
@@ -47,7 +48,6 @@ export const UPDATE_LOADOUT = 'UPDATE_LOADOUT';
 export const ADD_ERROR = 'ADD_ERROR';
 export const TOGGLE_SHOW_ERROR = 'TOGGLE_SHOW_ERROR';
 export const TOGGLE_SHOW_FILTERS = 'TOGGLE_SHOW_FILTERS';
-export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const DEL_ERROR = 'DEL_ERROR';
 export const SET_EDITOR_STATE = 'SET_EDITOR_STATE';
 export const SET_EDITED_ELEMENT = 'SET_EDITED_ELEMENT';
@@ -200,6 +200,12 @@ const breakDateRangeIntoDays = (start: moment.Moment | string,
 };
 
 export const actions = {
+    batchActions: createAction(BATCH_ACTIONS, (...batchedActions) => ({
+        type: BATCH_ACTIONS,
+        payload: {
+            actions: batchedActions,
+        },
+    })),
     addUpdateAircrewFormAddQual: createAction(ADD_UPDATE_AIRCREW_FORM_ADD_QUAL, (qual: string) => ({
         type: ADD_UPDATE_AIRCREW_FORM_ADD_QUAL,
         payload: {
@@ -498,49 +504,58 @@ export const actions = {
             input,
         },
     })),
-    addError: createAction(ADD_ERROR, (args: IAddErrorArgs) => {
-        const errorId = cuid();
-        return {
-            type: ADD_ERROR,
-            payload: {
-                errorId,
+    addError: createAction(ADD_ERROR, (args: IAddErrorArgs | IAddErrorArgs[]) => {
+        /**
+         * this creates an errorByIds object that can be spread to the state.
+         * It uses mutating keyed assignment because that is SIGNIFICANTLY faster than
+         * creating an entirely new object on every iteration. Even just creating the
+         * object here vice a batched action call to the reducer is way better.
+         */
+        const errorsById = {};
+        if (Array.isArray(args)) {
+            args.forEach(errorArg => {
+                const errorId = cuid();
+                errorsById[errorId] = {
+                    id: errorId,
+                    time: new Date(),
+                    dayId: errorArg.dayId,
+                    type: errorArg.type,
+                    location: errorArg.location,
+                    locationId: errorArg.locationId,
+                    level: errorArg.level,
+                    message: errorArg.message,
+                    meta: {
+                        ...errorArg.meta,
+                    },
+                };
+            });
+        } else {
+            const errorId = cuid();
+            errorsById[errorId] = {
+                id: errorId,
                 time: new Date(),
-                type: args.type,
                 dayId: args.dayId,
+                type: args.type,
                 location: args.location,
                 locationId: args.locationId,
                 level: args.level,
                 message: args.message,
-            },
-            meta: {
-                ...args.meta,
+                meta: {
+                    ...args.meta,
+                },
+            };
+        }
+        return {
+            type: ADD_ERROR,
+            payload: {
+                errorsById,
             },
         };
     }),
-    toggleShowError: createAction(TOGGLE_SHOW_ERROR, (errorId: string) => ({
-        type: TOGGLE_SHOW_ERROR,
-        payload: {
-            errorId,
-        },
-        meta: {
-            timeHiddenToggled: new Date(),
-        },
-    })),
-    clearError: createAction(CLEAR_ERROR, (errorId: string, dayId: string) => ({
-        type: CLEAR_ERROR,
-        payload: {
-            errorId,
-            dayId,
-        },
-        meta: {
-            timeInactive: new Date(),
-        },
-    })),
-    delError: createAction(DEL_ERROR, (errorId: string, dayId: string) => ({
+    delError: createAction(DEL_ERROR, (errorIds: string[]) => ({
         type: DEL_ERROR,
         payload: {
-            errorId,
-            dayId,
+            errorIds,
         },
     })),
     setEditorState: createAction(SET_EDITOR_STATE, (editorState: EditorState) => ({

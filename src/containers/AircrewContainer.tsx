@@ -148,13 +148,12 @@ const makeGetCrewDay = () => memoizeOne(
 );
 
 const pushIdOntoUnavailableIds = (
-    errorArray: string[],
     block: ISchedBlock,
     conflictsWithBlock: ISchedBlock,
     aircrew: IAircrew,
     currentDayId: string
 ): string[] => {
-    return [...errorArray, aircrew.id];
+    return [aircrew.id];
 };
 
 const aircrewIsUnavailable = (
@@ -166,15 +165,14 @@ const aircrewIsUnavailable = (
 ): boolean => {
     let unavailableAircrewIds: string[] = [];
     if (activeRefs && timeBlock) {
-        unavailableAircrewIds = getSchedErrorsFromSchedBlocks(
+        unavailableAircrewIds = unavailableAircrewIds.concat(getSchedErrorsFromSchedBlocks(
             activeRefs,
             aircrew,
             timeBlock,
             settings,
             currentDayId,
-            unavailableAircrewIds,
             pushIdOntoUnavailableIds
-        );
+        ));
         // if (flightIsCrewHotPit(block, timeBlock, settings)) {
         //     return;
         // } else if (block.start >= timeBlock.start && block.start <= timeBlock.end) {

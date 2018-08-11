@@ -219,6 +219,19 @@ export const getSchedFromSnivs = _.memoize(
     }
 );
 
+const mergeRefs = (accumRefs: ISchedObject, addRefs: ISchedObject): ISchedObject => {
+    const mergedRefs = {
+        ...accumRefs,
+    };
+    const mergeKeys = Object.keys(addRefs);
+    mergeKeys.forEach(key => {
+        mergedRefs[key] ?
+            mergedRefs[key] = [...mergedRefs[key], ...addRefs[key]] :
+            mergedRefs[key] = addRefs[key];
+    });
+    return mergedRefs;
+};
+
 const getActiveRefsFromFlight = memoizeOne(
     (sortieCrewRefsBySortieId: ISortieCrewRefsBySortieId,
      sortieIds: string[],
@@ -260,16 +273,13 @@ const getActiveAircrewRefsFromFlights = createSelector(
     ): ISchedObject => {
         let activeAircrewRefs = {};
         flightIds.forEach(flightId => {
-            activeAircrewRefs = {
-                ...activeAircrewRefs,
-                ...getActiveRefsFromFlight(
-                    sortieCrewRefsBySortieId,
-                    flightsById[flightId].sorties,
-                    flightsById[flightId],
-                    currentDayId,
-                    settings
-                ),
-            };
+            activeAircrewRefs = mergeRefs(activeAircrewRefs, getActiveRefsFromFlight(
+                sortieCrewRefsBySortieId,
+                flightsById[flightId].sorties,
+                flightsById[flightId],
+                currentDayId,
+                settings
+            ));
         });
         return activeAircrewRefs;
     }
@@ -312,15 +322,12 @@ const getActiveAircrewRefsFromFlightNotes = createSelector(
     ): ISchedObject => {
         let activeAircrewRefs = {};
         flightIds.forEach(flightId => {
-            activeAircrewRefs = {
-                ...activeAircrewRefs,
-                ...getActiveRefsFromFlightNote(
-                    notesById,
-                    flightsById[flightId],
-                    currentDayId,
-                    settings
-                ),
-            };
+            activeAircrewRefs = mergeRefs(activeAircrewRefs, getActiveRefsFromFlightNote(
+                notesById,
+                flightsById[flightId],
+                currentDayId,
+                settings
+            ));
         });
         return activeAircrewRefs;
     }
@@ -357,14 +364,11 @@ const getActiveAircrewRefsFromNotes = createSelector(
     ): ISchedObject => {
         let activeAircrewRefs = {};
         noteIds.forEach(noteId => {
-            activeAircrewRefs = {
-                ...activeAircrewRefs,
-                ...getActiveRefsFromNote(
-                    notesById[noteId],
-                    currentDayId,
-                    settings
-                ),
-            };
+            activeAircrewRefs = mergeRefs(activeAircrewRefs, getActiveRefsFromNote(
+                notesById[noteId],
+                currentDayId,
+                settings
+            ));
         });
         return activeAircrewRefs;
     }
@@ -393,13 +397,10 @@ const getActiveAircrewRefsFromSnivs = createSelector(
     (snivs, currentDayId): ISchedObject => {
         let activeAircrewRefs = {};
         snivs.forEach(sniv => {
-            activeAircrewRefs = {
-                ...activeAircrewRefs,
-                ...getActiveRefsFromSniv(
-                    sniv,
-                    currentDayId
-                ),
-            };
+            activeAircrewRefs = mergeRefs(activeAircrewRefs, getActiveRefsFromSniv(
+                sniv,
+                currentDayId
+            ));
         });
         return activeAircrewRefs;
     }
@@ -459,19 +460,6 @@ export const getActiveTimeBlock = createSelector(
         return null;
     }
 );
-
-const mergeRefs = (accumRefs: ISchedObject, addRefs: ISchedObject): ISchedObject => {
-    const mergedRefs = {
-        ...accumRefs,
-    };
-    const mergeKeys = Object.keys(addRefs);
-    mergeKeys.forEach(key => {
-        mergedRefs[key] ?
-            mergedRefs[key] = [...mergedRefs[key], ...addRefs[key]] :
-            mergedRefs[key] = addRefs[key];
-    });
-    return mergedRefs;
-};
 
 const getActiveAircrewRefs = createSelector(
     getActiveAircrewRefsFromFlights,

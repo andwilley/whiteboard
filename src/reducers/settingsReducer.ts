@@ -5,7 +5,7 @@ import { actions, IAction } from '../actions';
 
 const settingsReducer = (
     state: ISettings = {
-        minutesBeforeBrief: 60,
+        minutesBeforeBrief: 30,
         minutesAfterLand: 60,
         minutesAfterBoxTime: 30,
         minutesBriefToTakeoff: 120,

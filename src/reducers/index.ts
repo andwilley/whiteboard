@@ -27,6 +27,7 @@ import * as notesSelectors from './notesReducer';
 import * as crewListUISelectors from './crewListUIReducer';
 import * as errorsSelectors from './errorReducer';
 import * as editorSelectors from './editorStateReducer';
+import { enableBatching } from '../util/utilFunctions';
 
 const whiteboardApp = combineReducers<IState>({
     aircrew: aircrewReducer,
@@ -45,7 +46,7 @@ const whiteboardApp = combineReducers<IState>({
     editor: editorStateReducer,
 });
 
-export default whiteboardApp;
+export default enableBatching(whiteboardApp);
 
 /**
  *
@@ -318,23 +319,22 @@ export const getErrorsById = (state: IState) => {
     return errorsSelectors.getErrorsById(getErrors(state));
 };
 
-export const getActiveErrorIds = (state: IState) => {
-    return errorsSelectors.getActiveErrorIds(state.errors);
+export const getAllErrorIds = (state: IState) => {
+    return errorsSelectors.getAllErrorIds(getErrors(state));
 };
+
+export const getAllErrors = createSelector(
+    getErrors,
+    errorsSelectors.getAllErrors
+);
 
 export const getEntityErrors = (state: IState, errorLoc: UErrorLocs) => {
     return errorsSelectors.getEntityErrors(
         getErrorsById(state),
-        getActiveErrorIds(state),
+        getAllErrorIds(state),
         errorLoc
     );
 };
-
-export const getActiveDayErrors = createSelector(
-    getErrorsById,
-    getCurrentDayObj,
-    errorsSelectors.getActiveDayErrors
-);
 
 /**
  *
