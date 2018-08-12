@@ -67,6 +67,10 @@ export const getNotesById = (state: IEntity<INotes>) => {
     return state.byId;
 };
 
+export const getNoteById = (state: IEntity<INotes>, noteId: string) => {
+    return state.byId[noteId];
+};
+
 export const getTimeFromNotes = (note: INotes) => {
     return RGX_STARTS_WITH_TIME_BLOCK.exec(note.content);
 };

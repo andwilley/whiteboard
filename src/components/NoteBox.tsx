@@ -1,41 +1,36 @@
 import * as React from 'react';
-import Note from './Note';
-import { INotes, UNoteEntity } from '../types/State';
+import { UNoteEntity } from '../types/State';
 import IconButton from './IconButton';
-import { IDelNoteArgs } from '../actions';
 import ErrorListContainer from '../containers/ErrorListContainer';
+import { NoteContainer } from '../containers/NoteContainer';
 
 interface INoteBoxProps {
     className: string | undefined;
-    notes: INotes[] | undefined;
+    noteIds: string[] | undefined;
     entityType: UNoteEntity;
     entityId: string;
-    onInputChange: (noteId: string) => (e: any) => void;
+    showErrors?: boolean;
     onAddNoteClick: () => void;
-    onDelNoteClick: (obj: IDelNoteArgs) => (e: any) => void;
 }
 
 class NoteBox extends React.PureComponent<INoteBoxProps> {
     render() {
         const {
             className = '',
-            notes = [],
+            noteIds = [],
             entityType,
             entityId,
-            onInputChange,
+            showErrors = false,
             onAddNoteClick,
-            onDelNoteClick,
         } = this.props;
-        const noteComponentsList = notes.map(note =>
+        const noteComponentsList = noteIds.map(noteId =>
             (
-            <Note
+            <NoteContainer
                 className={className}
-                note={note}
-                key={note.id}
-                onDelNoteClick={onDelNoteClick}
-                onInputChange={onInputChange(note.id)}
-                errorLoc={entityType}
-                errorLocId={entityId}
+                noteId={noteId}
+                key={noteId}
+                entityType={entityType}
+                entityId={entityId}
             />
             )
         );
@@ -53,7 +48,7 @@ class NoteBox extends React.PureComponent<INoteBoxProps> {
                 <div className="row">
                     {noteComponentsList}
                 </div>
-                <ErrorListContainer className={className} errorLoc={entityType} errorLocId={entityId} />
+                {showErrors && <ErrorListContainer className={className} errorLoc={entityType} errorLocId={entityId} />}
             </div>
         );
     }

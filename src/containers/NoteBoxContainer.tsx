@@ -1,19 +1,17 @@
 import { connect } from 'react-redux';
-import { actions, IDelNoteArgs } from '../actions';
+import { actions } from '../actions';
 import { noteEntity, editables } from '../whiteboard-constants';
-import { IState, INotes, IFlights, IDays, ISorties, IAircrew, UNoteEntity, IEntity } from '../types/State';
+import { IState, IFlights, IDays, ISorties, IAircrew, UNoteEntity } from '../types/State';
 import NoteBox from '../components/NoteBox';
-import { getFlightById, getDayById, getSortie, getCrewById, getNotesById } from '../reducers';
-import { createSelector } from 'reselect';
-import { setErrorsOnFreshState } from './FlexInputContainer';
-import { errorTypes } from '../errors';
+import { getFlightById, getDayById, getSortie, getCrewById } from '../reducers';
 import { EditorState } from 'draft-js';
-const { addUpdateNote, delNote } = actions;
+const { addUpdateNote } = actions;
 
 interface INoteBoxContainerProps {
     className?: string;
     entityType: UNoteEntity;
     entityId: string;
+    showErrors?: boolean;
 }
 
 const getNoteEntitySelector = (
@@ -34,29 +32,21 @@ const getNoteEntitySelector = (
     }
 };
 
-const makeGetNotes = () => createSelector(
-    getNoteEntitySelector,
-    getNotesById,
-    (notesEntity: IFlights | IDays | ISorties | IAircrew, notesById: IEntity<INotes>['byId']): INotes[] | undefined => {
-        /**
-         * @returns memoized array of note entities.
-         *
-         */
-        if (notesEntity.notes.length === 0) {
-            return undefined;
-        }
-        return notesEntity.notes.map(noteId => notesById[noteId]);
+const getNoteIds = (notesEntity: IFlights | IDays | ISorties | IAircrew): string[] | undefined => {
+    /**
+     * @returns memoized array of note entities.
+     *
+     */
+    if (notesEntity.notes.length === 0) {
+        return undefined;
     }
-);
+    return notesEntity.notes;
+};
 
 const makeMapStateToProps = () => {
-    const getNotes = makeGetNotes();
     const mapStateToProps = (state: IState, ownProps: INoteBoxContainerProps) => {
         return {
-            // className: ownProps.className,
-            notes: getNotes(state, ownProps),
-            // errorLoc: ownProps.entityType,
-            // errorLocId: ownProps.entityId,
+            noteIds: getNoteIds(getNoteEntitySelector(state, ownProps)),
             ...ownProps,
         };
     };
@@ -75,18 +65,6 @@ const mapDispatchToProps = (dispatch: any, ownProps: INoteBoxContainerProps) => 
                 actions.setEditorState(EditorState.createEmpty()),
                 actions.setEditedElement(editables.NOTE, addNoteAction.payload.id)
             ));
-        },
-        onDelNoteClick: (args: IDelNoteArgs) => (e: any) => {
-            dispatch(delNote(args));
-            dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
-        },
-        onInputChange: (noteId: string) => (inputValue: string): void => {
-            dispatch(addUpdateNote({
-                id: noteId,
-                entity: ownProps.entityType,
-                entityId: ownProps.entityId,
-                content: inputValue,
-            }));
         },
     };
 };

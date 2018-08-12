@@ -29,6 +29,7 @@ const Day: React.SFC<IDayProps> = ({ dayId }) => (
                 className="text-dark"
                 entityType={noteEntity.DAY_NOTE}
                 entityId={dayId}
+                showErrors={true}
             />
             <ErrorListContainer errorLoc={errorLocs.DAY} errorLocId={dayId} />
         </div>

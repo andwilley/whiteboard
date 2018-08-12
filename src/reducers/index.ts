@@ -291,8 +291,16 @@ export const getBackSeatSymbols = (state: IState, sortieId: string) => {
  *
  */
 
+export const getNotes = (state: IState) => {
+    return state.notes;
+};
+
 export const getNotesById = (state: IState) => {
-    return notesSelectors.getNotesById(state.notes);
+    return notesSelectors.getNotesById(getNotes(state));
+};
+
+export const getNoteById = (state: IState, noteId: string) => {
+    return notesSelectors.getNoteById(getNotes(state), noteId);
 };
 
 /**
