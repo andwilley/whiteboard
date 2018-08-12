@@ -1,10 +1,13 @@
 import { connect } from 'react-redux';
 import { actions, IDelNoteArgs } from '../actions';
-import { noteEntity } from '../whiteboard-constants';
+import { noteEntity, editables } from '../whiteboard-constants';
 import { IState, INotes, IFlights, IDays, ISorties, IAircrew, UNoteEntity, IEntity } from '../types/State';
 import NoteBox from '../components/NoteBox';
 import { getFlightById, getDayById, getSortie, getCrewById, getNotesById } from '../reducers';
 import { createSelector } from 'reselect';
+import { setErrorsOnFreshState } from './FlexInputContainer';
+import { errorTypes } from '../errors';
+import { EditorState } from 'draft-js';
 const { addUpdateNote, delNote } = actions;
 
 interface INoteBoxContainerProps {
@@ -63,13 +66,19 @@ const makeMapStateToProps = () => {
 const mapDispatchToProps = (dispatch: any, ownProps: INoteBoxContainerProps) => {
     return {
         onAddNoteClick: () => {
-            dispatch(addUpdateNote({
+            const addNoteAction = addUpdateNote({
                 entity: ownProps.entityType,
                 entityId: ownProps.entityId,
-            }));
+            });
+            dispatch(actions.batchActions(
+                addNoteAction,
+                actions.setEditorState(EditorState.createEmpty()),
+                actions.setEditedElement(editables.NOTE, addNoteAction.payload.id)
+            ));
         },
         onDelNoteClick: (args: IDelNoteArgs) => (e: any) => {
             dispatch(delNote(args));
+            dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         onInputChange: (noteId: string) => (inputValue: string): void => {
             dispatch(addUpdateNote({

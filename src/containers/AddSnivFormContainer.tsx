@@ -1,13 +1,14 @@
 import * as Moment from 'moment';
 import { connect } from 'react-redux';
 import AddSnivForm from '../components/AddSnivForm';
-import { blankSnivForm, snivTimeTypes } from '../whiteboard-constants';
+import { blankSnivForm, snivTimeTypes, editables } from '../whiteboard-constants';
 import { IErrors, IState, IAddUpdateSnivFormValues } from '../types/State';
 import { errorTypes, errorLocs, errorLevels, errorMessages } from '../errors';
 import { actions, IAddUpdateSnivArgs, IAddErrorArgs } from '../actions';
 import { setErrorsOnFreshState } from './FlexInputContainer';
 import { RGX_24HOUR_TIME } from '../util/regEx';
 import { conv24HrTimeToMoment } from '../util/utilFunctions';
+import { EditorState } from 'draft-js';
 const { setSnivForm, addUpdateSniv, addUpdateSnivFormDisplay, addError } = actions;
 
 const getAddUpdateSnivFormValues = (state: IState): IAddUpdateSnivFormValues => {
@@ -92,7 +93,12 @@ const mapDispatchToProps = (dispatch: any) => {
                 end: sniv.end,
                 message: sniv.message,
             }));
-            dispatch(setSnivForm(blankSnivForm));
+            const setSnivFormAction = setSnivForm(blankSnivForm);
+            dispatch(actions.batchActions(
+                setSnivFormAction,
+                actions.setEditorState(EditorState.createEmpty()),
+                actions.setEditedElement(editables.SNIV_FORM, '')
+            ));
             dispatch(setErrorsOnFreshState([errorTypes.SCHEDULE_CONFLICT]));
         },
         onAircrewInputChange: (input: string) => {

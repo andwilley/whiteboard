@@ -3,12 +3,13 @@ import { actions, IAction } from '../actions';
 import { IState, IFlights } from '../types/State';
 import FlightBox from '../components/FlightBox';
 import { errorTypes } from '../errors';
-import { noteEntity } from '../whiteboard-constants';
+import { noteEntity, editables } from '../whiteboard-constants';
 import { RGX_24HOUR_TIME } from '../util/regEx';
 import { setErrorsOnFreshState } from './FlexInputContainer';
 import { conv24HrTimeToMoment } from '../util/utilFunctions';
 import { getCurrentDayId, getSettings, getCurrentDayFlights } from '../reducers';
 import { createSelector } from 'reselect';
+import { EditorState } from 'draft-js';
 const { addFlight, delFlight, delSortie, delNote, toggleFlightExactTimes } = actions;
 
 interface IFlightBoxContainerProps {
@@ -77,7 +78,12 @@ const mapStateToProps = (state: IState, ownProps: IFlightBoxContainerProps) => {
 const mapDispatchToProps = (dispatch: any, ownProps: IFlightBoxContainerProps) => {
     return {
         onAddFlightClick: (dayId: string) => {
-            dispatch(addFlight(dayId, ownProps.sim));
+            const addFlightAction = addFlight(dayId, ownProps.sim);
+            dispatch(actions.batchActions(
+                addFlightAction,
+                actions.setEditorState(EditorState.createEmpty()),
+                actions.setEditedElement(editables.TAKEOFF, addFlightAction.payload.flightId)
+            ));
         },
         onDelFlightClick: (flight: IFlights, dayId: string) => (e: any) => {
             const delFlightActions: IAction[] = [];

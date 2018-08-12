@@ -109,8 +109,13 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({
     onDelAircrewFormButtonClick,
 }) => {
     const rankIsValid = addUpdateAircrewFormValues.rank === 0 ? true : parseRank(addUpdateAircrewFormValues.rank);
+    const callsignInputRef = React.createRef<HTMLInputElement>();
     const onSubmit = (e: any) => {
         e.preventDefault();
+        // focus the first input for quick entry
+        if (callsignInputRef.current) {
+            callsignInputRef.current.focus();
+        }
         onAddUpdateAircrewSubmit({
             id: addUpdateAircrewFormValues.id,
             callsign: addUpdateAircrewFormValues.callsign.trim(),
@@ -166,6 +171,7 @@ const AddUpdateAircrewForm: React.SFC<IAddUpdateAircrewFormProps> = ({
                 onChange={onInputChange}
                 required={true}
                 autoFocus={true}
+                ref={callsignInputRef}
             />
             <input
                 type="text"
