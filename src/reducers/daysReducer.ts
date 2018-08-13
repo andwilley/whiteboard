@@ -68,30 +68,21 @@ const daysById = (state: {[id: string]: IDays} = {}, action: IAction) => {
                         .filter((noteId: string) => noteId !== action.payload.id),
                 },
             };
-        // case getType(actions.addError):
-        //     if (action.payload.dayId === '' ||
-        //         state[action.payload.dayId].errors.indexOf(action.payload.errorId) > -1) {
-        //         return state;
-        //     }
-        //     return {
-        //         ...state,
-        //         [action.payload.dayId]: {
-        //             ...state[action.payload.dayId],
-        //             errors: state[action.payload.dayId].errors.concat(action.payload.errorId),
-        //         },
-        //     };
-        // case getType(actions.delError):
-        //     if (action.payload.dayId === '') {
-        //         return state;
-        //     }
-        //     return {
-        //         ...state,
-        //         [action.payload.dayId]: {
-        //             ...state[action.payload.dayId],
-        //             errors: state[action.payload.dayId].errors
-        //                 .filter((errorId: string) => errorId !== action.payload.errorId),
-        //         },
-        //     };
+        case getType(actions.reorderNotes):
+            if (action.payload.noteLoc !== noteEntity.DAY_NOTE ||
+                action.payload.sourceLocId !== action.payload.destLocId) {
+                return state;
+            }
+            const notesCopy = state[action.payload.sourceLocId].notes.concat();
+            const moveNoteId = notesCopy.splice(action.payload.oldIndex, 1)[0];
+            notesCopy.splice(action.payload.newIndex, 0, moveNoteId);
+            return {
+                ...state,
+                [action.payload.sourceLocId]: {
+                    ...state[action.payload.sourceLocId],
+                    notes: notesCopy,
+                },
+            };
         default:
             return state;
     }

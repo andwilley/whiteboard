@@ -58,6 +58,8 @@ export const SET_SNIV_FORM = 'SET_SNIV_FORM';
 export const ADD_AIRCREW_REF_TO_SNIV_FORM = 'ADD_AIRCREW_REF_TO_SNIV_FORM';
 export const DEL_AIRCREW_REF_FROM_SNIV_FORM = 'DEL_AIRCREW_REF_FROM_SNIV_FORM';
 export const ADD_UPDATE_SNIV_FORM_DISPLAY = 'ADD_UPDATE_SNIV_FORM_DISPLAY';
+export const REORDER_NOTES = 'REORDER_NOTES';
+export const REORDER_SORTIES = 'REORDER_SORTIES';
 
 // const makeActionCreator = (type, ...payloadNames) => {
 //     return (...payloadValues) => {
@@ -619,6 +621,36 @@ export const actions = {
         type: ADD_UPDATE_SNIV_FORM_DISPLAY,
         payload: {
             display,
+        },
+    })),
+    reorderNotes: createAction(REORDER_NOTES, (
+        noteLoc: UNoteEntity,
+        sourceLocId: string,
+        destLocId: string,
+        oldIndex: number,
+        newIndex: number
+    ) => ({
+        type: REORDER_NOTES,
+        payload: {
+            noteLoc,
+            sourceLocId,
+            destLocId,
+            oldIndex,
+            newIndex,
+        },
+    })),
+    reorderSorties: createAction(REORDER_SORTIES, (
+        sourceLocId: string,
+        destLocId: string,
+        oldIndex: number,
+        newIndex: number
+    ) => ({
+        type: REORDER_SORTIES,
+        payload: {
+            sourceLocId,
+            destLocId,
+            oldIndex,
+            newIndex,
         },
     })),
 };

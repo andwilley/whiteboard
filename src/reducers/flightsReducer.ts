@@ -5,6 +5,7 @@ import { actions, IAction } from '../actions';
 import { noteEntity } from '../whiteboard-constants';
 import * as Moment from 'moment';
 import { conv24HrTimeToMoment } from '../util/utilFunctions';
+import { errorLocs } from '../errors';
 
 const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
     switch (action.type) {
@@ -122,6 +123,47 @@ const flightsById = (state: {[id: string]: IFlights} = {}, action: IAction) => {
                     ...state[action.payload.flightId],
                     airspace: state[action.payload.flightId].airspace
                         .filter(airspaceId => airspaceId !== action.payload.id),
+                },
+            };
+        case getType(actions.reorderNotes):
+            if (action.payload.noteLoc !== noteEntity.FLIGHT_NOTE) {
+                return state;
+            }
+            const sourceNotesCopy = state[action.payload.sourceLocId].notes.concat();
+            const destNotesCopy = action.payload.sourceLocId === action.payload.destLocId ?
+                sourceNotesCopy :
+                state[action.payload.destLocId].notes.concat();
+            const movedNoteId = sourceNotesCopy.splice(action.payload.oldIndex, 1)[0];
+            destNotesCopy.splice(action.payload.newIndex, 0, movedNoteId);
+            return {
+                ...state,
+                [action.payload.sourceLocId]: {
+                    ...state[action.payload.sourceLocId],
+                    notes: sourceNotesCopy,
+                },
+                [action.payload.destLocId]: {
+                    ...state[action.payload.destLocId],
+                    notes: destNotesCopy,
+                },
+            };
+        case getType(actions.reorderSorties):
+            const sourceId = action.payload.sourceLocId.slice(errorLocs.FLIGHT.length + 1);
+            const destId = action.payload.destLocId.slice(errorLocs.FLIGHT.length + 1);
+            const sourceSortiesCopy = state[sourceId].sorties.concat();
+            const destSortiesCopy = sourceId === destId ?
+                sourceSortiesCopy :
+                state[destId].sorties.concat();
+            const movedSortieId = sourceSortiesCopy.splice(action.payload.oldIndex, 1)[0];
+            destSortiesCopy.splice(action.payload.newIndex, 0, movedSortieId);
+            return {
+                ...state,
+                [sourceId]: {
+                    ...state[sourceId],
+                    sorties: sourceSortiesCopy,
+                },
+                [destId]: {
+                    ...state[destId],
+                    sorties: destSortiesCopy,
                 },
             };
         default:

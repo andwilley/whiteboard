@@ -153,3 +153,11 @@
   margin-top: .2rem;
   margin-bottom: .2rem;
 }
+
+.wb-droppable-height {
+  min-height: .1rem;
+}
+
+.wb-is-dragging {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}

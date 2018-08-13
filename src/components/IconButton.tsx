@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { icons } from '../whiteboard-constants';
 import { UIcons } from '../types/WhiteboardTypes';
+import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 interface IIconButtonProps {
     onClick?: (...args: any[]) => any;
@@ -11,7 +12,8 @@ interface IIconButtonProps {
     pointer?: boolean;
     style?: React.CSSProperties;
     viewBox?: string;
-    hover?: 'only-hover' | 'always-visible';
+    dragHandleProps?: DraggableProvidedDragHandleProps | null;
+    hover?: 'only-hover' | 'only-hover-hold-space' | 'always-visible';
 }
 
 const IconButton: React.SFC<IIconButtonProps> = ({
@@ -25,9 +27,15 @@ const IconButton: React.SFC<IIconButtonProps> = ({
     pointer = true,
     viewBox = '0 0 8 8',
     hover = 'always-visible',
+    dragHandleProps,
 }) => {
+    const hoverClass = hover === 'only-hover' ?
+        ` wb-only-hover-element` :
+        hover === 'only-hover-hold-space' ?
+            ` wb-only-hover-element-hold-space` :
+            ``;
     return (
-        <span onClick={onClick} className={`${className}${hover === 'only-hover' ? ` wb-only-hover-element` : ''}`}>
+        <span onClick={onClick} className={`${className}${hoverClass}`} {...dragHandleProps}>
             {icon &&
                 <svg
                     className={`icon icon-${icon}${svgClass ? ` ${svgClass}` : ''}

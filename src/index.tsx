@@ -14,6 +14,8 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { createStore, applyMiddleware } from 'redux';
 import registerServiceWorker from './registerServiceWorker';
 import { INITIAL_STATE } from './reducers/initialstate';
+import { DragDropContext } from 'react-beautiful-dnd';
+import { onDragEnd, onDragUpdate } from './util/dragDropHooks';
 
 const store = createStore(whiteboardApp, INITIAL_STATE,
                           composeWithDevTools(applyMiddleware(thunk))
@@ -21,7 +23,9 @@ const store = createStore(whiteboardApp, INITIAL_STATE,
 
 ReactDOM.render(
     <Provider store={store}>
-        <App />
+        <DragDropContext onDragEnd={onDragEnd(store.dispatch)} onDragUpdate={onDragUpdate}>
+            <App />
+        </DragDropContext>
     </Provider>,
     document.getElementById('root')
 );

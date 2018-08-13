@@ -3,6 +3,7 @@ import { UNoteEntity } from '../types/State';
 import IconButton from './IconButton';
 import ErrorListContainer from '../containers/ErrorListContainer';
 import { NoteContainer } from '../containers/NoteContainer';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface INoteBoxProps {
     className: string | undefined;
@@ -23,15 +24,22 @@ class NoteBox extends React.PureComponent<INoteBoxProps> {
             showErrors = false,
             onAddNoteClick,
         } = this.props;
-        const noteComponentsList = noteIds.map(noteId =>
+        const noteComponentsList = noteIds.map((noteId, i) =>
             (
-            <NoteContainer
-                className={className}
-                noteId={noteId}
-                key={noteId}
-                entityType={entityType}
-                entityId={entityId}
-            />
+            <Draggable draggableId={noteId} index={i} type={entityType} key={noteId}>
+                {(provided, snapshot) => (
+                    <NoteContainer
+                        className={className}
+                        noteId={noteId}
+                        entityType={entityType}
+                        entityId={entityId}
+                        isDragging={snapshot.isDragging}
+                        draggableRef={provided.innerRef}
+                        draggableProps={provided.draggableProps}
+                        dragHandleProps={provided.dragHandleProps}
+                    />
+                )}
+            </Draggable>
             )
         );
         return (
@@ -45,9 +53,14 @@ class NoteBox extends React.PureComponent<INoteBoxProps> {
                     }}
                     svgClass="float-right"
                 />
-                <div className="row">
-                    {noteComponentsList}
-                </div>
+                <Droppable droppableId={entityId} type={entityType}>
+                    {(provided, snapShot) => (
+                        <div className="row wb-droppable-height" ref={provided.innerRef} {...provided.droppableProps}>
+                            {noteComponentsList}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
                 {showErrors && <ErrorListContainer className={className} errorLoc={entityType} errorLocId={entityId} />}
             </div>
         );
