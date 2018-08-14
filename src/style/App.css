@@ -160,4 +160,6 @@
 
 .wb-is-dragging {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+  border: 1px solid #e9e6e6;
+  border-radius: 5px;
 }

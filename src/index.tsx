@@ -16,10 +16,39 @@ import registerServiceWorker from './registerServiceWorker';
 import { INITIAL_STATE } from './reducers/initialstate';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { onDragEnd, onDragUpdate } from './util/dragDropHooks';
+import { loadState, saveState } from './util/localStorage';
+import * as _ from 'lodash';
 
-const store = createStore(whiteboardApp, INITIAL_STATE,
+const persistedState = loadState();
+
+const store = createStore(whiteboardApp, persistedState || INITIAL_STATE,
                           composeWithDevTools(applyMiddleware(thunk))
 );
+
+store.subscribe(_.throttle(() => {
+    const {
+        aircrew,
+        groups,
+        days,
+        flights,
+        sorties,
+        snivs,
+        notes,
+        crewListUI,
+        settings,
+    } = store.getState();
+    saveState({
+        aircrew,
+        groups,
+        days,
+        flights,
+        sorties,
+        snivs,
+        notes,
+        crewListUI,
+        settings,
+    });
+}, 2000));
 
 ReactDOM.render(
     <Provider store={store}>
