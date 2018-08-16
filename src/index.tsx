@@ -48,7 +48,7 @@ store.subscribe(_.throttle(() => {
         crewListUI,
         settings,
     });
-}, 2000));
+}, 3000));
 
 ReactDOM.render(
     <Provider store={store}>

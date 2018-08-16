@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { actions } from '../actions';
+import { actions, IAction } from '../actions';
 import { connect } from 'react-redux';
 import * as cuid from 'cuid';
 import * as _ from 'lodash';
@@ -309,7 +309,7 @@ const getMatchedNames = (
 };
 
 export const setErrorsOnFreshState = (errorTypesToCheck: UErrorTypes[]) => {
-    return (dispatch: any, getState: () => IState) => {
+    return _.debounce((dispatch: any, getState: () => IState) => {
         const state = getState();
         const currentDayId = getCurrentDayId(state);
         /** clear and recalc schedule conflict errors */
@@ -321,10 +321,6 @@ export const setErrorsOnFreshState = (errorTypesToCheck: UErrorTypes[]) => {
                     clearErrorIds.push(errorId);
                 }
             });
-            performance.mark('Clear Errors Start');
-            dispatch(actions.delError(clearErrorIds));
-            performance.mark('Clear Errors End');
-            performance.measure('Clear Errors Perf', 'Clear Errors Start', 'Clear Errors End');
             const activeAircrewRefs = getActiveAircrewRefs(state);
             const activeTimeBlock = getActiveTimeBlock(state);
             const newErrors = findSchedErrors(
@@ -337,13 +333,13 @@ export const setErrorsOnFreshState = (errorTypesToCheck: UErrorTypes[]) => {
             newErrors.forEach(error => {
                 addErrorArgsList.push(error);
             });
-            performance.mark('Set Errors Start');
-            dispatch(actions.addError(addErrorArgsList));
-            performance.mark('Set Errors End');
-            performance.measure('Set Errors Perf', 'Set Errors Start', 'Set Errors End');
-            dispatch(actions.setEditedElementTimeblock(activeTimeBlock));
+            dispatch(actions.batchActions(
+                actions.delError(clearErrorIds),
+                actions.addError(addErrorArgsList),
+                actions.setEditedElementTimeblock(activeTimeBlock))
+            );
         }
-    };
+    }, 500);
 };
 
 interface IGetOnChangeWithNameMatchArgs {
@@ -354,6 +350,7 @@ interface IGetOnChangeWithNameMatchArgs {
     element: UEditables;
     entityId: string;
     errorConfig: IErrorConfig;
+    oldElementRefIds: string[] | undefined;
     onChange: (e: any) => any;
 }
 
@@ -365,6 +362,7 @@ const getOnChangeWithNameMatch = ({
     element,
     entityId,
     errorConfig,
+    oldElementRefIds,
     onChange,
 }: IGetOnChangeWithNameMatchArgs): ((editorState: EditorState) => void) => {
     /**
@@ -377,33 +375,29 @@ const getOnChangeWithNameMatch = ({
      * and dispatches the Ids[] of matched aircrew to the specified state slice.
      * If not specified, returns the same onChange function.
      */
-    let aircrewRefIdDispatch: (ids: string[]) => void;
+    let makeAircrewRefIdAction: (ids: string[]) => IAction | null;
     if (!hasNames) {
-        aircrewRefIdDispatch = (matchedAircrewIds: string[]) => { return; };
+        makeAircrewRefIdAction = (matchedAircrewIds: string[]) => null;
     } else {
         switch (element) {
             case nameLocation.FRONT_SEAT_NAME:
-                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
-                    dispatch(actions.updateSeatCrewRefs(entityId, 'front', matchedAircrewIds));
-                };
+                makeAircrewRefIdAction = (matchedAircrewIds: string[]) =>
+                    actions.updateSeatCrewRefs(entityId, 'front', matchedAircrewIds);
                 break;
             case nameLocation.BACK_SEAT_NAME:
-                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
-                    dispatch(actions.updateSeatCrewRefs(entityId, 'back', matchedAircrewIds));
-                };
+                makeAircrewRefIdAction = (matchedAircrewIds: string[]) =>
+                    actions.updateSeatCrewRefs(entityId, 'back', matchedAircrewIds);
                 break;
             case nameLocation.NOTE:
-                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
-                    dispatch(actions.updateNoteCrewRefs(entityId, matchedAircrewIds));
-                };
+                makeAircrewRefIdAction = (matchedAircrewIds: string[]) =>
+                    actions.updateNoteCrewRefs(entityId, matchedAircrewIds);
                 break;
             case nameLocation.SNIV_FORM:
-                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => {
-                    dispatch(actions.setSnivForm({aircrewRefIds: matchedAircrewIds}));
-                };
+                makeAircrewRefIdAction = (matchedAircrewIds: string[]) =>
+                    actions.setSnivForm({aircrewRefIds: matchedAircrewIds});
                 break;
             default:
-                aircrewRefIdDispatch = (matchedAircrewIds: string[]) => { return; };
+                makeAircrewRefIdAction = (matchedAircrewIds: string[]) => null;
                 break;
         }
     }
@@ -415,11 +409,24 @@ const getOnChangeWithNameMatch = ({
             editorState.getCurrentContent().getPlainText()
         );
         const matchedAircrewIds = matchedAircrew.map(aircrew => aircrew.id);
-        aircrewRefIdDispatch(matchedAircrewIds);
+        const actionsToDispatch = [];
+        const aircrewRefIdAction = makeAircrewRefIdAction(matchedAircrewIds);
+        const refIdsAreSame =
+            (matchedAircrewIds.length === 0 && !oldElementRefIds) ||
+            (
+                matchedAircrewIds.length > 0 &&
+                oldElementRefIds &&
+                matchedAircrewIds.length === oldElementRefIds.length &&
+                matchedAircrewIds.every((newId, i) => newId === oldElementRefIds[i])
+            );
+        if (aircrewRefIdAction && !refIdsAreSame) {
+            actionsToDispatch.push(aircrewRefIdAction);
+        }
         /** update the editor state and reset the decorators for the editor */
         const decorator = makeGetDecorators()(matchedAircrew, groupList);
         const newEditorState = EditorState.set(editorState, {decorator});
-        dispatch(actions.setEditorState(newEditorState));
+        actionsToDispatch.push(actions.setEditorState(newEditorState));
+        dispatch(actions.batchActions(...actionsToDispatch));
         /** run the original onChange passed to this container as a prop (update the input value) */
         onChange(editorState.getCurrentContent().getPlainText());
         /** get the new errors and dispatch to state. */
@@ -558,6 +565,7 @@ const makeGetGroupList = () => createSelector(
 
 interface IFlexInputStateProps {
     aircrewList?: IAircrew[];
+    elementRefIds: string[] | undefined;
     groupList?: IGroups[];
     decorators: CompositeDecorator | undefined;
     errors: IErrors[] | undefined;
@@ -588,6 +596,7 @@ const makeMapStateToProps = () => {
         const groupList = getGroupList(state);
         return {
             aircrewList: hasNames ? getAircrewList(state.aircrew) : undefined,
+            elementRefIds: hasNames ? getRefIdStateSlice(state, ownProps) : undefined,
             decorators: getDecorators(aircrewRefList, groupList),
             groupList: hasNames ? groupList : undefined,
             errors: componentErrors,
@@ -677,6 +686,7 @@ const mergeProps = (stateProps: IFlexInputStateProps, dispatchProps: any, ownPro
                 element: ownProps.element,
                 entityId: ownProps.entityId,
                 errorConfig: ownProps.errorConfig,
+                oldElementRefIds: stateProps.elementRefIds,
                 onChange: ownProps.onInputChange,
             }) : null,
         onClick: dispatchProps.onClick(
