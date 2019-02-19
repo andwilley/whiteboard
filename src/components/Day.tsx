@@ -34,7 +34,7 @@ const Day: React.SFC<IDayProps> = ({ dayId }) => (
             <ErrorListContainer errorLoc={errorLocs.DAY} errorLocId={dayId} />
         </div>
         <div className="footer pt-5">
-            Whiteboard is one of many collaborative efforts by Steamboat Willey and Tummy's Mom.
+            Whiteboard.
         </div>
     </main>
 );
